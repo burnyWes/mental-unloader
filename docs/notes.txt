@@ -20,11 +20,152 @@ DONE
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
-- Einkaufsliste (Hinzufügen / Entfernen) 
-- Mahlzeiten (Rezepte / Zutaten) (Zu Einkaufsliste hinzufügen) 
-- Vorräte (Liste aller Mahlzeiten x-Portionen) 
-- Essensplaner (random, zieht auch Mahlzeiten aus Vorräte) 
-- Einstellungen 
-	- Push-Benachrichtigungen ein/aus 
-- Alexa-Integration 
-m Auf Einkaufsliste können Zutaten oder Mahlzeiten liegen 
+- iOS App
+  - Diese App wird mehr oder weniger eine TODO-Listen-App
+  - viele Dinge, wie grundsätzliches Design, look and feel, Tech-Stack, VoiceOver-First-Ansatz etc. sollen aus einem
+  anderen Projekt übernommen werden. Frag mich nach dem Pfad des Projekts.
+  - App für iOS aber nicht nativ, kein Apple-Dev-Acount
+  - GitHub-Pages
+  - Datenbank:
+    - firestore
+    - Daten syncron auf mehreren Geräten
+    - Haushaltskonto zum einmaligen einlogggen
+  - Design:
+    - Hintergrund: schwarz
+    - Schrift: weiß
+    - Buttons: Text weiß, dunkel-orange gefüllt und hel-orange dicke border
+    - light-theme: Farben exakt invertieren, z.B. #00FF00 -> #FF00FF
+  - App-Aufbau
+    - vieles wie in Beispiel-App
+      - Navigation oben fixiert
+      - Buttons oft unten fixiert
+      - meist zentriert
+
+      - Navigation:
+        |Dringend||Kategorien||Einstellungen|
+        - 3 Buttons aber nicht mit Text, sondern Icons
+        - Dringend = Checkliste-Icon
+        - Kategorien: diskutiere mit mir sowohl über den Namen, als auch über ein Icon. Im weiteren Verlauf meiner
+        Erläuterungen sollte klar werden, das hier zu finden ist.
+        - Einstellungen: Zahnrad-Icon
+
+      - Kategorien-Seite:
+        |Navigation           |
+        Kategorien          [+]
+        -----------------------
+         ---------------------
+        ( Meine TODOs )    -> )
+         ---------------------
+
+         ---------------------
+        ( Familien-TODOs ) -> )
+         ---------------------
+
+        - [+]-Button führt zu einer Seite, auf der man eine neue Kategorie erstellen kann.
+        - Auf dieser Seite sind 2 Kategorien als Buttons: Hintergrund des Textes soll schwarz, Hintergrund des Pfeils
+        soll dunkel-orange. Border soll hell-orange
+        - Button drücken führt zu neuer Seite: Kategorie-Listen (auch hier naming noch nicht festgelegt)
+
+      - Kategorie-Listen-Seite
+        |Navigation         |
+        Kategoriename  [/][+]
+        ---------------------
+         --------------------
+        ( TODO-Liste 1      >
+         ---------------------
+
+        --------------------
+       ( TODO-Liste 2      >
+        ---------------------
+
+       - [/]-Button: Kategorie bearbeiten Button mit Stift-Icon
+       - [+]-Button: TODO-Liste hinzufügen Button
+       - Klick auf eine Liste öffnet die Liste mit den Todos.
+
+      - TODO-Liste-Seite
+        |Navigation         |
+        Meine Liste    [/][+]
+        ---------------------
+        | offen || erledigt |
+         --------------------
+        ( Aufgabe 1     | J |
+         --------------------
+
+         --------------------
+        ( Aufgabe 2     | J |
+         --------------------
+
+        - [/]-Button: Liste bearbeiten Button
+        - [+]-Button: TODO hinzufügen Button
+        - | J |-Button: Aufgabe erledigen Button mit weißem check-haken-icon, führt zu Abfrage-Dialog
+        - offen und erledigt-Buttons sind Filter. Die Anzahl soll mit auf dem Button stehen
+
+      - TODO-Erstellen/Bearbeiten-Seite
+        |<zurück|
+        Name
+        Name-Textfeld
+
+        Beschreibung
+        Beschreibung-Textfeld
+
+        Dringlichkeit (Text noch nicht festgelegt)
+        x Dringend   [ ]
+        y Stichtag   [ ]
+        z Irgendwann [ ] <- Text steht noch nicht fest
+
+        - x,y,z = passende icons (schlag was vor)
+
+        - Wenn "Stichtag" gecheckt, dann folgendes sichtbar
+        Stichtag
+          | ^|| ^|| ^  |
+          |TT||MM||JJJJ|
+          | v|| v|| v  |
+
+          - |^| = up-Buton
+          - |v| = down-Button
+
+          dringend ab (text noch nicht fest)
+          |Dropdown: sofort, 1 Woche vorher, 1 Monat vorher, 1/4 Jahr vorher, 1/2 Jahr vorher, 1 JAhr vorher|
+
+          Wiederkehrend   [ ] <- Text noch offen
+
+          - Wenn Wiederkehrend gecheckt, dann folgendes sichtbar
+
+            |Dropdown, wöchentlich, monatlich, vierteljährlich, halbjährlich, jährlich|
+
+        |Speichern| mit Discette-Icon und Text
+
+      - TODO-Übersichtsseite
+        |<zurück|
+        TODO-Name
+
+        Inhalt
+
+        |Erledigen||Bearbeiten||Löschen|
+
+        - Die 3 Buttons Erledigen, Bearbeiten und Löschen nur Icons, Haken, Stift, Mülleimer
+
+      - Einstellungen-Seite
+        |Navigation   |
+        Einstellungen
+        ---------------
+        Darkmode    [ ]
+
+      - Dringend-Seite
+        - wie TODO-Liste-Seite nur ohne [/][+]-Buttons neben Überschrift
+        - Hier sind alle TODOs aus allen Kategorien und allen Listen aufgelistet, die mit dringend markiert sind, oder
+        einen Stichtag haben und der gewählte Zeitraum <= der Auswahl
+        - Auf dieser Seite erledigen, erledigt das TODO auch in der jeweiligen Liste
+        - sortiert nach dringlichkeit und datum
+        - Wenn ein TODO mit Dringend markiert wird, so soll beim speichern heute als Stichtag gesetzt werden.
+
+    - weitere infos:
+      - Checkbox, Radio-Button und Toggle sollen alle wie Checkbox aussehen, d.h. nur links und unten vom Quadrat
+      zeichnen und großer grüner Haken (siehe BeispielApp)
+      - Die Anzahl Dringender TODOs soll in der Navigation direkt an dem Dringend-Button erkennbar sein.
+      - Achte auf das skizzierte Design von Kategorie-Button, Listen-Button und TODO-Button. Alle ähnlich und doch
+      anders
+      - wiederkehrende TODOs setzen den Zähler bei erledigt-filter um eins hoch und tauchen dort auch auf, aber
+      verschwinden nicht aus der offen-liste und der nächste Stichtag wird beim erledigen entsprechend verschoben.
+m Push-Benachrichtigungen, wenn eine Aufgabe dringend wird (braucht FCM + Cloud Functions/Blaze-Tarif) - Idee fuer spaeter, siehe docs/agents/plans/2026-10-08-gesamtplan.md
+m Badge am Home-Bildschirm-Icon (Badging API, ohne Server oft veraltet) - Idee fuer spaeter

@@ -1,0 +1,30 @@
+Notes 
+
+--------------------------------------------------------------------------------
+
+Legende: 
+	- = todo
+	f = new big feature
+	/ = in progress
+	x = done 
+	m = maybe some day 
+	n = not gonna do that 
+	b = bug 
+
+--------------------------------------------------------------------------------
+
+TODO-List
+--------- 
+DONE 
+----------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+TODO 
+----------------------------------------------------------------------------------------------------------------------------------
+- Einkaufsliste (Hinzufügen / Entfernen) 
+- Mahlzeiten (Rezepte / Zutaten) (Zu Einkaufsliste hinzufügen) 
+- Vorräte (Liste aller Mahlzeiten x-Portionen) 
+- Essensplaner (random, zieht auch Mahlzeiten aus Vorräte) 
+- Einstellungen 
+	- Push-Benachrichtigungen ein/aus 
+- Alexa-Integration 
+m Auf Einkaufsliste können Zutaten oder Mahlzeiten liegen 

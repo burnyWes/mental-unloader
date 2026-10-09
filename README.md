@@ -93,7 +93,7 @@ Passwort oder geänderte Regeln.
 7. **Regeln ausrollen:** einmalig `npx firebase login`, dann
 
    ```
-   npx firebase deploy --only firestore:rules --project <projekt-id>
+   npx firebase deploy --only firestore:rules --project mental-unloader-b0212
    ```
 
    Geklappt: Firestore Database → Reiter „Regeln“ zeigt die Haushalts-UID. Die Regeln

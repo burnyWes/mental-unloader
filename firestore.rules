@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isHousehold() {
-      return request.auth != null && request.auth.uid == 'household-uid-placeholder';
+      return request.auth != null && request.auth.uid == 'qraGQfyjhbeqVxIEFYOf0TsMzJs2';
     }
 
     match /folders/{folderId} {

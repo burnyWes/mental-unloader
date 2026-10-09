@@ -568,42 +568,42 @@ sie ein. Danach rollst du die Regeln aus, und die App wird gepusht.
 
 **Vorbereitung durch den Nutzer** (README, Schritte 1 bis 6):
 
-- [ ] Projekt angelegt, Projekt-ID notiert
-- [ ] Web-App registriert, `firebaseConfig` an den Agenten übergeben
-- [ ] E-Mail/Passwort aktiviert
-- [ ] Haushaltskonto angelegt, Zugangsdaten in den Passwortmanagern, UID an den Agenten
+- [x] Projekt angelegt, Projekt-ID notiert
+- [x] Web-App registriert, `firebaseConfig` an den Agenten übergeben
+- [x] E-Mail/Passwort aktiviert
+- [x] Haushaltskonto angelegt, Zugangsdaten in den Passwortmanagern, UID an den Agenten
   übergeben
-- [ ] Selbstregistrierung abgeschaltet
-- [ ] Firestore in `europe-west3` im Produktionsmodus angelegt
+- [x] Selbstregistrierung abgeschaltet
+- [x] Firestore in `europe-west3` im Produktionsmodus angelegt
 
 **Aufgaben**:
 
-- [ ] `src/shared/auth/firebaseConfig.ts`: die Demo-Werte durch das übergebene
+- [x] `src/shared/auth/firebaseConfig.ts`: die Demo-Werte durch das übergebene
   `firebaseConfig`-Objekt ersetzen.
-- [ ] `.firebaserc` mit `{ "projects": { "default": "<projekt-id>" } }` anlegen.
-- [ ] `package.json`: In `test:e2e` wird `--project demo-mental-unloader` durch die echte
+- [x] `.firebaserc` mit `{ "projects": { "default": "<projekt-id>" } }` anlegen.
+- [x] `package.json`: In `test:e2e` wird `--project demo-mental-unloader` durch die echte
   Projekt-ID ersetzt. Die App und `prepareEmulators` sprechen den Emulator mit
   `firebaseConfig.projectId` an. Weicht `--project` davon ab, warnt der Emulator bei
   `singleProjectMode` bei jeder Anfrage (firebase-tools 15.30.1,
   `emulator/auth/server.js`, Modus `WARNING`). `test:rules` bleibt bei
   `demo-mental-unloader`.
-- [ ] `firestore.rules`: `household-uid-placeholder` durch die übergebene UID ersetzen.
-- [ ] `README.md`: In der Anleitung die tatsächliche Projekt-ID in den Befehlen
+- [x] `firestore.rules`: `household-uid-placeholder` durch die übergebene UID ersetzen.
+- [x] `README.md`: In der Anleitung die tatsächliche Projekt-ID in den Befehlen
   einsetzen.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test`, `npm run test:rules` und `npm run test:e2e` laufen grün
-- [ ] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
-- [ ] Nach einem frischen `npm run build` enthält `dist/assets/*.js` die echte
+- [x] `npm run test`, `npm run test:rules` und `npm run test:e2e` laufen grün
+- [x] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
+- [x] Nach einem frischen `npm run build` enthält `dist/assets/*.js` die echte
   `projectId` und weder `demo-mental-unloader` noch `127.0.0.1:9099`. Der Build ist
   nötig, weil auch der E2E-Lauf nach `dist/` schreibt.
 
 **Manuelle Verifikation**:
 
-- [ ] README Schritt 5: Die curl-Probe gegen den echten `apiKey` liefert
+- [x] README Schritt 5: Die curl-Probe gegen den echten `apiKey` liefert
   `ADMIN_ONLY_OPERATION`.
-- [ ] README Schritt 7: Die Regeln sind ausgerollt, und die Konsole zeigt unter
+- [x] README Schritt 7: Die Regeln sind ausgerollt, und die Konsole zeigt unter
   Firestore → Regeln die Haushalts-UID.
 - [ ] Nach dem Push auf `main` (nur auf ausdrückliche Anweisung) ist der Workflow grün.
   In Safari auf dem iPhone erscheint die Anmeldeseite, und der Passwortmanager bietet
@@ -629,6 +629,8 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 - Phase 1: Im E2E steht der Fehlertext zweimal auf der Seite (Fehlerzeile und
   Live-Region). Der Test prüft deshalb das erste Vorkommen.
 - Phase 1: Das Emulator-Passwort im E2E lautet `nur-im-emulator`.
+- Phase 2: Projekt angelegt, Projekt-ID `mental-unloader-b0212` (`mental-unloader` war
+  vergeben).
 
 ## Verweise
 

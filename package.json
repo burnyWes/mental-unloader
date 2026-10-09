@@ -15,7 +15,7 @@
     "icons": "node scripts/generateIcons.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-mental-unloader \"vitest run --config vitest.rules.config.ts\"",
     "build:e2e": "vite build --mode emulator",
-    "test:e2e": "firebase emulators:exec --only auth --project demo-mental-unloader \"npm run build:e2e && playwright test\""
+    "test:e2e": "firebase emulators:exec --only auth --project mental-unloader-b0212 \"npm run build:e2e && playwright test\""
   },
   "dependencies": {
     "firebase": "^12.19.0",

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mental Unloader">
+  <rect width="512" height="512" rx="112.64" fill="#000000" />
+  <rect x="35.84" y="35.84" width="440.32" height="440.32" rx="97.28" fill="none" stroke="#ff9933" stroke-width="30.72" />
+  <polyline points="122.88,153.6 122.88,389.12 358.4,389.12" fill="none" stroke="#ffffff" stroke-width="30.72" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="174.08,256 240.64,322.56 399.36,122.88" fill="none" stroke="#00ff33" stroke-width="56.32" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

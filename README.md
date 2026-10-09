@@ -5,6 +5,11 @@ aus nutzbar.
 
 Adresse: https://burnywes.github.io/mental-unloader/
 
+## Auf dem iPhone installieren
+
+In Safari die Adresse öffnen, dann Teilen → „Zum Home-Bildschirm“. Die App startet von
+dort ohne Browserleiste und bietet neue Versionen mit „Neue Version laden“ an.
+
 ## Arbeitsweise
 
 Die Dauerregeln stehen in [CLAUDE.md](CLAUDE.md), die projektspezifischen Angaben in
@@ -30,7 +35,11 @@ npm run test      Unit- und Komponententests, Architekturtest
 npm run lint      ESLint einschließlich Schicht- und Kontextgrenzen
 npm run format    Prettier
 npm run build     Typprüfung und Produktions-Build nach dist/
+npm run icons     App-Icons und favicon.svg nach public/ neu zeichnen
 ```
+
+Das Motiv der Icons steht in `scripts/checkMarkMotif.mjs`. Nach einer Änderung dort
+`npm run icons` ausführen und die erzeugten Dateien mit einchecken.
 
 Ein Push auf `main` prüft und baut die App im Workflow „Deploy to GitHub Pages“ und
 rollt sie aus.

@@ -1,12 +1,21 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { App } from './App'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
+import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
 import { accessibilityViolations } from './testSupport/accessibility'
 
-function renderApp(appearanceClient = createInMemoryAppearanceClient()) {
-  return render(<App appearanceClient={appearanceClient} />)
+function renderApp(
+  appearanceClient = createInMemoryAppearanceClient(),
+  appUpdateClient = createInMemoryAppUpdateClient(),
+) {
+  return render(
+    <App
+      appearanceClient={appearanceClient}
+      appUpdateClient={appUpdateClient}
+    />,
+  )
 }
 
 const areaButtons = ['Dringend', 'Ordner', 'Einstellungen']
@@ -20,6 +29,8 @@ async function openSettings() {
 }
 
 const darkModeSwitch = { name: 'Dunkelmodus' }
+
+const updateOffer = { name: 'Neue Version laden' }
 
 describe('App', () => {
   it('starts on the urgent tasks with their heading focused', () => {
@@ -127,5 +138,40 @@ describe('App', () => {
 
     expect(screen.getByRole('switch', darkModeSwitch)).toBeInTheDocument()
     expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('offers nothing while no new version waits', () => {
+    renderApp()
+
+    expect(screen.queryByRole('button', updateOffer)).not.toBeInTheDocument()
+  })
+
+  it('offers and announces a waiting new version', () => {
+    const appUpdateClient = createInMemoryAppUpdateClient()
+    renderApp(undefined, appUpdateClient)
+
+    act(() => appUpdateClient.releaseUpdate(() => {}))
+
+    expect(screen.getByRole('button', updateOffer)).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Neue Version verfügbar.',
+    )
+  })
+
+  it('loads the new version only once the household asks for it', async () => {
+    let loadedVersions = 0
+    const appUpdateClient = createInMemoryAppUpdateClient()
+    renderApp(undefined, appUpdateClient)
+
+    act(() =>
+      appUpdateClient.releaseUpdate(() => {
+        loadedVersions += 1
+      }),
+    )
+    expect(loadedVersions).toBe(0)
+
+    await userEvent.click(screen.getByRole('button', updateOffer))
+
+    expect(loadedVersions).toBe(1)
   })
 })

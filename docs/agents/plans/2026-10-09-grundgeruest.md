@@ -493,13 +493,13 @@ Schalter „Dunkelmodus“, der pro Gerät gespeichert wird und vor dem ersten Z
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem iPhone in Safari startet die App dunkel, auch wenn iOS auf Hell steht.
+- [x] Auf dem iPhone in Safari startet die App dunkel, auch wenn iOS auf Hell steht.
   Nach dem Ausschalten von „Dunkelmodus“ wird sie hell. Ob die obere Leiste mitdreht,
   hält diese Prüfung nur fest; verbindlich ist die Prüfung der installierten App in
   Phase 3.
-- [ ] Nach einem Neuladen bleibt die gewählte Darstellung erhalten, ohne kurz in der
+- [x] Nach einem Neuladen bleibt die gewählte Darstellung erhalten, ohne kurz in der
   anderen aufzublitzen.
-- [ ] VoiceOver liest den Schalter als „Dunkelmodus, Schalter, ein“ bzw. „aus“.
+- [x] VoiceOver liest den Schalter als „Dunkelmodus, Schalter, ein“ bzw. „aus“.
 
 ### Phase 3: Installierbare PWA
 
@@ -509,10 +509,10 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
 
 **Aufgaben**:
 
-- [ ] `vite-plugin-pwa` als Entwicklungsabhängigkeit ergänzen (Version wie in MZP), in
+- [x] `vite-plugin-pwa` als Entwicklungsabhängigkeit ergänzen (Version wie in MZP), in
   `tsconfig.app.json` unter `types` `vite-plugin-pwa/client` ergänzen und das Skript
   `"icons": "node scripts/generateIcons.mjs"` aufnehmen.
-- [ ] `test/icons.test.ts` (test-getrieben):
+- [x] `test/icons.test.ts` (test-getrieben):
   - `public/icon-192.png`, `icon-512.png`, `icon-maskable-512.png` und
     `apple-touch-icon.png` existieren und haben laut PNG-Kopf (IHDR, Breite und Höhe ab
     Byte 16) 192, 512, 512 und 180 Pixel Kantenlänge
@@ -521,7 +521,7 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
   - jeder Punkt von `MOTIF` (aus `scripts/checkMarkMotif.mjs`) liegt, um
     `contentScale: 0.8` verkleinert und um die Strichbreite erweitert, im Kreis mit
     r = 0,4 um die Mitte (sichere Zone des maskierbaren Icons)
-- [ ] `scripts/generateIcons.mjs` aus MZP übernehmen:
+- [x] `scripts/generateIcons.mjs` aus MZP übernehmen:
   - Die Farben werden durch `BACKGROUND = [0x00, 0x00, 0x00]`,
     `FRAME = [0xff, 0x99, 0x33]`, `BOX = [0xff, 0xff, 0xff]` und
     `CHECK = [0x00, 0xff, 0x33]` ersetzt.
@@ -541,8 +541,8 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
     `include`.
   - Zusätzlich schreibt das Skript `public/favicon.svg` mit demselben Motiv als SVG
     (`role="img"`, `aria-label="Mental Unloader"`).
-- [ ] `npm run icons` ausführen und die erzeugten Dateien einchecken.
-- [ ] `vite.config.ts`: `VitePWA` nach MZP mit:
+- [x] `npm run icons` ausführen und die erzeugten Dateien einchecken.
+- [x] `vite.config.ts`: `VitePWA` nach MZP mit:
   - `registerType: 'prompt'`, `injectRegister: null`,
     `includeAssets: ['favicon.svg', 'apple-touch-icon.png']`
   - `manifest`: `name` und `short_name` „Mental Unloader“, `description`
@@ -550,32 +550,32 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
     `display: 'standalone'`, `orientation: 'portrait'`, `theme_color` und
     `background_color` `#000000` und die drei Icons wie in MZP
   - `workbox.globPatterns` wie in MZP
-- [ ] `index.html`: `apple-mobile-web-app-capable` `yes`, `apple-mobile-web-app-title`
+- [x] `index.html`: `apple-mobile-web-app-capable` `yes`, `apple-mobile-web-app-title`
   „Mental Unloader“, `apple-mobile-web-app-status-bar-style` `default` (Entscheidung 7),
   `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` und
   `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`.
-- [ ] `src/shared/appUpdate/appUpdateClient.ts`, `inMemoryAppUpdateClient.ts`,
+- [x] `src/shared/appUpdate/appUpdateClient.ts`, `inMemoryAppUpdateClient.ts`,
   `serviceWorkerAppUpdateClient.ts`, `useAppUpdate.ts` und `AppUpdateOffer.tsx` aus MZP
   1:1 übernehmen. `.appUpdate` kommt aus MZP in `src/index.css`.
-- [ ] `src/App.tsx`: neues Prop `appUpdateClient: AppUpdateClient`. Es ruft
+- [x] `src/App.tsx`: neues Prop `appUpdateClient: AppUpdateClient`. Es ruft
   `useAppUpdate(appUpdateClient, announce)` auf und rendert `<AppUpdateOffer>` unter der
   Seite, wenn ein Update bereitsteht.
-- [ ] `src/main.tsx`: `createServiceWorkerAppUpdateClient()` übergeben.
-- [ ] `src/App.test.tsx` ergänzen, mit den Fällen aus MZP:
+- [x] `src/main.tsx`: `createServiceWorkerAppUpdateClient()` übergeben.
+- [x] `src/App.test.tsx` ergänzen, mit den Fällen aus MZP:
   - ohne wartende Version wird nichts angeboten
   - eine wartende Version wird angeboten und angesagt („Neue Version verfügbar.“)
   - die Version wird erst nach dem Tipp auf „Neue Version laden“ geladen
-- [ ] `README.md`: den Abschnitt „Auf dem iPhone installieren“ ergänzen (Safari →
+- [x] `README.md`: den Abschnitt „Auf dem iPhone installieren“ ergänzen (Safari →
   Teilen → „Zum Home-Bildschirm“) und den Hinweis auf `npm run icons`.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, einschließlich `test/icons.test.ts` und der
+- [x] `npm run test` läuft grün, einschließlich `test/icons.test.ts` und der
   Update-Fälle in `src/App.test.tsx`
-- [ ] `npm run build` läuft grün, und `dist/` enthält `manifest.webmanifest` und `sw.js`
-- [ ] `dist/manifest.webmanifest` enthält `"name":"Mental Unloader"`,
+- [x] `npm run build` läuft grün, und `dist/` enthält `manifest.webmanifest` und `sw.js`
+- [x] `dist/manifest.webmanifest` enthält `"name":"Mental Unloader"`,
   `"short_name":"Mental Unloader"` und `"start_url":"/mental-unloader/"`
-- [ ] `npm run lint` und `npm run format:check` laufen grün
+- [x] `npm run lint` und `npm run format:check` laufen grün
 
 **Manuelle Verifikation**:
 
@@ -592,6 +592,15 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1: Der Architekturtest prüft zusätzlich, dass `tasks/api` nicht auf `ui`
+  zugreift und dass `tasks/domain` den gemeinsamen Domänenteil nutzen darf.
+- Phase 2: Für die Barrierefreiheit der Einstellungen mit Schalter gibt es einen eigenen
+  Testfall, der auch prüft, dass der Schalter wirklich da ist.
+- Phase 3: `MOTIF` beschreibt Kästchen und Haken als Linienzüge in Bruchteilen der
+  Kantenlänge (`points`, `thickness`). Der Rahmen der Icons mit 192 und 512 Pixeln hat
+  außen 22 % Radius, innen 16 %. Der Hintergrund ist bei 192/512 mit 22 % gerundet,
+  beim deckenden `apple-touch-icon.png` eckig.
 
 ## Verweise
 

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import type { AppearanceClient } from './shared/appearance/appearanceClient'
 import { useAppearance } from './shared/appearance/useAppearance'
+import { AppUpdateOffer } from './shared/appUpdate/AppUpdateOffer'
+import type { AppUpdateClient } from './shared/appUpdate/appUpdateClient'
+import { useAppUpdate } from './shared/appUpdate/useAppUpdate'
 import { Announcer } from './shared/ui/Announcer'
 import { ChecklistIcon } from './shared/ui/ChecklistIcon'
 import { NavigationBar, type Area } from './shared/ui/NavigationBar'
@@ -21,10 +24,12 @@ type AreaId = (typeof AREAS)[number]['id']
 
 type AppProps = {
   appearanceClient: AppearanceClient
+  appUpdateClient: AppUpdateClient
 }
 
-export function App({ appearanceClient }: AppProps) {
-  const { spokenText } = useAnnouncer()
+export function App({ appearanceClient, appUpdateClient }: AppProps) {
+  const { spokenText, announce } = useAnnouncer()
+  const installUpdate = useAppUpdate(appUpdateClient, announce)
   const appearance = useAppearance(appearanceClient)
   const [activeArea, setActiveArea] = useState<AreaId>('urgent')
 
@@ -66,6 +71,9 @@ export function App({ appearanceClient }: AppProps) {
   return (
     <>
       {areaPage()}
+      {installUpdate !== null && (
+        <AppUpdateOffer installUpdate={installUpdate} />
+      )}
       <Announcer text={spokenText} />
     </>
   )

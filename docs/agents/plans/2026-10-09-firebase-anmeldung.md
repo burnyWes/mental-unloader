@@ -5,7 +5,7 @@ branch: main
 story: MUL-002
 topic: "Firebase und Anmeldung: Login auf allen Geräten"
 tags: [plan, firebase, auth, firestore-rules, emulator, playwright, abmelden, bestaetigungsseite]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-002 — Firebase und Anmeldung: Login auf allen Geräten
@@ -605,17 +605,17 @@ sie ein. Danach rollst du die Regeln aus, und die App wird gepusht.
   `ADMIN_ONLY_OPERATION`.
 - [x] README Schritt 7: Die Regeln sind ausgerollt, und die Konsole zeigt unter
   Firestore → Regeln die Haushalts-UID.
-- [ ] Nach dem Push auf `main` (nur auf ausdrückliche Anweisung) ist der Workflow grün.
+- [x] Nach dem Push auf `main` (nur auf ausdrückliche Anweisung) ist der Workflow grün.
   In Safari auf dem iPhone erscheint die Anmeldeseite, und der Passwortmanager bietet
   das Haushaltskonto an.
-- [ ] Nach der Anmeldung erscheint „Dringend“. Nach dem Schließen und erneuten Öffnen
+- [x] Nach der Anmeldung erscheint „Dringend“. Nach dem Schließen und erneuten Öffnen
   der App vom Home-Bildschirm ist man weiterhin angemeldet.
-- [ ] Die Anmeldung klappt auch auf dem zweiten iPhone.
-- [ ] Mit VoiceOver: Die Anmeldeseite liest „Mental Unloader, Überschrift“. Eine falsche
+- [x] Die Anmeldung klappt auch auf dem zweiten iPhone.
+- [x] Mit VoiceOver: Die Anmeldeseite liest „Mental Unloader, Überschrift“. Eine falsche
   Eingabe wird angesagt. Einstellungen → „Abmelden“ führt zur Bestätigungsseite
   („Abmelden?“), die Knöpfe unten sind erreichbar, und nach dem Bestätigen sagt
   VoiceOver „Abgemeldet.“
-- [ ] Im Hellmodus ist der Fehlertext auf der Anmeldeseite gut lesbar.
+- [x] Im Hellmodus ist der Fehlertext auf der Anmeldeseite gut lesbar.
 
 ## Notizen zur Umsetzung
 

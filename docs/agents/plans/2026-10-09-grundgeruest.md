@@ -5,7 +5,7 @@ branch: main
 story: MUL-001
 topic: "Grundgerüst: leere App auf dem Home-Bildschirm"
 tags: [plan, grundgeruest, pwa, navigation, dunkelmodus, github-pages, architekturtest]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-001 — Grundgerüst: leere App auf dem Home-Bildschirm

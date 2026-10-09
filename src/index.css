@@ -1,0 +1,124 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  --surface: #000000;
+  --ink: #ffffff;
+  --accent: #b34700;
+  --accentLine: #ff9933;
+  --checkMark: #00ff33;
+  --divider: #333333;
+}
+
+html {
+  background-color: var(--surface);
+}
+
+body {
+  margin: 0;
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+.page {
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.pageBelowNavigation {
+  padding-top: 1rem;
+}
+
+.navigationBar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  padding-top: env(safe-area-inset-top);
+}
+
+.navigationBar ul {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0.5rem max(1rem, env(safe-area-inset-left));
+  max-width: 40rem;
+}
+
+.navigationBar li {
+  flex: 1;
+}
+
+.navigationBar button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  font: inherit;
+  min-height: 44px;
+  border: 3px solid var(--ink);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: var(--ink);
+}
+
+.navigationBar button {
+  background-color: var(--surface);
+  border: 3px solid var(--accentLine);
+  color: var(--ink);
+}
+
+.navigationBar button[aria-current='page'] {
+  background-color: var(--accent);
+}
+
+:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.announcer {
+  min-height: 1.5rem;
+  margin: 0;
+  padding: 0.5rem max(1rem, env(safe-area-inset-left));
+  border-top: 1px solid var(--divider);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pageHeader h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.buttonIcon {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+h1:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 4px;
+}

@@ -1,11 +1,18 @@
 # Mental-Unloader
 
-Nimmt den Kopf von Alltagsorganisation rund ums Essen: Einkaufsliste, Mahlzeiten mit
-Rezepten und Zutaten, Vorräte und ein Essensplaner, der daraus Vorschläge macht.
+Aufgaben-App des Haushalts für das iPhone, als Progressive Web App vom Home-Bildschirm
+aus nutzbar.
 
-Stack und Aufbau werden in der ersten Planungsrunde festgelegt.
+Adresse: https://burnywes.github.io/mental-unloader/
 
-## Arbeitsablauf
+## Arbeitsweise
+
+Die Dauerregeln stehen in [CLAUDE.md](CLAUDE.md), die projektspezifischen Angaben in
+[.claude/projekt.md](.claude/projekt.md). Offene Punkte und Bugs stehen in
+[docs/notes.txt](docs/notes.txt). Den Weg zur fertigen App beschreibt der
+[Gesamtplan](docs/agents/plans/2026-10-08-gesamtplan.md).
+
+## Ablauf
 
 ```
 /grill-me <Vorhaben>        Vorhaben auf Herz und Nieren prüfen
@@ -15,5 +22,15 @@ Stack und Aufbau werden in der ersten Planungsrunde festgelegt.
 /commit                     Format, Lint, Tests, Architektur, Secrets -> Commit
 ```
 
-Projektdaten (Kürzel, Bauart, Befehle) stehen in `.claude/projekt.md`, offene Punkte in
-`docs/notes.txt`.
+## Befehle
+
+```
+npm run dev       Entwicklungsserver
+npm run test      Unit- und Komponententests, Architekturtest
+npm run lint      ESLint einschließlich Schicht- und Kontextgrenzen
+npm run format    Prettier
+npm run build     Typprüfung und Produktions-Build nach dist/
+```
+
+Ein Push auf `main` prüft und baut die App im Workflow „Deploy to GitHub Pages“ und
+rollt sie aus.

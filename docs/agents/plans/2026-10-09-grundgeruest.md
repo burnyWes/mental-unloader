@@ -262,26 +262,26 @@ Paletten-Test, beides folgt in Phase 2.
 
 **Aufgaben**:
 
-- [ ] `package.json` anlegen (`name: "mental-unloader"`, `private`, `type: "module"`).
+- [x] `package.json` anlegen (`name: "mental-unloader"`, `private`, `type: "module"`).
   Abhängigkeiten und Versionen kommen aus MZP, **ohne** `firebase`,
   `@firebase/rules-unit-testing`, `firebase-tools`, `@playwright/test` und (bis Phase 3)
   `vite-plugin-pwa`. Skripte: `dev`, `build` (`tsc -b && vite build`), `preview`,
   `lint`, `format`, `format:check`, `test`, `test:watch`. Danach `npm install`, damit
   `package-lock.json` entsteht.
-- [ ] `tsconfig.json`, `tsconfig.app.json` und `tsconfig.node.json` aus MZP übernehmen.
+- [x] `tsconfig.json`, `tsconfig.app.json` und `tsconfig.node.json` aus MZP übernehmen.
   In `tsconfig.app.json` steht unter `types` vorerst nur `vite/client`. In
   `tsconfig.node.json` enthält `include` nur `vite.config.ts`, `vitest.config.ts` und
   `test/**/*.ts`.
-- [ ] `.prettierrc.json` und `.prettierignore` aus MZP 1:1 übernehmen (ignoriert unter
+- [x] `.prettierrc.json` und `.prettierignore` aus MZP 1:1 übernehmen (ignoriert unter
   anderem `.claude`, `docs`, `public/*.png`, `CLAUDE.md` und `README.md`).
-- [ ] `.gitignore` erweitern um `node_modules/`, `dist/`, `dev-dist/`, `build/`,
+- [x] `.gitignore` erweitern um `node_modules/`, `dist/`, `dev-dist/`, `build/`,
   `coverage/`, `.env`, `.env.*`, `!.env.example`, `.DS_Store`, `Thumbs.db` und `*.local`.
   Die vorhandenen Zeilen bleiben stehen.
-- [ ] `vite.config.ts`: `base: '/mental-unloader/'` und `plugins: [react()]`.
-- [ ] `vitest.config.ts` aus MZP 1:1 übernehmen (Projekte `unit` und `ui`).
-- [ ] `eslint.config.js` aus MZP übernehmen und `const contexts = ['tasks']` setzen. Die
+- [x] `vite.config.ts`: `base: '/mental-unloader/'` und `plugins: [react()]`.
+- [x] `vitest.config.ts` aus MZP 1:1 übernehmen (Projekte `unit` und `ui`).
+- [x] `eslint.config.js` aus MZP übernehmen und `const contexts = ['tasks']` setzen. Die
   Ausnahmen für `e2e/**` entfallen.
-- [ ] `test/domainLayerBoundary.test.ts` übernehmen und auf diese Probe-Pfade umstellen:
+- [x] `test/domainLayerBoundary.test.ts` übernehmen und auf diese Probe-Pfade umstellen:
   `src/tasks/domain/boundaryProbe.ts`, `src/tasks/ui/boundaryProbe.ts`,
   `src/tasks/api/boundaryProbe.ts`, `src/shared/domain/boundaryProbe.ts` und
   `src/shared/ui/boundaryProbe.ts`. Fälle:
@@ -292,26 +292,26 @@ Paletten-Test, beides folgt in Phase 2.
   - `../../tasks/…` in `shared/ui` und `shared/domain` wird abgewiesen
   - `react` in `tasks/ui` ist erlaubt, `../../shared/ui/useHeadingFocus` in `tasks/ui`
     ist erlaubt, `../../shared/domain/…` in `tasks/domain` ist erlaubt
-- [ ] `src/testSupport/accessibility.ts` und `setupComponentTests.ts` aus MZP übernehmen.
-- [ ] `src/shared/ui/announcement.ts`, `announcement.test.ts`, `useAnnouncer.ts`,
+- [x] `src/testSupport/accessibility.ts` und `setupComponentTests.ts` aus MZP übernehmen.
+- [x] `src/shared/ui/announcement.ts`, `announcement.test.ts`, `useAnnouncer.ts`,
   `Announcer.tsx` und `useHeadingFocus.ts` aus MZP übernehmen.
-- [ ] `src/shared/ui/NavigationBar.tsx`, `ChecklistIcon.tsx` und `SettingsIcon.tsx` aus
+- [x] `src/shared/ui/NavigationBar.tsx`, `ChecklistIcon.tsx` und `SettingsIcon.tsx` aus
   MZP übernehmen.
-- [ ] `src/tasks/ui/FolderIcon.tsx` neu anlegen: ein Ordner mit Lasche im Strichstil von
+- [x] `src/tasks/ui/FolderIcon.tsx` neu anlegen: ein Ordner mit Lasche im Strichstil von
   `ChecklistIcon` (`className="buttonIcon"`, `aria-hidden`, `focusable="false"`):
   ```tsx
   <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
   ```
-- [ ] `src/tasks/ui/UrgentPage.tsx` mit `navigation: ReactNode` als Prop: `<main
+- [x] `src/tasks/ui/UrgentPage.tsx` mit `navigation: ReactNode` als Prop: `<main
   className="page pageBelowNavigation">`, `h1` „Dringend“ mit `useHeadingFocus` und
   `tabIndex={-1}`, darunter `<p>Nichts Dringendes.</p>`.
-- [ ] `src/tasks/ui/FoldersPage.tsx`, gleich aufgebaut, mit „Ordner“ und
+- [x] `src/tasks/ui/FoldersPage.tsx`, gleich aufgebaut, mit „Ordner“ und
   „Noch keine Ordner.“
-- [ ] `src/shared/ui/SettingsPage.tsx` aus MZP, reduziert auf die Eintragsart `toggle`.
+- [x] `src/shared/ui/SettingsPage.tsx` aus MZP, reduziert auf die Eintragsart `toggle`.
   Das Prop `onOpenEntry` und die Klasse `mealRow` entfallen. Props sind `navigation` und
   `entries`. In Phase 1 wird die Seite mit leerer Eintragsliste gerendert, die leere
   `ul` entfällt dann, und es bleibt nur die Überschrift.
-- [ ] `src/App.tsx` mit Bereichen, Navigation und Announcer:
+- [x] `src/App.tsx` mit Bereichen, Navigation und Announcer:
   ```tsx
   const AREAS = [
     { id: 'urgent', label: 'Dringend', icon: <ChecklistIcon /> },
@@ -322,14 +322,14 @@ Paletten-Test, beides folgt in Phase 2.
   Startzustand ist `'urgent'`. Die Bereichsseiten werden mit `key={activeArea}`
   gerendert, damit `useHeadingFocus` bei jedem Wechsel neu greift. `<Announcer>` steht
   immer im Dokument.
-- [ ] `src/main.tsx`: `createRoot(...).render(<StrictMode><App /></StrictMode>)` mit
+- [x] `src/main.tsx`: `createRoot(...).render(<StrictMode><App /></StrictMode>)` mit
   `import './index.css'`.
-- [ ] `index.html` nach MZP-Vorbild: `lang="de"`, `viewport-fit=cover`,
+- [x] `index.html` nach MZP-Vorbild: `lang="de"`, `viewport-fit=cover`,
   `<title>Mental Unloader</title>`, `<meta name="color-scheme" content="dark light">`,
   `theme-color` `#000000`. Das
   Skript vor dem ersten Zeichnen, Icons und die Apple-Meta-Angaben folgen in Phase 2
   und 3.
-- [ ] `src/index.css` aus MZP übernehmen, nur mit den Regeln, die jetzt gebraucht
+- [x] `src/index.css` aus MZP übernehmen, nur mit den Regeln, die jetzt gebraucht
   werden:
   - `html` und `body` mit `--surface` als Hintergrund
   - `.page`, `.pageBelowNavigation`, `.navigationBar*`
@@ -352,7 +352,7 @@ Paletten-Test, beides folgt in Phase 2.
     background-color: var(--accent);
   }
   ```
-- [ ] `src/App.test.tsx` (test-getrieben, vor `App.tsx`). Alle Fälle rendern über eine
+- [x] `src/App.test.tsx` (test-getrieben, vor `App.tsx`). Alle Fälle rendern über eine
   Hilfsfunktion `renderApp()` wie in MZP. In Phase 2 und 3 bekommt sie Voreinstellungen
   für die neuen Pflicht-Props, damit die bestehenden Fälle unverändert bleiben:
   - startet auf der Überschrift „Dringend“ und zeigt „Nichts Dringendes.“
@@ -365,15 +365,15 @@ Paletten-Test, beides folgt in Phase 2.
   - nach Klick auf „Einstellungen“ hat die Überschrift „Einstellungen“ den Fokus
   - die Live-Region (`role="status"`) ist vom ersten Rendern an im Dokument
   - `accessibilityViolations` ist für Dringend, Ordner und Einstellungen jeweils leer
-- [ ] `public/.nojekyll` anlegen (leer).
-- [ ] `.github/workflows/deploy.yml` aus MZP 1:1 übernehmen.
-- [ ] `.claude/projekt.md` ausfüllen:
+- [x] `public/.nojekyll` anlegen (leer).
+- [x] `.github/workflows/deploy.yml` aus MZP 1:1 übernehmen.
+- [x] `.claude/projekt.md` ausfüllen:
   - `Stack: TypeScript, React 19, Vite 8, vite-plugin-pwa, Firebase/Firestore, GitHub Pages`
   - Befehle: `Test: npm run test`, `Lint: npm run lint`, `Format: npm run format`,
     `Build: npm run build`
   - Fachliche Kontexte: `- **tasks** — Ordner, Listen und Aufgaben des Haushalts mit
     Fälligkeit, Wiederholung und der Sammelsicht aller dringenden Aufgaben.`
-- [ ] `README.md` neu schreiben, im Aufbau wie MZP:
+- [x] `README.md` neu schreiben, im Aufbau wie MZP:
   - ein Satz zum Zweck (Aufgaben-App des Haushalts für das iPhone als PWA)
   - die Adresse `https://burnywes.github.io/mental-unloader/`
   - Verweise auf `CLAUDE.md`, `.claude/projekt.md`, `docs/notes.txt` und den Gesamtplan
@@ -383,11 +383,11 @@ Paletten-Test, beides folgt in Phase 2.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run format:check` läuft grün
-- [ ] `npm run lint` läuft grün
-- [ ] `npm run test` läuft grün, einschließlich `test/domainLayerBoundary.test.ts` und
+- [x] `npm run format:check` läuft grün
+- [x] `npm run lint` läuft grün
+- [x] `npm run test` läuft grün, einschließlich `test/domainLayerBoundary.test.ts` und
   `src/App.test.tsx`
-- [ ] `npm run build` läuft grün, und `dist/index.html` verweist auf Assets unter
+- [x] `npm run build` läuft grün, und `dist/index.html` verweist auf Assets unter
   `/mental-unloader/`
 
 **Manuelle Verifikation**:

@@ -1,2 +1,16 @@
+node_modules/
+dist/
+dev-dist/
+build/
+coverage/
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+Thumbs.db
+*.local
+
 .claude/settings.local.json
 .idea/

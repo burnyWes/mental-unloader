@@ -6,19 +6,20 @@
 
 Name:    Mental-Unloader
 Kürzel:  MUL
-Stack:   offen (Klärung in der ersten grill-me-Session)
+Stack:   TypeScript, React 19, Vite 8, vite-plugin-pwa, Firebase/Firestore, GitHub Pages
 Bauart:  onion
 
 ## Befehle
 
-Test:    -
-Lint:    -
-Format:  -
-Build:   -
+Test:    npm run test
+Lint:    npm run lint
+Format:  npm run format
+Build:   npm run build
 
 ## Fachliche Kontexte
 
-<noch keine>
+- **tasks** — Ordner, Listen und Aufgaben des Haushalts mit Fälligkeit, Wiederholung und
+  der Sammelsicht aller dringenden Aufgaben.
 
 ---
 

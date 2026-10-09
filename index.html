@@ -9,6 +9,14 @@
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#000000" />
     <title>Mental Unloader</title>
+    <script>
+      try {
+        document.documentElement.dataset.darkMode =
+          localStorage.getItem('darkMode') !== 'false'
+      } catch (storageBlocked) {
+        document.documentElement.dataset.darkMode = 'true'
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

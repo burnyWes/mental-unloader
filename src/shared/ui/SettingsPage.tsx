@@ -35,6 +35,7 @@ export function SettingsPage({ navigation, entries }: SettingsPageProps) {
                   <input
                     type="checkbox"
                     role="switch"
+                    className="checkboxLook"
                     checked={entry.enabled}
                     onChange={entry.onToggle}
                   />

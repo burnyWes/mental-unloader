@@ -392,10 +392,10 @@ Paletten-Test, beides folgt in Phase 2.
 
 **Manuelle Verifikation**:
 
-- [ ] Nach dem Push auf `main` ist der Workflow „Deploy to GitHub Pages“ grün, und
+- [x] Nach dem Push auf `main` ist der Workflow „Deploy to GitHub Pages“ grün, und
   `https://burnywes.github.io/mental-unloader/` zeigt in Safari auf dem iPhone die
   Dringend-Seite.
-- [ ] Mit VoiceOver lassen sich alle drei Bereiche über die Navigation erreichen. Nach
+- [x] Mit VoiceOver lassen sich alle drei Bereiche über die Navigation erreichen. Nach
   jedem Wechsel liest VoiceOver die Überschrift vor.
 
 ### Phase 2: Farben und Dunkelmodus
@@ -407,7 +407,7 @@ Schalter „Dunkelmodus“, der pro Gerät gespeichert wird und vor dem ersten Z
 
 **Aufgaben**:
 
-- [ ] `test/palette.test.ts` aus MZP übernehmen und anpassen (test-getrieben, vor dem
+- [x] `test/palette.test.ts` aus MZP übernehmen und anpassen (test-getrieben, vor dem
   CSS):
   - `adapter` liest `src/shared/appearance/localStorageAppearanceClient.ts`, und die
     Schlüsselsuche sucht nach `DARK_MODE_KEY = '…'`
@@ -421,17 +421,17 @@ Schalter „Dunkelmodus“, der pro Gerät gespeichert wird und vor dem ersten Z
     `[data-dark-mode='false']`.
   - Der Test „inverts every colour“ benennt die Paletten als `dark` (erster Block) und
     `light` (zweiter Block).
-- [ ] `src/index.css`: zweiter Block `:root[data-dark-mode='false']` mit
+- [x] `src/index.css`: zweiter Block `:root[data-dark-mode='false']` mit
   `color-scheme: light` und den sechs Hell-Werten aus Entscheidung 8.
-- [ ] `src/index.css`: Checkbox-Optik als wiederverwendbare Klasse `checkboxLook`, nach
+- [x] `src/index.css`: Checkbox-Optik als wiederverwendbare Klasse `checkboxLook`, nach
   `.itemList input[type='checkbox']` in MZP. Nur linke und untere Kante (`--ink`,
   3 px), 40×40 px, und im angehakten Zustand ein Haken in `--checkMark`
   (`::before`, 15×29 px, 5 px, `rotate(45deg)`). Dazu `.itemList`, `.itemList li` mit
   Trennlinien in `--divider`, `.itemList label` (`display: flex`, `align-items: center`,
   `gap`, `min-height: 44px`) und `.settingsToggle` aus MZP.
-- [ ] `src/shared/appearance/appearanceClient.ts`: `DeviceStorage` und
+- [x] `src/shared/appearance/appearanceClient.ts`: `DeviceStorage` und
   `AppearanceClient` mit `readDarkMode()` und `writeDarkMode()`.
-- [ ] `src/shared/appearance/localStorageAppearanceClient.test.ts` aus MZP übernehmen
+- [x] `src/shared/appearance/localStorageAppearanceClient.test.ts` aus MZP übernehmen
   und umdrehen (test-getrieben):
   - gespeichertes `'false'` ergibt aus
   - gespeichertes `'true'` ergibt an
@@ -440,30 +440,30 @@ Schalter „Dunkelmodus“, der pro Gerät gespeichert wird und vor dem ersten Z
   - schreibt `'true'` bzw. `'false'`
   - ohne Speicher und bei Lese- oder Schreibsperre bleibt der Schalter an und es wird
     nichts geworfen
-- [ ] `src/shared/appearance/localStorageAppearanceClient.ts` mit
+- [x] `src/shared/appearance/localStorageAppearanceClient.ts` mit
   `DARK_MODE_KEY = 'darkMode'` und `readDarkMode: () => storedValue(storage) !== 'false'`.
-- [ ] `src/shared/appearance/inMemoryAppearanceClient.ts` mit `darkMode = true` als
+- [x] `src/shared/appearance/inMemoryAppearanceClient.ts` mit `darkMode = true` als
   Voreinstellung und `storedDarkMode()`.
-- [ ] `src/shared/appearance/useAppearance.test.tsx` aus MZP übernehmen und anpassen
+- [x] `src/shared/appearance/useAppearance.test.tsx` aus MZP übernehmen und anpassen
   (test-getrieben):
   - die Statusleiste übernimmt `--surface` der Palette
   - nach dem Umschalten steht `dataset.darkMode` auf `'false'`, und die Statusleiste
     übernimmt den hellen `--surface`
   - ohne Palette bleibt die Statusleiste unberührt
-- [ ] `src/shared/appearance/useAppearance.ts` mit `{ darkMode, toggleDarkMode }`. Es
+- [x] `src/shared/appearance/useAppearance.ts` mit `{ darkMode, toggleDarkMode }`. Es
   setzt `document.documentElement.dataset.darkMode = String(darkMode)` und liest
   `--surface` für `meta[name="theme-color"]`.
-- [ ] `src/App.tsx`: neues Prop `appearanceClient: AppearanceClient`, `useAppearance`
+- [x] `src/App.tsx`: neues Prop `appearanceClient: AppearanceClient`, `useAppearance`
   aufrufen und der Einstellungsseite den Eintrag übergeben:
   ```tsx
   { kind: 'toggle', id: 'darkMode', label: 'Dunkelmodus',
     enabled: appearance.darkMode, onToggle: appearance.toggleDarkMode }
   ```
-- [ ] `src/shared/ui/SettingsPage.tsx`: Einträge als `ul.itemList` und den Schalter als
+- [x] `src/shared/ui/SettingsPage.tsx`: Einträge als `ul.itemList` und den Schalter als
   `<input type="checkbox" role="switch" className="checkboxLook">` in
   `label.settingsToggle` rendern.
-- [ ] `src/main.tsx`: `createLocalStorageAppearanceClient()` übergeben.
-- [ ] `index.html`: Skript vor dem ersten Zeichnen ergänzen:
+- [x] `src/main.tsx`: `createLocalStorageAppearanceClient()` übergeben.
+- [x] `index.html`: Skript vor dem ersten Zeichnen ergänzen:
   ```html
   <script>
     try {
@@ -474,22 +474,22 @@ Schalter „Dunkelmodus“, der pro Gerät gespeichert wird und vor dem ersten Z
     }
   </script>
   ```
-- [ ] `src/App.test.tsx` ergänzen:
+- [x] `src/App.test.tsx` ergänzen:
   - ohne gespeicherten Wunsch steht `dataset.darkMode` auf `'true'`
   - ein Gerät mit gespeichertem `false` startet hell
   - der Schalter „Dunkelmodus“ (`role="switch"`) ist zu Beginn an
   - nach einem Tipp ist er aus, `storedDarkMode()` liefert `false`, und
     `dataset.darkMode` steht auf `'false'`
   - axe meldet auf den Einstellungen mit Schalter keine Verstöße
-- [ ] `docs/notes.txt` unten unter TODO anhängen:
+- [x] `docs/notes.txt` unten unter TODO anhängen:
   `b Farbe "Ueberfaellig" im Hellmodus (#009999 auf Weiss) hat nur ca. 3,5:1 Kontrast, Text braucht 4,5:1 - in MUL-006 klaeren`
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, einschließlich `test/palette.test.ts`,
+- [x] `npm run test` läuft grün, einschließlich `test/palette.test.ts`,
   `localStorageAppearanceClient.test.ts`, `useAppearance.test.tsx` und
   `src/App.test.tsx`
-- [ ] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
+- [x] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
 
 **Manuelle Verifikation**:
 

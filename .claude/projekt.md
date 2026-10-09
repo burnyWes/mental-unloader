@@ -11,7 +11,7 @@ Bauart:  onion
 
 ## Befehle
 
-Test:    npm run test
+Test:    npm run test && npm run test:rules
 Lint:    npm run lint
 Format:  npm run format
 Build:   npm run build

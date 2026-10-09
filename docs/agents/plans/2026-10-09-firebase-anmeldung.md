@@ -304,7 +304,7 @@ committet, aber **nicht gepusht** (Entscheidung 1).
 
 **Aufgaben**:
 
-- [ ] `package.json`:
+- [x] `package.json`:
   - unter `dependencies` `firebase` `^12.19.0`
   - unter `devDependencies` `@firebase/rules-unit-testing` `^5.0.2`,
     `@playwright/test` `^1.63.0` und `firebase-tools` `^15.30.1` (Versionen wie in MZP)
@@ -315,18 +315,18 @@ committet, aber **nicht gepusht** (Entscheidung 1).
     "test:e2e": "firebase emulators:exec --only auth --project demo-mental-unloader \"npm run build:e2e && playwright test\""
     ```
   - danach `npm install` und `npx playwright install chromium`
-- [ ] `.gitignore` ergänzen um `!.env.emulator` (direkt unter `!.env.example`),
+- [x] `.gitignore` ergänzen um `!.env.emulator` (direkt unter `!.env.example`),
   `playwright-report/`, `test-results/`, `blob-report/`, `playwright/.cache/`,
   `.firebase/`, `firebase-debug.log`, `firestore-debug.log` und `ui-debug.log`.
-- [ ] `.prettierignore` um `blob-report` ergänzen. `playwright-report` und
+- [x] `.prettierignore` um `blob-report` ergänzen. `playwright-report` und
   `test-results` stehen dort schon.
-- [ ] `tsconfig.node.json`: In `include` kommen `playwright.config.ts`,
+- [x] `tsconfig.node.json`: In `include` kommen `playwright.config.ts`,
   `vitest.rules.config.ts`, `firestore.rules.test.ts` und `e2e/**/*.ts` dazu.
-- [ ] `eslint.config.js`: Der Block mit den Node-Globals gilt zusätzlich für
+- [x] `eslint.config.js`: Der Block mit den Node-Globals gilt zusätzlich für
   `e2e/**/*.ts` und `firestore.rules.test.ts`.
-- [ ] `firebase.json` aus MZP 1:1 (`singleProjectMode`, Firestore 8080, Auth 9099, UI
+- [x] `firebase.json` aus MZP 1:1 (`singleProjectMode`, Firestore 8080, Auth 9099, UI
   aus, `firestore.rules`).
-- [ ] `firestore.rules` mit Platzhalter-UID:
+- [x] `firestore.rules` mit Platzhalter-UID:
   ```
   rules_version = '2';
 
@@ -354,8 +354,8 @@ committet, aber **nicht gepusht** (Entscheidung 1).
     }
   }
   ```
-- [ ] `vitest.rules.config.ts` aus MZP 1:1.
-- [ ] `firestore.rules.test.ts` nach MZP (test-getrieben, vor den Regeln). Die UID wird
+- [x] `vitest.rules.config.ts` aus MZP 1:1.
+- [x] `firestore.rules.test.ts` nach MZP (test-getrieben, vor den Regeln). Die UID wird
   aus den Regeln gelesen (`householdUidFrom`), `projectId: 'demo-mental-unloader'`. Je
   Sammlung `folders`, `lists` und `tasks` (per `describe.each`):
   - der Haushalt darf schreiben, lesen und löschen
@@ -364,12 +364,12 @@ committet, aber **nicht gepusht** (Entscheidung 1).
 
   Dazu kommt ein Fall: Der Haushalt wird außerhalb der freigegebenen Sammlungen
   abgewiesen (`households/ours`).
-- [ ] `src/shared/auth/credentials.ts` und `credentials.test.ts` aus MZP 1:1.
-- [ ] `src/shared/auth/signInFailure.ts` und `signInFailure.test.ts` aus MZP 1:1.
-- [ ] `src/shared/auth/authClient.ts` aus MZP, ergänzt um `signOut(): Promise<void>`.
-- [ ] `src/shared/auth/inMemoryAuthClient.ts` aus MZP, ergänzt um
+- [x] `src/shared/auth/credentials.ts` und `credentials.test.ts` aus MZP 1:1.
+- [x] `src/shared/auth/signInFailure.ts` und `signInFailure.test.ts` aus MZP 1:1.
+- [x] `src/shared/auth/authClient.ts` aus MZP, ergänzt um `signOut(): Promise<void>`.
+- [x] `src/shared/auth/inMemoryAuthClient.ts` aus MZP, ergänzt um
   `async signOut() { publish({ status: 'signedOut' }) }`.
-- [ ] `src/shared/auth/firebaseConfig.ts` mit Demo-Werten:
+- [x] `src/shared/auth/firebaseConfig.ts` mit Demo-Werten:
   ```ts
   export const firebaseConfig = {
     apiKey: 'demo-api-key',
@@ -377,26 +377,26 @@ committet, aber **nicht gepusht** (Entscheidung 1).
     projectId: 'demo-mental-unloader',
   }
   ```
-- [ ] `src/shared/auth/firebase.ts` nach Abschnitt „Abstraktionen“: nur App und Auth,
+- [x] `src/shared/auth/firebase.ts` nach Abschnitt „Abstraktionen“: nur App und Auth,
   Auth-Emulator bei `VITE_USE_EMULATORS`.
-- [ ] `src/shared/auth/firebaseAuthClient.ts` aus MZP, ergänzt um
+- [x] `src/shared/auth/firebaseAuthClient.ts` aus MZP, ergänzt um
   `signOut: () => signOut(auth)`.
-- [ ] `src/shared/auth/useSession.ts` aus MZP 1:1.
-- [ ] `src/shared/auth/SignInPage.test.tsx` aus MZP (test-getrieben), dazu ein neuer
+- [x] `src/shared/auth/useSession.ts` aus MZP 1:1.
+- [x] `src/shared/auth/SignInPage.test.tsx` aus MZP (test-getrieben), dazu ein neuer
   Fall: Die Überschrift „Mental Unloader“ hat beim Erscheinen den Fokus.
-- [ ] `src/shared/auth/SignInPage.tsx` aus MZP: Überschrift „Mental Unloader“ mit
+- [x] `src/shared/auth/SignInPage.tsx` aus MZP: Überschrift „Mental Unloader“ mit
   `useHeadingFocus` und `tabIndex={-1}`. Ansonsten bleibt alles gleich: Felder in
   `p.field`, Fehlertext in `p#signInFailure.failure`, Knopf `type="submit"`.
-- [ ] `src/shared/ui/BackIcon.tsx` neu nach Abschnitt „Abstraktionen“.
-- [ ] `src/shared/ui/BottomBar.tsx` neu nach Abschnitt „Abstraktionen“.
-- [ ] `src/shared/ui/ConfirmationPage.test.tsx` (test-getrieben):
+- [x] `src/shared/ui/BackIcon.tsx` neu nach Abschnitt „Abstraktionen“.
+- [x] `src/shared/ui/BottomBar.tsx` neu nach Abschnitt „Abstraktionen“.
+- [x] `src/shared/ui/ConfirmationPage.test.tsx` (test-getrieben):
   - die Überschrift trägt `heading` und hat den Fokus
   - die Erklärung ist sichtbar
   - der Knopf mit `confirmLabel` ruft `onConfirm` auf
   - „Abbrechen“ und „Zurück“ rufen jeweils `onCancel` auf
   - auf der Seite gibt es keine Navigation
   - axe meldet keine Verstöße
-- [ ] `src/shared/ui/ConfirmationPage.tsx`:
+- [x] `src/shared/ui/ConfirmationPage.tsx`:
   ```tsx
   <main className="page">
     <button type="button" className="backButton" onClick={onCancel}>
@@ -414,11 +414,11 @@ committet, aber **nicht gepusht** (Entscheidung 1).
   (`src/meals/ui/AddSupplyPage.tsx:104-114`). Außerhalb einer Landmark meldet axe die
   Regel `region`. Die Ref aus `useHeadingFocus` heißt `headingRef`, damit sie sich von
   der Prop `heading` unterscheidet.
-- [ ] `src/shared/ui/SettingsPage.tsx`: neue Prop `onRequestSignOut: () => void`. Unter
+- [x] `src/shared/ui/SettingsPage.tsx`: neue Prop `onRequestSignOut: () => void`. Unter
   der Liste steht `<button type="button" className="signOutButton"
   onClick={onRequestSignOut}>Abmelden</button>`. Der Name grenzt die Prop vom
   tatsächlichen Abmelden ab (`onSignOut` in `SignedInApp`).
-- [ ] `src/index.css`:
+- [x] `src/index.css`:
   - im ersten `:root` die Tokens `--failure: #ff9999` und
     `--bottomBarHeight: calc(3rem + 1rem + 1px)`
   - im zweiten `:root` das Token `--failure: #006666`
@@ -433,9 +433,9 @@ committet, aber **nicht gepusht** (Entscheidung 1).
   - `.bottomBar`, `.bottomBarContent`, `.bottomBarContent button` sowie die
     `body:has(.bottomBar)`- und `html:has(.bottomBar)`-Regeln aus MZP, aber ohne
     `.bottomBarInFlow` und ohne die `:not(.bottomBarInFlow)`-Teile
-- [ ] `test/palette.test.ts`: `TEXT_ON_ITS_BACKGROUND` bekommt das Paar
+- [x] `test/palette.test.ts`: `TEXT_ON_ITS_BACKGROUND` bekommt das Paar
   `['--failure', '--surface']`.
-- [ ] `src/SignedInApp.tsx`: übernimmt `AREAS`, `activeArea`, `navigation`,
+- [x] `src/SignedInApp.tsx`: übernimmt `AREAS`, `activeArea`, `navigation`,
   `settingsEntries` und `areaPage()` aus `App.tsx`. Die Props sind `appearance`
   (Ergebnis von `useAppearance`) und `onSignOut: () => void`. Der neue Zustand
   `confirmingSignOut` zeigt statt der Bereichsseite:
@@ -450,7 +450,7 @@ committet, aber **nicht gepusht** (Entscheidung 1).
   ```
   Nach „Abbrechen“ wird wieder der Bereich `settings` gezeigt. Die Einstellungsseite
   wird dabei neu eingehängt, sodass ihre Überschrift den Fokus bekommt.
-- [ ] `src/App.tsx`: neue Prop `authClient: AuthClient`. `useSession` entscheidet:
+- [x] `src/App.tsx`: neue Prop `authClient: AuthClient`. `useSession` entscheidet:
   - `loading` → `<p className="page">Wird geladen.</p>`
   - `signedOut` → `<SignInPage authClient={authClient} announce={announce} />`
   - `signedIn` → `<SignedInApp appearance={appearance} onSignOut={signOut} />`
@@ -459,7 +459,7 @@ committet, aber **nicht gepusht** (Entscheidung 1).
   Aufruf, wird stattdessen „Abmelden fehlgeschlagen.“ angesagt (per `try/catch`, also
   ohne unbehandelte Ablehnung), und man bleibt angemeldet. `useAppearance`, `useAppUpdate`, `AppUpdateOffer` und
   `Announcer` bleiben in `App`.
-- [ ] `src/App.test.tsx` (test-getrieben):
+- [x] `src/App.test.tsx` (test-getrieben):
   - `renderApp` bekommt als dritten Parameter `authClient`. Voreinstellung ist ein
     `createInMemoryAuthClient(household, { status: 'signedIn', userId: household.userId })`
     mit `const household = { email: 'haushalt@example.com', password: 'geheim',
@@ -483,12 +483,12 @@ committet, aber **nicht gepusht** (Entscheidung 1).
       Live-Region „Abmelden fehlgeschlagen.“
     - nach dem Abmelden und erneuten Anmelden steht die App wieder auf „Dringend“
     - axe meldet auf der Anmeldeseite und auf der Bestätigungsseite keine Verstöße
-- [ ] `src/main.tsx`: `authClient={createFirebaseAuthClient(auth)}` übergeben, mit
+- [x] `src/main.tsx`: `authClient={createFirebaseAuthClient(auth)}` übergeben, mit
   `auth` aus `./shared/auth/firebase.ts`.
-- [ ] `.env.emulator` mit `VITE_USE_EMULATORS=true`.
-- [ ] `playwright.config.ts` aus MZP, mit `baseURL` und `webServer.url`
+- [x] `.env.emulator` mit `VITE_USE_EMULATORS=true`.
+- [x] `playwright.config.ts` aus MZP, mit `baseURL` und `webServer.url`
   `http://localhost:4173/mental-unloader/`.
-- [ ] `e2e/emulatorHousehold.ts`, reduziert aus MZP:
+- [x] `e2e/emulatorHousehold.ts`, reduziert aus MZP:
   - `household` (`haushalt@example.com`, Passwort nur für den Emulator)
   - `householdUid()` aus `firestore.rules`
   - `callEmulator`
@@ -498,15 +498,15 @@ committet, aber **nicht gepusht** (Entscheidung 1).
   `PROJECT` kommt aus `firebaseConfig.projectId`. Der Import lautet
   `../src/shared/auth/firebaseConfig.ts` **mit** Endung (`module: nodenext` in
   `tsconfig.node.json`, wie MZP `e2e/emulatorHousehold.ts:3`).
-- [ ] `e2e/keyboard.ts` mit `typeInto`, `pressButton` und `signIn` aus MZP.
-- [ ] `e2e/session.spec.ts` (`beforeEach`: `prepareEmulators()`), nur per Tastatur:
+- [x] `e2e/keyboard.ts` mit `typeInto`, `pressButton` und `signIn` aus MZP.
+- [x] `e2e/session.spec.ts` (`beforeEach`: `prepareEmulators()`), nur per Tastatur:
   - nach der Anmeldung ist die Überschrift „Dringend“ sichtbar
   - ein falsches Passwort zeigt „E-Mail oder Passwort stimmt nicht.“
   - nach `page.reload()` ist man noch angemeldet (Überschrift „Dringend“)
   - Einstellungen → Abmelden → Abmelden führt zur Überschrift „Mental Unloader“, und
     nach `page.reload()` steht dort weiterhin die Anmeldeseite
-- [ ] `.claude/projekt.md`: `Test: npm run test && npm run test:rules`.
-- [ ] `README.md`:
+- [x] `.claude/projekt.md`: `Test: npm run test && npm run test:rules`.
+- [x] `README.md`:
   - Befehle `test:rules`, `test:e2e` und den einmaligen Schritt
     `npx playwright install chromium` ergänzen
   - Hinweis: Regeltests und E2E brauchen Java 21 oder neuer
@@ -549,13 +549,13 @@ committet, aber **nicht gepusht** (Entscheidung 1).
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, einschließlich `credentials.test.ts`,
+- [x] `npm run test` läuft grün, einschließlich `credentials.test.ts`,
   `signInFailure.test.ts`, `SignInPage.test.tsx`, `ConfirmationPage.test.tsx`,
   `src/App.test.tsx` und `test/palette.test.ts` mit `--failure`
-- [ ] `npm run test:rules` läuft grün
-- [ ] `npm run test:e2e` läuft grün mit allen vier Abläufen aus `e2e/session.spec.ts`
-- [ ] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
-- [ ] `git status` zeigt `.env.emulator` als neue Datei, aber keine Playwright- oder
+- [x] `npm run test:rules` läuft grün
+- [x] `npm run test:e2e` läuft grün mit allen vier Abläufen aus `e2e/session.spec.ts`
+- [x] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
+- [x] `git status` zeigt `.env.emulator` als neue Datei, aber keine Playwright- oder
   Firebase-Logdateien
 
 ### Phase 2: Echtes Firebase-Projekt anschließen
@@ -620,6 +620,15 @@ sie ein. Danach rollst du die Regeln aus, und die App wird gepusht.
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- Phase 1: `npm install` (npm 11.17) führt die Install-Skripte von `re2`, `protobufjs`
+  und `@firebase/util` nicht aus (`allow-scripts`). Die Emulatoren, Regeltests und E2E
+  laufen trotzdem; MZP hat dafür ebenfalls keine Freigabe.
+- Phase 1: Der Lockfile-Diff ist groß, enthält aber nur neue Pakete. Keine bestehende
+  Version hat sich geändert.
+- Phase 1: Im E2E steht der Fehlertext zweimal auf der Seite (Fehlerzeile und
+  Live-Region). Der Test prüft deshalb das erste Vorkommen.
+- Phase 1: Das Emulator-Passwort im E2E lautet `nur-im-emulator`.
 
 ## Verweise
 

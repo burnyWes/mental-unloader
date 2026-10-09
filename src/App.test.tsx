@@ -4,18 +4,68 @@ import { describe, expect, it } from 'vitest'
 import { App } from './App'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
+import type { AuthClient } from './shared/auth/authClient'
+import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
 import { accessibilityViolations } from './testSupport/accessibility'
+
+const household = {
+  email: 'haushalt@example.com',
+  password: 'geheim',
+  userId: 'household',
+}
+
+function signedInAuthClient() {
+  return createInMemoryAuthClient(household, {
+    status: 'signedIn',
+    userId: household.userId,
+  })
+}
 
 function renderApp(
   appearanceClient = createInMemoryAppearanceClient(),
   appUpdateClient = createInMemoryAppUpdateClient(),
+  authClient: AuthClient = signedInAuthClient(),
 ) {
   return render(
     <App
       appearanceClient={appearanceClient}
       appUpdateClient={appUpdateClient}
+      authClient={authClient}
     />,
   )
+}
+
+function renderSignedOutApp() {
+  return renderApp(undefined, undefined, createInMemoryAuthClient(household))
+}
+
+const undecidedAuthClient: AuthClient = {
+  observeSession: () => () => {},
+  signIn: () => Promise.resolve({ succeeded: true }),
+  signOut: () => Promise.resolve(),
+}
+
+function authClientFailingToSignOut(): AuthClient {
+  return {
+    ...signedInAuthClient(),
+    signOut: () => Promise.reject(new Error('auth/network-request-failed')),
+  }
+}
+
+async function signInAsHousehold() {
+  await userEvent.type(screen.getByLabelText('E-Mail'), household.email)
+  await userEvent.type(screen.getByLabelText('Passwort'), household.password)
+  await userEvent.click(screen.getByRole('button', { name: 'Anmelden' }))
+}
+
+async function requestSignOut() {
+  await openSettings()
+  await userEvent.click(screen.getByRole('button', { name: 'Abmelden' }))
+}
+
+async function confirmSignOut() {
+  await requestSignOut()
+  await userEvent.click(screen.getByRole('button', { name: 'Abmelden' }))
 }
 
 const areaButtons = ['Dringend', 'Ordner', 'Einstellungen']
@@ -173,5 +223,109 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', updateOffer))
 
     expect(loadedVersions).toBe(1)
+  })
+
+  it('waits while the session is not yet known', () => {
+    renderApp(undefined, undefined, undecidedAuthClient)
+
+    expect(screen.getByText('Wird geladen.')).toBeInTheDocument()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it('asks a signed out household to sign in without offering the areas', () => {
+    renderSignedOutApp()
+
+    expect(
+      screen.getByRole('heading', { name: 'Mental Unloader' }),
+    ).toHaveFocus()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it('shows the urgent tasks once the household signed in', async () => {
+    renderSignedOutApp()
+
+    await signInAsHousehold()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dringend' }),
+    ).toHaveFocus()
+  })
+
+  it('asks for confirmation before signing out', async () => {
+    renderApp()
+
+    await requestSignOut()
+
+    expect(screen.getByRole('heading', { name: 'Abmelden?' })).toHaveFocus()
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+  })
+
+  it.each(['Abbrechen', 'Zurück'])(
+    'returns to the settings and stays signed in with %s',
+    async (name) => {
+      renderApp()
+      await requestSignOut()
+
+      await userEvent.click(screen.getByRole('button', { name }))
+
+      expect(
+        screen.getByRole('heading', { name: 'Einstellungen' }),
+      ).toHaveFocus()
+      expect(
+        screen.getByRole('navigation', { name: 'Bereiche' }),
+      ).toBeInTheDocument()
+    },
+  )
+
+  it('signs out once confirmed and announces it', async () => {
+    renderApp()
+
+    await confirmSignOut()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Mental Unloader' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Abgemeldet.')
+  })
+
+  it('announces a failed sign out and stays signed in', async () => {
+    renderApp(undefined, undefined, authClientFailingToSignOut())
+
+    await confirmSignOut()
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Abmelden fehlgeschlagen.',
+    )
+    expect(
+      screen.queryByRole('heading', { name: 'Mental Unloader' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('starts on the urgent tasks again after signing out and in', async () => {
+    renderApp()
+    await confirmSignOut()
+
+    await signInAsHousehold()
+
+    expect(
+      await screen.findByRole('heading', { name: 'Dringend' }),
+    ).toHaveFocus()
+    expect(screen.getByRole('button', { name: 'Dringend' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+  })
+
+  it('shows the sign in page without accessibility violations', async () => {
+    const { container } = renderSignedOutApp()
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
+
+  it('shows the sign out confirmation without accessibility violations', async () => {
+    const { container } = renderApp()
+    await requestSignOut()
+
+    expect(await accessibilityViolations(container)).toEqual([])
   })
 })

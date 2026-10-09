@@ -1,0 +1,25 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isHousehold() {
+      return request.auth != null && request.auth.uid == 'household-uid-placeholder';
+    }
+
+    match /folders/{folderId} {
+      allow read, write: if isHousehold();
+    }
+
+    match /lists/{listId} {
+      allow read, write: if isHousehold();
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if isHousehold();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

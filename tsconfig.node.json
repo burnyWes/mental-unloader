@@ -20,6 +20,10 @@
     "vite.config.ts",
     "vitest.config.ts",
     "test/**/*.ts",
-    "scripts/checkMarkMotif.mjs"
+    "scripts/checkMarkMotif.mjs",
+    "playwright.config.ts",
+    "vitest.rules.config.ts",
+    "firestore.rules.test.ts",
+    "e2e/**/*.ts"
   ]
 }

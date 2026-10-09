@@ -12,9 +12,14 @@ export type SettingsEntry = {
 type SettingsPageProps = {
   navigation: ReactNode
   entries: readonly SettingsEntry[]
+  onRequestSignOut: () => void
 }
 
-export function SettingsPage({ navigation, entries }: SettingsPageProps) {
+export function SettingsPage({
+  navigation,
+  entries,
+  onRequestSignOut,
+}: SettingsPageProps) {
   const heading = useHeadingFocus()
 
   return (
@@ -44,6 +49,13 @@ export function SettingsPage({ navigation, entries }: SettingsPageProps) {
             ))}
           </ul>
         )}
+        <button
+          type="button"
+          className="signOutButton"
+          onClick={onRequestSignOut}
+        >
+          Abmelden
+        </button>
       </main>
     </>
   )

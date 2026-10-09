@@ -69,7 +69,13 @@ export default tseslint.config(
   },
   ...moduleBoundaries,
   {
-    files: ['scripts/**/*.mjs', '*.config.ts', 'test/**/*.ts'],
+    files: [
+      'scripts/**/*.mjs',
+      '*.config.ts',
+      'test/**/*.ts',
+      'e2e/**/*.ts',
+      'firestore.rules.test.ts',
+    ],
     languageOptions: {
       globals: globals.node,
     },

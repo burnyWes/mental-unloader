@@ -92,7 +92,7 @@ Stellen angepasst.
    |---|---|---|---|
    | `--surface` | Hintergrund | `#000000` | `#ffffff` |
    | `--ink` | Schrift, Checkbox-Kanten, Fokusrahmen | `#ffffff` | `#000000` |
-   | `--accent` | Knopf-Fläche | `#b34700` | `#4cb8ff` |
+   | `--accent` | Knopf-Fläche | `#993d00` | `#66c2ff` |
    | `--accentLine` | Knopf-Rahmen | `#ff9933` | `#0066cc` |
    | `--checkMark` | Haken | `#00ff33` | `#ff00cc` |
    | `--divider` | Trennlinien | `#333333` | `#cccccc` |
@@ -579,14 +579,14 @@ Die App wird installierbar, zeigt das Haken-Icon und bietet neue Versionen an.
 
 **Manuelle Verifikation**:
 
-- [ ] In Safari auf dem iPhone über Teilen → „Zum Home-Bildschirm“ hinzufügen. Unter dem
+- [x] In Safari auf dem iPhone über Teilen → „Zum Home-Bildschirm“ hinzufügen. Unter dem
   Icon steht „Mental Unloader“, und das Icon zeigt den grünen Haken mit hell-orangem
   Rand auf Schwarz. Der Rand ist auch **an den vier Ecken** vollständig und ohne
   schwarze Zwickel zur Maske sichtbar.
-- [ ] Vom Home-Bildschirm aus startet die App ohne Browserleiste, und die Dringend-Seite
+- [x] Vom Home-Bildschirm aus startet die App ohne Browserleiste, und die Dringend-Seite
   erscheint. Im Dunkelmodus ist die Statusleiste schwarz mit heller Schrift, nach dem
   Ausschalten von „Dunkelmodus“ weiß mit dunkler Schrift.
-- [ ] Nach einem weiteren Push auf `main` erscheint beim nächsten Öffnen „Neue Version
+- [x] Nach einem weiteren Push auf `main` erscheint beim nächsten Öffnen „Neue Version
   laden“. VoiceOver sagt es an, und erst nach dem Tipp lädt die neue Version.
 
 ## Notizen zur Umsetzung
@@ -601,6 +601,9 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   Kantenlänge (`points`, `thickness`). Der Rahmen der Icons mit 192 und 512 Pixeln hat
   außen 22 % Radius, innen 16 %. Der Hintergrund ist bei 192/512 mit 22 % gerundet,
   beim deckenden `apple-touch-icon.png` eckig.
+- Nach der Abnahme: Die Knopf-Fläche `--accent` ist auf Wunsch des Nutzers dunkler,
+  `#993d00` statt `#b34700`, im Hellmodus als Umkehr `#66c2ff` statt `#4cb8ff`. Weiße
+  Schrift auf der Fläche erreicht damit etwa 6,9:1.
 
 ## Verweise
 

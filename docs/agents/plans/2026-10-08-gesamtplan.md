@@ -189,7 +189,7 @@ das Vorhaben in neun Teilpläne (MUL-001 bis MUL-009) auf. Jeder Teilplan entste
     |---|---|---|
     | Hintergrund | `#000000` | `#FFFFFF` |
     | Schrift | `#FFFFFF` | `#000000` |
-    | Knopf-Fläche | `#B34700` | `#4CB8FF` |
+    | Knopf-Fläche | `#993D00` | `#66C2FF` |
     | Knopf-Rahmen | `#FF9933` | `#0066CC` |
     | Haken | `#00FF33` | `#FF00CC` |
     | Überfällig | `#FF6666` | `#009999` |

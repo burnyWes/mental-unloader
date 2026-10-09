@@ -92,7 +92,7 @@ Stellen angepasst.
    |---|---|---|---|
    | `--surface` | Hintergrund | `#000000` | `#ffffff` |
    | `--ink` | Schrift, Checkbox-Kanten, Fokusrahmen | `#ffffff` | `#000000` |
-   | `--accent` | Knopf-Fläche | `#993d00` | `#66c2ff` |
+   | `--accent` | Knopf-Fläche | `#803300` | `#7fccff` |
    | `--accentLine` | Knopf-Rahmen | `#ff9933` | `#0066cc` |
    | `--checkMark` | Haken | `#00ff33` | `#ff00cc` |
    | `--divider` | Trennlinien | `#333333` | `#cccccc` |
@@ -601,9 +601,10 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   Kantenlänge (`points`, `thickness`). Der Rahmen der Icons mit 192 und 512 Pixeln hat
   außen 22 % Radius, innen 16 %. Der Hintergrund ist bei 192/512 mit 22 % gerundet,
   beim deckenden `apple-touch-icon.png` eckig.
-- Nach der Abnahme: Die Knopf-Fläche `--accent` ist auf Wunsch des Nutzers dunkler,
-  `#993d00` statt `#b34700`, im Hellmodus als Umkehr `#66c2ff` statt `#4cb8ff`. Weiße
-  Schrift auf der Fläche erreicht damit etwa 6,9:1.
+- Nach der Abnahme: Die Knopf-Fläche `--accent` ist auf Wunsch des Nutzers in zwei
+  Schritten dunkler geworden, über `#993d00` auf `#803300` statt `#b34700`, im
+  Hellmodus als Umkehr `#7fccff` statt `#4cb8ff`. Weiße Schrift auf der Fläche erreicht
+  damit etwa 8,8:1.
 
 ## Verweise
 

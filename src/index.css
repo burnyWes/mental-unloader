@@ -8,7 +8,7 @@
   line-height: 1.5;
   --surface: #000000;
   --ink: #ffffff;
-  --accent: #993d00;
+  --accent: #803300;
   --accentLine: #ff9933;
   --checkMark: #00ff33;
   --divider: #333333;
@@ -18,7 +18,7 @@
   color-scheme: light;
   --surface: #ffffff;
   --ink: #000000;
-  --accent: #66c2ff;
+  --accent: #7fccff;
   --accentLine: #0066cc;
   --checkMark: #ff00cc;
   --divider: #cccccc;

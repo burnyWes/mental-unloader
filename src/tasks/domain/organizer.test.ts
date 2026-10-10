@@ -50,6 +50,13 @@ function task(
 
 const urgent: Due = { kind: 'urgent', since: '2026-10-10' }
 
+const weeklyOnThe15th: Due = {
+  kind: 'deadline',
+  deadline: '2026-10-15',
+  urgentFrom: 'oneWeek',
+  repetition: { rhythm: 'weekly', anchorDay: 15 },
+}
+
 const muell = task('task-1', haushalt.id, urgent)
 const keller = task('task-2', haushalt.id)
 const fenster = task('task-3', haushalt.id, urgent, [5])
@@ -134,6 +141,7 @@ describe('openTaskSummaryOfList', () => {
       kind: 'deadline',
       deadline,
       urgentFrom: 'oneWeek',
+      repetition: null,
     })
     const withDeadlines: Organizer = {
       ...organizer,
@@ -148,6 +156,17 @@ describe('openTaskSummaryOfList', () => {
 
     expect(openTaskSummaryOfList(withDeadlines, geburtstage.id, today)).toEqual(
       { open: 4, urgent: 2 },
+    )
+  })
+
+  it('counts a completed recurring task as open and urgent', () => {
+    const withRecurring: Organizer = {
+      ...organizer,
+      tasks: [task('muell', geburtstage.id, weeklyOnThe15th, [5])],
+    }
+
+    expect(openTaskSummaryOfList(withRecurring, geburtstage.id, today)).toEqual(
+      { open: 1, urgent: 1 },
     )
   })
 
@@ -202,7 +221,7 @@ describe('urgentTasksOf', () => {
     deadline: string,
     urgentFrom: 'oneWeek' | 'immediately' = 'oneWeek',
   ): Due {
-    return { kind: 'deadline', deadline, urgentFrom }
+    return { kind: 'deadline', deadline, urgentFrom, repetition: null }
   }
 
   function urgentSince(since: string): Due {
@@ -254,6 +273,16 @@ describe('urgentTasksOf', () => {
         ],
       }),
     ).toEqual(['fire'])
+  })
+
+  it('keeps a completed recurring task once its lead is reached', () => {
+    expect(
+      idsOf({
+        folders: [familie],
+        lists: [haushalt],
+        tasks: [created('muell', haushalt.id, weeklyOnThe15th, 1, [5])],
+      }),
+    ).toEqual(['muell'])
   })
 
   it('orders across lists: older urgency first, then deadlines, then creation', () => {

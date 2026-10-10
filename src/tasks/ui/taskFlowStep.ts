@@ -1,7 +1,7 @@
 import type { Folder } from '../domain/folder'
 import { listById, type List, type ListId } from '../domain/list'
 import { folderOfList, type Organizer } from '../domain/organizer'
-import { isCompleted, type Task } from '../domain/task'
+import { isOpen, type Task } from '../domain/task'
 import type { TaskDraft } from './foldersAreaPage'
 
 export type CompletionAskedFrom = 'overview' | 'row'
@@ -53,7 +53,7 @@ export function resolveTaskFlowStep(
     case 'overview':
       return { kind: 'overview', alreadyCompleted: false }
     case 'confirmCompletion':
-      if (isCompleted(shown.task))
+      if (!isOpen(shown.task))
         return { kind: 'overview', alreadyCompleted: true }
       return step
     case 'confirmDeletion':

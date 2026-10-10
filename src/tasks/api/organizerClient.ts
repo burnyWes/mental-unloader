@@ -1,3 +1,4 @@
+import type { CalendarDay } from '../domain/calendarDay'
 import type { FolderId } from '../domain/folder'
 import type { ListId } from '../domain/list'
 import type { Organizer } from '../domain/organizer'
@@ -18,8 +19,13 @@ export interface OrganizerClient {
   changeList(id: ListId, name: string, folderId: FolderId): void
   removeList(id: ListId, taskIds: readonly TaskId[]): void
   addTask(task: NewTask): TaskId
-  changeTask(id: TaskId, content: TaskContent, listId: ListId): void
-  completeTask(id: TaskId, at: number): void
+  changeTask(
+    id: TaskId,
+    content: TaskContent,
+    listId: ListId,
+    completionsReset: boolean,
+  ): void
+  completeTask(id: TaskId, at: number, nextDeadline: CalendarDay | null): void
   reopenTask(id: TaskId): void
   removeTask(id: TaskId): void
 }

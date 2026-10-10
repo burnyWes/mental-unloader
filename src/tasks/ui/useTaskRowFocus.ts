@@ -22,6 +22,28 @@ function awaitedButton(focus: ListPageFocus): string | null {
         : completeButtonKey(focus.id)
     case 'heading':
     case 'followingTask':
+    case 'followingPlace':
+      return null
+  }
+}
+
+function focusKeysOf(
+  shownTaskIds: readonly TaskId[],
+  focus: ListPageFocus,
+): readonly TaskId[] {
+  if (focus.kind !== 'followingPlace') return shownTaskIds
+  return shownTaskIds.filter((id) => id !== focus.completedId)
+}
+
+function placeToFollow(focus: ListPageFocus): number | null {
+  switch (focus.kind) {
+    case 'followingTask':
+      return focus.removedAt
+    case 'followingPlace':
+      return focus.at
+    case 'heading':
+    case 'arrivingTask':
+    case 'returningTask':
       return null
   }
 }
@@ -41,9 +63,9 @@ export function useTaskRowFocus(
   heading: RefObject<HTMLHeadingElement | null>,
 ) {
   const { keepRow } = useFocusAfterRemoval(
-    shownTaskIds,
+    focusKeysOf(shownTaskIds, focus),
     heading,
-    focus.kind === 'followingTask' ? focus.removedAt : null,
+    placeToFollow(focus),
   )
   const { keepArrival } = useFocusOnArrival<string>(
     awaitedButton(focus),

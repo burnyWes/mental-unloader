@@ -5,7 +5,8 @@ import { folderOfList, type Organizer } from '../domain/organizer'
 import {
   DEFAULT_URGENCY_LEAD,
   initialDeadlineOf,
-  isCompleted,
+  hasCompletions,
+  isRecurring,
   taskById,
   type DueChoice,
   type DueKind,
@@ -14,6 +15,7 @@ import {
   type UrgencyLead,
 } from '../domain/task'
 import { completedTasksInOrder, openTasksInOrder } from '../domain/taskOrder'
+import { DEFAULT_REPEAT_RHYTHM, type RepeatRhythm } from '../domain/repetition'
 import type { FoldersOverviewFocus } from './FoldersPage'
 
 export type FolderPageFocus =
@@ -28,6 +30,7 @@ export type ListPageFocus =
   | { kind: 'arrivingTask'; id: TaskId }
   | { kind: 'returningTask'; id: TaskId; button: 'open' | 'complete' }
   | { kind: 'followingTask'; removedAt: number; removedId: TaskId }
+  | { kind: 'followingPlace'; at: number; completedId: TaskId }
 
 export type TaskFlowEntry = 'overview' | 'completion'
 
@@ -37,6 +40,8 @@ export type TaskDraft = {
   dueKind: DueKind
   deadline: CalendarDay
   urgentFrom: UrgencyLead
+  repeats: boolean
+  rhythm: RepeatRhythm
 }
 
 type ListDraft = {
@@ -140,6 +145,8 @@ export function emptyTaskDraft(today: CalendarDay): TaskDraft {
     dueKind: 'someday',
     deadline: initialDeadlineOf(today),
     urgentFrom: DEFAULT_URGENCY_LEAD,
+    repeats: false,
+    rhythm: DEFAULT_REPEAT_RHYTHM,
   }
 }
 
@@ -148,11 +155,14 @@ export function dueChoiceOf(draft: TaskDraft): DueChoice {
     kind: draft.dueKind,
     deadline: draft.deadline,
     urgentFrom: draft.urgentFrom,
+    repeats: draft.repeats,
+    rhythm: draft.rhythm,
   }
 }
 
-export function filterOf(task: Task): TaskFilterKind {
-  return isCompleted(task) ? 'completed' : 'open'
+export function filterOf(task: Task, cameFrom: TaskFilterKind): TaskFilterKind {
+  if (isRecurring(task)) return cameFrom
+  return hasCompletions(task) ? 'completed' : 'open'
 }
 
 export function tasksShownIn(

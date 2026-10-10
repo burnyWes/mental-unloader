@@ -53,6 +53,7 @@ export function UrgentPage({
               <li key={task.id}>
                 <TaskRow
                   task={task}
+                  shownAs="open"
                   today={today}
                   origin={{ folderName: folder.name, listName: list.name }}
                   onOpen={onOpenTask}

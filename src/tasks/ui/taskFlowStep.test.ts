@@ -29,6 +29,8 @@ const draft: TaskDraft = {
   dueKind: 'someday',
   deadline: '2026-10-17',
   urgentFrom: 'oneWeek',
+  repeats: false,
+  rhythm: 'monthly',
 }
 
 const organizer: Organizer = {
@@ -73,6 +75,30 @@ describe('resolveTaskFlowStep', () => {
         organizer,
       ),
     ).toEqual({ kind: 'overview', alreadyCompleted: true })
+  })
+
+  it('keeps asking before completing a recurring task completed before', () => {
+    const recurring = {
+      ...shownTask,
+      task: {
+        ...muell,
+        due: {
+          kind: 'deadline',
+          deadline: '2026-10-17',
+          urgentFrom: 'oneWeek',
+          repetition: { rhythm: 'weekly', anchorDay: 17 },
+        },
+        completions: [5],
+      } satisfies Task,
+    }
+
+    expect(
+      resolveTaskFlowStep(
+        { kind: 'confirmCompletion', from: 'row' },
+        recurring,
+        organizer,
+      ),
+    ).toEqual({ kind: 'confirmCompletion', from: 'row' })
   })
 
   it('asks before deleting a task', () => {

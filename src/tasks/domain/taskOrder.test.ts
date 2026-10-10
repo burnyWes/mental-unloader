@@ -9,7 +9,7 @@ function urgentSince(since: string): Due {
 }
 
 function deadlineOn(deadline: string): Due {
-  return { kind: 'deadline', deadline, urgentFrom: 'oneWeek' }
+  return { kind: 'deadline', deadline, urgentFrom: 'oneWeek', repetition: null }
 }
 
 function task(
@@ -103,6 +103,28 @@ describe('openTasksInOrder', () => {
     const tasks = [task('offen', SOMEDAY, 1), task('erledigt', SOMEDAY, 2, [5])]
 
     expect(namesOf(openTasksInOrder(tasks))).toEqual(['offen'])
+  })
+})
+
+describe('a completed recurring task', () => {
+  const recurring = task(
+    'Müll',
+    {
+      kind: 'deadline',
+      deadline: '2026-10-17',
+      urgentFrom: 'oneWeek',
+      repetition: { rhythm: 'weekly', anchorDay: 17 },
+    },
+    1,
+    [5],
+  )
+
+  it('stays among the open tasks', () => {
+    expect(namesOf(openTasksInOrder([recurring]))).toEqual(['Müll'])
+  })
+
+  it('also shows among the completed tasks', () => {
+    expect(namesOf(completedTasksInOrder([recurring]))).toEqual(['Müll'])
   })
 })
 

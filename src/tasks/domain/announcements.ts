@@ -1,6 +1,7 @@
 import { spokenDateOf, spokenDayOf, type CalendarDay } from './calendarDay'
 import { MAXIMUM_NAME_LENGTH, type InvalidNameReason } from './name'
 import type { OpenTaskSummary } from './organizer'
+import type { RepeatRhythm } from './repetition'
 import { MAXIMUM_DESCRIPTION_LENGTH, type UrgencyLead } from './task'
 
 export function folderCreatedAnnouncement(name: string): string {
@@ -139,6 +140,33 @@ export function taskAlreadyCompletedAnnouncement(name: string): string {
   return `${name} wurde schon erledigt.`
 }
 
+export function recurringTaskCompletionExplanation(
+  next: CalendarDay,
+  today: CalendarDay,
+): string {
+  return `Der nächste Stichtag ist der ${spokenDayOf(next, today)}.`
+}
+
+export function recurringTaskCompletedAnnouncement(
+  name: string,
+  next: CalendarDay,
+  today: CalendarDay,
+): string {
+  return `${name} erledigt, nächster Stichtag ${spokenDayOf(next, today)}.`
+}
+
+export function completionCountLabel(count: number): string {
+  return `${count} mal erledigt`
+}
+
+export function shortCompletionCountOf(count: number): string {
+  return `${count}× erledigt`
+}
+
+export function recurringCompletedLabel(count: number, lastAt: number): string {
+  return `${completionCountLabel(count)}, zuletzt am ${spokenDateOf(lastAt)}`
+}
+
 export function completedOnLabel(at: number): string {
   return `erledigt am ${spokenDateOf(at)}`
 }
@@ -166,6 +194,14 @@ export const URGENCY_LEAD_LABELS: Record<UrgencyLead, string> = {
   oneQuarter: '¼ Jahr vorher',
   halfYear: '½ Jahr vorher',
   oneYear: '1 Jahr vorher',
+}
+
+export const REPEAT_RHYTHM_LABELS: Record<RepeatRhythm, string> = {
+  weekly: 'wöchentlich',
+  monthly: 'monatlich',
+  quarterly: 'vierteljährlich',
+  halfYearly: 'halbjährlich',
+  yearly: 'jährlich',
 }
 
 export function taskDeletionHeading(name: string): string {

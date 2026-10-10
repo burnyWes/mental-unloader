@@ -312,16 +312,16 @@ Eine Aufgabe mit 📅 lässt sich als wiederkehrend speichern und bearbeiten. Ze
 sich in dieser Phase noch wie bei normalen Aufgaben.
 
 **Aufgaben**:
-- [ ] `calendarDay.test.ts` / `calendarDay.ts`: `dayOfMonthOf` und
+- [x] `calendarDay.test.ts` / `calendarDay.ts`: `dayOfMonthOf` und
   `addMonthsOnAnchor(day, months, anchorDay)` test-getrieben.
   - Fälle: 31.01. + 1 mit Anker 31 → 28.02. (29.02. im Schaltjahr), 28.02. + 1 mit Anker
     31 → 31.03., 30.11. + 3 mit Anker 30 → 28.02., 29.02.2028 + 12 mit Anker 29 →
     28.02.2029, Jahreswechsel 15.11. + 3 → 15.02. des Folgejahres.
-- [ ] `repetition.test.ts` / `repetition.ts`: `REPEAT_RHYTHMS`
+- [x] `repetition.test.ts` / `repetition.ts`: `REPEAT_RHYTHMS`
   (`weekly`, `monthly`, `quarterly`, `halfYearly`, `yearly`), `isRepeatRhythm`,
   `DEFAULT_REPEAT_RHYTHM`, `repetitionStartingOn(deadline, rhythm)` (Anker = Tag des
   Stichtags).
-- [ ] `task.test.ts` / `task.ts`:
+- [x] `task.test.ts` / `task.ts`:
   - `Due` deadline mit `repetition: Repetition | null`
   - `DueChoice` mit `repeats` und `rhythm`
   - `dueAfterChange`:
@@ -333,7 +333,7 @@ sich in dieser Phase noch wie bei normalen Aufgaben.
     - gleicher Stichtag, aber Anker passt nicht mehr (Anker 3, Stichtag 24.10.) →
       Anker 24
   - `isRecurring` test-getrieben
-- [ ] Alle `kind: 'deadline'`-Literale in Tests bekommen `repetition: null`:
+- [x] Alle `kind: 'deadline'`-Literale in Tests bekommen `repetition: null`:
   - `App.test.tsx:133`
   - `organizer.test.ts:134,205`
   - `task.test.ts:67,120,141`
@@ -344,38 +344,39 @@ sich in dieser Phase noch wie bei normalen Aufgaben.
 
   Die `TaskDraft`- und `DueChoice`-Literale in `taskFlowStep.test.ts:26` und
   `task.test.ts:73` (`chosen()`) bekommen `repeats` und `rhythm`.
-- [ ] `FoldersArea.tsx:220` (Anlegen über `dueAfterChange(null, …)`) übernimmt
+- [x] `FoldersArea.tsx:220` (Anlegen über `dueAfterChange(null, …)`) übernimmt
   `repeats` und `rhythm` über `dueChoiceOf`. Getestet wird das über den Bereichstest
   zum Anlegen.
-- [ ] `announcements.ts`: `REPEAT_RHYTHM_LABELS` (wöchentlich, monatlich,
+- [x] `announcements.ts`: `REPEAT_RHYTHM_LABELS` (wöchentlich, monatlich,
   vierteljährlich, halbjährlich, jährlich), Test, dass jeder Rhythmus einen Text hat.
-- [ ] `organizerClient.ts` bleibt in dieser Phase unverändert. `NewTask` und
+- [x] `organizerClient.ts` bleibt in dieser Phase unverändert. `NewTask` und
   `TaskContent` tragen die Wiederholung über `due`.
-- [ ] `firestoreOrganizerClient.ts`:
+- [x] `firestoreOrganizerClient.ts`:
   - `storedDueFields` schreibt `repeat` und `anchorDay`, wenn `repetition` gesetzt ist
   - `removedDueFields` löscht beide mit
   - `toDeadlineDue` liest tolerant: `isRepeatRhythm(stored.repeat)`, sonst `null`;
     `anchorDay` als ganze Zahl 1–31, sonst `dayOfMonthOf(deadline)`
-- [ ] `foldersAreaPage.ts`:
+- [x] `foldersAreaPage.ts`:
   - `TaskDraft` um `repeats: boolean` und `rhythm: RepeatRhythm` erweitert
   - `emptyTaskDraft` setzt `repeats: false` und `rhythm: DEFAULT_REPEAT_RHYTHM`
   - `dueChoiceOf` reicht beides durch
-- [ ] `TaskFlow.tsx`: `deadlineDraftOf` übernimmt `repeats` und `rhythm` aus der Aufgabe,
+- [x] `TaskFlow.tsx`: `deadlineDraftOf` übernimmt `repeats` und `rhythm` aus der Aufgabe,
   sonst gelten die Voreinstellungen.
-- [ ] `RepeatIcon.tsx`: SVG mit zwei Kreispfeilen im Stil von `CalendarIcon.tsx`.- [ ] `RepeatFields.tsx` mit `TaskFormPage.tsx`: Nur bei `dueKind === 'deadline'` und
+- [x] `RepeatIcon.tsx`: SVG mit zwei Kreispfeilen im Stil von `CalendarIcon.tsx`.
+- [x] `RepeatFields.tsx` mit `TaskFormPage.tsx`: Nur bei `dueKind === 'deadline'` und
   unterhalb von `UrgencyLeadSelect` erscheint der Schalter
   `<label><RepeatIcon/><span>Wiederkehrend</span><input type="checkbox"
   className="checkboxLook"/></label>`. Ist `repeats` gesetzt, folgt
   `<label htmlFor="repeatRhythm">Rhythmus</label><select id="repeatRhythm">`. Die CSS
   der Fälligkeits-Labels in `index.css` wird für den Schalter wiederverwendet.
-- [ ] `TaskRow.tsx`: In `DeadlineTaskName` (offen und überfällig) zeigt die Detailzeile
+- [x] `TaskRow.tsx`: In `DeadlineTaskName` (offen und überfällig) zeigt die Detailzeile
   hinter dem Datum `<RepeatIcon/>`. Der versteckte Text bekommt
   `, ${REPEAT_RHYTHM_LABELS[rhythm]}` direkt hinter Stichtag bzw. „überfällig seit …“
   und vor „, dringend“.
-- [ ] `e2e/organizer.ts`: `recurringRowName(name, spokenDay, rhythmLabel)`.
-- [ ] `TaskPage.tsx`: Bei `repetition !== null` folgt hinter „Dringend ab“ die Zeile
+- [x] `e2e/organizer.ts`: `recurringRowName(name, spokenDay, rhythmLabel)`.
+- [x] `TaskPage.tsx`: Bei `repetition !== null` folgt hinter „Dringend ab“ die Zeile
   `<dt>Wiederholung</dt><dd><RepeatIcon/> monatlich</dd>`.
-- [ ] `FoldersAreaDeadline.test.tsx` (oder eine neue `FoldersAreaRecurring.test.tsx`
+- [x] `FoldersAreaDeadline.test.tsx` (oder eine neue `FoldersAreaRecurring.test.tsx`
   nach demselben Muster, `foldersAreaHarness.tsx`):
   - Schalter erscheint nur bei 📅, Rhythmus nur bei Haken
   - Voreinstellung monatlich
@@ -385,15 +386,15 @@ sich in dieser Phase noch wie bei normalen Aufgaben.
   - Bearbeiten zeigt Haken und Rhythmus vorbelegt
   - Speichern ohne Datumsänderung behält den Anker
   - axe ohne Verstöße auf dem Formular mit Rhythmus
-- [ ] `e2e/recurring.spec.ts`: „keeps a recurring task after a reload“. Eine
+- [x] `e2e/recurring.spec.ts`: „keeps a recurring task after a reload“. Eine
   wiederkehrende Aufgabe wird angelegt, die Seite neu geladen, und Zeilenname sowie
   „Wiederholung“ auf der Übersicht stimmen.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün (Unit-, Bereichs- und Architekturtests)
-- [ ] `npm run test:rules` grün
-- [ ] `npm run lint` und `npm run build` laufen durch
-- [ ] `npx playwright test e2e/recurring.spec.ts` grün
+- [x] `npm run test` grün (Unit-, Bereichs- und Architekturtests)
+- [x] `npm run test:rules` grün
+- [x] `npm run lint` und `npm run build` laufen durch
+- [x] `npx playwright test e2e/recurring.spec.ts` grün
 
 ### Phase 2: Wiederkehrend erledigen
 
@@ -403,7 +404,7 @@ Erledigen schiebt den Stichtag weiter, die Aufgabe bleibt offen und sammelt ihre
 Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den Verlauf.
 
 **Aufgaben**:
-- [ ] `repetition.test.ts` / `repetition.ts`: `nextDeadlineAfter(deadline, repetition,
+- [x] `repetition.test.ts` / `repetition.ts`: `nextDeadlineAfter(deadline, repetition,
   today)` test-getrieben. Erst ein Schritt, dann so lange, bis das Ergebnis `> today`
   ist. Monatsschritte rechnen immer vom Anker aus.
   - wöchentlich, vor dem Stichtag erledigt: 15.10. (heute 10.10.) → 22.10.
@@ -415,19 +416,19 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
   - jährlich am 29.02.2028 → 28.02.2029, nach vier Jahren wieder 29.02.2032
   - lange überfällig (monatlich, Stichtag vor 14 Monaten) → erster Monatsanker nach
     heute
-- [ ] `task.test.ts` / `task.ts`:
+- [x] `task.test.ts` / `task.ts`:
   - `hasCompletions` (ersetzt `isCompleted`, alle Aufrufer umstellen)
   - `isOpen(task) = isRecurring(task) || !hasCompletions(task)`
   - `completionsNewestFirst(task)`
   - `nextDeadlineOf(task, today): CalendarDay | null`
   - `endsRepetition(previous: Due, next: Due)`: war wiederkehrend und ist es nicht mehr
-- [ ] `taskOrder.test.ts` / `taskOrder.ts`: `openTasksInOrder` filtert mit `isOpen`,
+- [x] `taskOrder.test.ts` / `taskOrder.ts`: `openTasksInOrder` filtert mit `isOpen`,
   `completedTasksInOrder` mit `hasCompletions`. Neu getestet: Eine wiederkehrende
   Aufgabe mit Erledigung steht in beiden.
-- [ ] `organizer.test.ts` / `organizer.ts`: `openTaskSummaryOfList` mit `isOpen`.
+- [x] `organizer.test.ts` / `organizer.ts`: `openTaskSummaryOfList` mit `isOpen`.
   Getestet wird, dass eine wiederkehrende Aufgabe mit Erledigung als offen zählt. Die
   Dringend-Sicht (`urgentTasksOf`) enthält sie, solange ihr Vorlauf erreicht ist.
-- [ ] `announcements.test.ts` / `announcements.ts`:
+- [x] `announcements.test.ts` / `announcements.ts`:
   - `recurringTaskCompletionExplanation(next, today)` → „Der nächste Stichtag ist der
     22. Oktober.“, im anderen Jahr „… der 5. Januar 2027.“
   - `recurringTaskCompletedAnnouncement(name, next, today)` → „Müll rausbringen erledigt,
@@ -435,23 +436,23 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
   - `recurringCompletedLabel(count, lastAt)` → „3 mal erledigt, zuletzt am 10. Oktober“
     (1 → „1 mal erledigt, …“)
   - `shortCompletionCountOf(count)` → „3× erledigt“
-- [ ] `organizerClient.ts`:
+- [x] `organizerClient.ts`:
   - `completeTask(id, at, nextDeadline: CalendarDay | null)`
   - `changeTask(id, content, listId, completionsReset: boolean)`
   - `useOrganizer.ts` reicht beides durch
-- [ ] `inMemoryOrganizerClient.ts`:
+- [x] `inMemoryOrganizerClient.ts`:
   - `completeTask` setzt bei `nextDeadline` zusätzlich `due.deadline`
   - `changeTask` leert bei `completionsReset` die `completions`
-- [ ] `firestoreOrganizerClient.ts`:
+- [x] `firestoreOrganizerClient.ts`:
   - `completeTask` schreibt `{ completions: arrayUnion(at), deadline: nextDeadline }` in
     einem `updateDoc`, `deadline` nur bei `nextDeadline !== null`
   - `changedStoredTask` setzt bei `completionsReset` `completions: []`
-- [ ] `foldersAreaPage.ts`:
+- [x] `foldersAreaPage.ts`:
   - `filterOf(task, cameFrom)`: wiederkehrend → `cameFrom`, sonst wie bisher über
     `hasCompletions`
   - `ListPageFocus` um `{ kind: 'followingPlace'; at: number; completedId: TaskId }`
     erweitert
-- [ ] `useTaskRowFocus.ts`:
+- [x] `useTaskRowFocus.ts`:
   - `focusKeysOf(shownIds, focus)` entfernt bei `followingPlace` die `completedId`
   - `useFocusAfterRemoval(focusKeys, heading, at)`
   - `awaitedButton` gibt für `followingPlace` `null` zurück
@@ -461,20 +462,20 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
     Dafür hält der In-Memory-Fake die Snapshots mit `holdBackSnapshots()` /
     `releaseSnapshots()` zurück (`inMemoryOrganizerClient.ts:12-13`, Muster in
     `FoldersAreaTasks.test.tsx:223`).
-- [ ] `FoldersArea.tsx`:
+- [x] `FoldersArea.tsx`:
   - `leaveTask('completed')` bei `isRecurring(task)` und Filter „offen“:
     `showList(list, folder.id, 'open', { kind: 'followingPlace', at, completedId })`.
     `at` stammt aus `tasksShownIn('open', …)` vor dem Schreiben.
   - Bei Filter „erledigt“ (Entscheidung 12):
     `showList(list, folder.id, 'completed', { kind: 'returningTask', id, button: 'open' })`
   - `back` und `deleted` nutzen `filterOf(task, shownPage.filter)`
-- [ ] `urgentAreaPage.ts` / `urgentAreaPage.test.ts`: `focusAfterLeaving` bei
+- [x] `urgentAreaPage.ts` / `urgentAreaPage.test.ts`: `focusAfterLeaving` bei
   `completed` und wiederkehrender Aufgabe →
   `followingPlace { at: stillShown ? currentPlace : openedAt, completedId }`.
-- [ ] `taskFlowStep.ts` / `taskFlowStep.test.ts`: Der Rückfall `alreadyCompleted` greift
+- [x] `taskFlowStep.ts` / `taskFlowStep.test.ts`: Der Rückfall `alreadyCompleted` greift
   nur bei `!isOpen(task)`. Eine wiederkehrende Aufgabe mit Erledigung bleibt auf der
   Bestätigung.
-- [ ] `TaskFlow.tsx`:
+- [x] `TaskFlow.tsx`:
   - `complete` berechnet `next = nextDeadlineOf(task, today)` und ruft
     `completeTask(id, at, next)` auf. Die Ansage kommt bei `next !== null` über
     `recurringTaskCompletedAnnouncement`.
@@ -482,20 +483,20 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
     `recurringTaskCompletionExplanation`.
   - `save` berechnet `completionsReset = endsRepetition(task.due, due)` und übergibt es
     an `changeTask`.
-- [ ] `TaskRow.tsx`:
+- [x] `TaskRow.tsx`:
   - Neue Prop `shownAs: TaskFilterKind` ersetzt die Weiche über `lastCompletion`
   - Bei `'completed'` und wiederkehrender Aufgabe rendert `RecurringCompletedTaskName`:
     sichtbar `3× erledigt, zuletzt 10.10.` (`aria-hidden`), gesprochen
     `, ${recurringCompletedLabel(count, last)}`
   - `ListPage` übergibt `filter`, `UrgentPage` übergibt `'open'`
-- [ ] `TaskPage.tsx`: Bei wiederkehrenden Aufgaben
+- [x] `TaskPage.tsx`: Bei wiederkehrenden Aufgaben
   - entfällt die Zeile „Erledigt“
   - gibt es bei mindestens einer Erledigung `<dt>Verlauf</dt><dd>3× erledigt
     <ul>…</ul></dd>`. Jeder Eintrag aus `completionsNewestFirst` wird mit
     `fullDayOf(calendarDayOf(new Date(at)))` geschrieben („10. Oktober 2026“), es gibt
     keine neue Datumsfunktion.
   - ist der erste Knopf immer ✓ „Erledigen“
-- [ ] Bereichstests (`FoldersAreaRecurring.test.tsx`, `UrgentArea.test.tsx`):
+- [x] Bereichstests (`FoldersAreaRecurring.test.tsx`, `UrgentArea.test.tsx`):
   - Bestätigung nennt den nächsten Stichtag
   - nach dem Bestätigen: neuer Stichtag in der Zeile, die Aufgabe unter „offen“ an
     neuer Position, Fokus auf der nachrückenden Zeile (bzw. Überschrift, wenn sie die
@@ -515,17 +516,17 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
     ist, der Fokus liegt auf der nachrückenden Zeile, der Badge sinkt; bei dauerhaft
     dringender Aufgabe (wöchentlich, „1 Monat vorher“) bleibt sie stehen
   - axe ohne Verstöße auf Übersicht mit Verlauf und auf der Erledigt-Ansicht
-- [ ] `e2e/recurring.spec.ts`: „moves the deadline when a recurring task is completed“.
+- [x] `e2e/recurring.spec.ts`: „moves the deadline when a recurring task is completed“.
   Eine wöchentliche Aufgabe wird angelegt und erledigt, die Zeile zeigt den Stichtag eine
   Woche später, und nach einem Neuladen stehen „erledigt (1)“ und der Verlauf auf der
   Übersicht.
 
 **Automatisierte Verifikation**:
-- [ ] `npm run test` grün (Unit-, Bereichs- und Architekturtests)
-- [ ] `npm run test:rules` grün
-- [ ] `npm run lint` und `npm run build` laufen durch
-- [ ] `npx playwright test` grün (alle E2E-Specs, auch `tasks`, `deadline`, `urgent`)
-- [ ] `grep -rn "isCompleted" src` liefert keine Treffer mehr
+- [x] `npm run test` grün (Unit-, Bereichs- und Architekturtests)
+- [x] `npm run test:rules` grün
+- [x] `npm run lint` und `npm run build` laufen durch
+- [x] `npx playwright test` grün (alle E2E-Specs, auch `tasks`, `deadline`, `urgent`)
+- [x] `grep -rn "isCompleted" src` liefert keine Treffer mehr
 
 **Manuelle Verifikation**:
 - [ ] Am iPhone mit VoiceOver eine monatliche Aufgabe anlegen, erledigen und prüfen:
@@ -537,6 +538,18 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
 ## Notizen zur Umsetzung
 
 Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalten.
+
+- `repetition.ts` hat zusätzlich `isAnchorDay` (tolerantes Lesen des Ankers im
+  Firestore-Adapter) und `isAnchoredOn` (Passprüfung aus Entscheidung 6) bekommen, damit
+  beide Regeln in der Domäne liegen.
+- `task.ts` exportiert `repetitionOf(due)`; `isRecurring` und `endsRepetition` bauen
+  darauf auf.
+- Die Übersicht spricht „3 mal erledigt“ und zeigt „3× erledigt“ (sichtbar und
+  gesprochen getrennt, wie in der Zeile).
+- 🔁 ist das Lucide-Motiv „repeat“ (zwei Pfeile im Kreislauf), damit es sich vom
+  Einzelpfeil ↺ (`ReopenIcon`) klar unterscheidet.
+- Das Sinken des Badges ist über `urgentTasksOf` abgedeckt; der Bereichstest der
+  Dringend-Seite prüft das Verschwinden der Zeile.
 
 ## Verweise
 

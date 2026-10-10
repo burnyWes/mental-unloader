@@ -1,7 +1,8 @@
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import type { Organizer } from '../domain/organizer'
-import type { Task } from '../domain/task'
+import type { CalendarDay } from '../domain/calendarDay'
+import type { Due, Task } from '../domain/task'
 import type { OrganizerClient } from './organizerClient'
 
 export type InMemoryOrganizerClient = OrganizerClient & {
@@ -11,6 +12,11 @@ export type InMemoryOrganizerClient = OrganizerClient & {
   storedTasks(): readonly Task[]
   holdBackSnapshots(): void
   releaseSnapshots(): void
+}
+
+function dueMovedTo(due: Due, nextDeadline: CalendarDay | null): Due {
+  if (due.kind !== 'deadline' || nextDeadline === null) return due
+  return { ...due, deadline: nextDeadline }
 }
 
 export function createInMemoryOrganizerClient({
@@ -86,16 +92,27 @@ export function createInMemoryOrganizerClient({
       publish()
       return id
     },
-    changeTask(id, content, listId) {
+    changeTask(id, content, listId, completionsReset) {
       tasks = tasks.map((task) =>
-        task.id === id ? { ...task, ...content, listId } : task,
+        task.id === id
+          ? {
+              ...task,
+              ...content,
+              listId,
+              completions: completionsReset ? [] : task.completions,
+            }
+          : task,
       )
       publish()
     },
-    completeTask(id, at) {
+    completeTask(id, at, nextDeadline) {
       tasks = tasks.map((task) =>
         task.id === id
-          ? { ...task, completions: [...task.completions, at] }
+          ? {
+              ...task,
+              due: dueMovedTo(task.due, nextDeadline),
+              completions: [...task.completions, at],
+            }
           : task,
       )
       publish()

@@ -29,7 +29,12 @@ import {
   tasksOfFolder,
   tasksOfList,
 } from '../domain/organizer'
-import { createDescription, dueAfterChange, type Task } from '../domain/task'
+import {
+  createDescription,
+  dueAfterChange,
+  isRecurring,
+  type Task,
+} from '../domain/task'
 import { FolderPage } from './FolderPage'
 import { FolderSelect } from './FolderSelect'
 import {
@@ -248,11 +253,34 @@ export function FoldersArea({
     }
   }
 
+  function followingPlace(task: Task): ListPageFocus {
+    const shownTasks = tasksShownIn('open', tasksOfList(organizer, task.listId))
+    return {
+      kind: 'followingPlace',
+      at: shownTasks.findIndex((each) => each.id === task.id),
+      completedId: task.id,
+    }
+  }
+
+  function leaveCompletedRecurringTask(shownPage: ShownTaskPage) {
+    const { task, list, folder, filter } = shownPage
+    if (filter === 'completed') {
+      showList(list, folder.id, 'completed', {
+        kind: 'returningTask',
+        id: task.id,
+        button: 'open',
+      })
+      return
+    }
+    showList(list, folder.id, 'open', followingPlace(task))
+  }
+
   function leaveTask(shownPage: ShownTaskPage, reason: TaskFlowLeaveReason) {
     const { task, list, folder } = shownPage
+    const returnFilter = filterOf(task, shownPage.filter)
     switch (reason) {
       case 'back':
-        showList(list, folder.id, filterOf(task), {
+        showList(list, folder.id, returnFilter, {
           kind: 'returningTask',
           id: task.id,
           button: 'open',
@@ -266,14 +294,18 @@ export function FoldersArea({
         })
         return
       case 'completed':
+        if (isRecurring(task)) {
+          leaveCompletedRecurringTask(shownPage)
+          return
+        }
         showList(list, folder.id, 'open', followingTask(task, 'open'))
         return
       case 'deleted':
         showList(
           list,
           folder.id,
-          filterOf(task),
-          followingTask(task, filterOf(task)),
+          returnFilter,
+          followingTask(task, returnFilter),
         )
     }
   }

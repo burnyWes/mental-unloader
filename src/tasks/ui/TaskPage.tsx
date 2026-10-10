@@ -5,19 +5,32 @@ import { PencilIcon } from '../../shared/ui/PencilIcon'
 import { ReopenIcon } from '../../shared/ui/ReopenIcon'
 import { TrashIcon } from '../../shared/ui/TrashIcon'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
-import { URGENCY_LEAD_LABELS } from '../domain/announcements'
 import {
+  completionCountLabel,
+  REPEAT_RHYTHM_LABELS,
+  shortCompletionCountOf,
+  URGENCY_LEAD_LABELS,
+} from '../domain/announcements'
+import {
+  calendarDayOf,
   fullDayOf,
   spokenDateOf,
   type CalendarDay,
 } from '../domain/calendarDay'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
-import { lastCompletion, type Task } from '../domain/task'
+import {
+  completionsNewestFirst,
+  isOpen,
+  isRecurring,
+  lastCompletion,
+  type Task,
+} from '../domain/task'
 import { isOverdueOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
 import { CoffeeIcon } from './CoffeeIcon'
 import { FlameIcon } from './FlameIcon'
+import { RepeatIcon } from './RepeatIcon'
 
 type TaskPageProps = {
   task: Task
@@ -57,6 +70,35 @@ function DueFact({ task, today }: { task: Task; today: CalendarDay }) {
   }
 }
 
+function CompletionFacts({ task }: { task: Task }) {
+  const completedAt = lastCompletion(task)
+  if (completedAt === null) return null
+  if (!isRecurring(task))
+    return (
+      <>
+        <dt>Erledigt</dt>
+        <dd>{spokenDateOf(completedAt)}</dd>
+      </>
+    )
+  const count = task.completions.length
+  return (
+    <>
+      <dt>Verlauf</dt>
+      <dd>
+        <span aria-hidden="true">{shortCompletionCountOf(count)}</span>
+        <span className="visuallyHidden">{completionCountLabel(count)}</span>
+        <ul className="completionHistory">
+          {completionsNewestFirst(task).map((at, place) => (
+            <li key={`${at}-${place}`}>
+              {fullDayOf(calendarDayOf(new Date(at)))}
+            </li>
+          ))}
+        </ul>
+      </dd>
+    </>
+  )
+}
+
 export function TaskPage({
   task,
   list,
@@ -69,7 +111,7 @@ export function TaskPage({
   onDelete,
 }: TaskPageProps) {
   const heading = useHeadingFocus()
-  const completedAt = lastCompletion(task)
+  const offersCompletion = isOpen(task)
 
   return (
     <main className="page">
@@ -93,6 +135,14 @@ export function TaskPage({
             <dd>{URGENCY_LEAD_LABELS[task.due.urgentFrom]}</dd>
           </>
         )}
+        {task.due.kind === 'deadline' && task.due.repetition !== null && (
+          <>
+            <dt>Wiederholung</dt>
+            <dd>
+              <RepeatIcon /> {REPEAT_RHYTHM_LABELS[task.due.repetition.rhythm]}
+            </dd>
+          </>
+        )}
         <dt>Liste</dt>
         <dd>
           <span aria-hidden="true">
@@ -102,20 +152,15 @@ export function TaskPage({
             {folder.name}, {list.name}
           </span>
         </dd>
-        {completedAt !== null && (
-          <>
-            <dt>Erledigt</dt>
-            <dd>{spokenDateOf(completedAt)}</dd>
-          </>
-        )}
+        <CompletionFacts task={task} />
       </dl>
       <BottomBar>
         <button
           type="button"
-          aria-label={completedAt === null ? 'Erledigen' : 'Wieder öffnen'}
-          onClick={completedAt === null ? onComplete : onReopen}
+          aria-label={offersCompletion ? 'Erledigen' : 'Wieder öffnen'}
+          onClick={offersCompletion ? onComplete : onReopen}
         >
-          {completedAt === null ? <CheckIcon /> : <ReopenIcon />}
+          {offersCompletion ? <CheckIcon /> : <ReopenIcon />}
         </button>
         <button type="button" aria-label="Bearbeiten" onClick={onEdit}>
           <PencilIcon />

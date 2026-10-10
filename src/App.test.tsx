@@ -133,6 +133,7 @@ function deadlineTask(name: string, deadline: string) {
     kind: 'deadline',
     deadline,
     urgentFrom: 'oneWeek',
+    repetition: null,
   })
 }
 

@@ -119,6 +119,7 @@ export function ListPage({
               <li key={task.id}>
                 <TaskRow
                   task={task}
+                  shownAs={filter}
                   today={today}
                   onOpen={onOpenTask}
                   onComplete={filter === 'open' ? onCompleteTask : undefined}

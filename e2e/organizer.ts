@@ -110,3 +110,28 @@ export async function createDeadlineTask(page: Page, name: string) {
   await page.keyboard.press('ArrowUp')
   await pressButton(page, 'Speichern')
 }
+
+export function recurringRowName(
+  name: string,
+  spokenDay: string,
+  rhythmLabel: string,
+) {
+  return `${deadlineRowName(name, spokenDay)}, ${rhythmLabel}`
+}
+
+export async function createRecurringTask(
+  page: Page,
+  name: string,
+  rhythmLabel: string,
+) {
+  await pressButton(page, 'Aufgabe anlegen')
+  await typeInto(page, 'Name', name)
+  await page.getByRole('radio', { name: 'Stichtag' }).focus()
+  await page.keyboard.press('Space')
+  await page.getByRole('spinbutton', { name: 'Jahr' }).focus()
+  await page.keyboard.press('ArrowUp')
+  await page.getByRole('checkbox', { name: 'Wiederkehrend' }).focus()
+  await page.keyboard.press('Space')
+  await page.getByLabel('Rhythmus', { exact: true }).selectOption(rhythmLabel)
+  await pressButton(page, 'Speichern')
+}

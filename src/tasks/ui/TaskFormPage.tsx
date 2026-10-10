@@ -13,6 +13,7 @@ import { CoffeeIcon } from './CoffeeIcon'
 import { DeadlineStepper } from './DeadlineStepper'
 import { FlameIcon } from './FlameIcon'
 import type { TaskDraft } from './foldersAreaPage'
+import { RepeatFields } from './RepeatFields'
 import { UrgencyLeadSelect } from './UrgencyLeadSelect'
 
 const DUE_CHOICES: readonly {
@@ -149,6 +150,12 @@ export function TaskFormPage({
           <UrgencyLeadSelect
             urgentFrom={draft.urgentFrom}
             onChange={(urgentFrom) => change({ urgentFrom })}
+          />
+          <RepeatFields
+            repeats={draft.repeats}
+            rhythm={draft.rhythm}
+            onRepeatsChange={(repeats) => change({ repeats })}
+            onRhythmChange={(rhythm) => change({ rhythm })}
           />
         </>
       )}

@@ -115,6 +115,24 @@ export function subtractMonths(day: CalendarDay, count: number): CalendarDay {
   )
 }
 
+export function addMonthsOnAnchor(
+  day: CalendarDay,
+  months: number,
+  anchorDay: number,
+): CalendarDay {
+  const { year, month } = partsOf(day)
+  const target = new Date(Date.UTC(year, month - 1 + months, 1))
+  return withDayCutToMonth(
+    target.getUTCFullYear(),
+    target.getUTCMonth() + 1,
+    anchorDay,
+  )
+}
+
+export function dayOfMonthOf(day: CalendarDay): number {
+  return partsOf(day).day
+}
+
 export function isCalendarDay(value: unknown): value is CalendarDay {
   if (typeof value !== 'string') return false
   const form = CALENDAR_DAY_FORM.exec(value)

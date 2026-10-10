@@ -16,10 +16,16 @@ import {
   listMovedAnnouncement,
   listSavedAnnouncement,
   completedOnLabel,
+  completionCountLabel,
   deadlineLabel,
   nameFailureMessage,
   openTaskSummaryLabel,
   overdueLabel,
+  recurringCompletedLabel,
+  recurringTaskCompletedAnnouncement,
+  recurringTaskCompletionExplanation,
+  shortCompletionCountOf,
+  REPEAT_RHYTHM_LABELS,
   TASK_COMPLETION_EXPLANATION,
   TASK_DELETION_EXPLANATION,
   taskAlreadyCompletedAnnouncement,
@@ -77,6 +83,47 @@ describe('task completion announcements', () => {
   })
 })
 
+describe('recurring task completion announcements', () => {
+  it('names the next deadline before completing', () => {
+    expect(recurringTaskCompletionExplanation('2026-10-22', '2026-10-10')).toBe(
+      'Der nächste Stichtag ist der 22. Oktober.',
+    )
+  })
+
+  it('names the year of a next deadline in another year', () => {
+    expect(recurringTaskCompletionExplanation('2027-01-05', '2026-10-10')).toBe(
+      'Der nächste Stichtag ist der 5. Januar 2027.',
+    )
+  })
+
+  it('announces a completed recurring task with its next deadline', () => {
+    expect(
+      recurringTaskCompletedAnnouncement(
+        'Müll rausbringen',
+        '2026-10-22',
+        '2026-10-10',
+      ),
+    ).toBe('Müll rausbringen erledigt, nächster Stichtag 22. Oktober.')
+  })
+
+  it.each([
+    [1, '1 mal erledigt'],
+    [3, '3 mal erledigt'],
+  ])('counts %i completions as %s', (count, label) => {
+    expect(completionCountLabel(count)).toBe(label)
+  })
+
+  it('names the count and the last completion', () => {
+    expect(
+      recurringCompletedLabel(3, new Date(2026, 9, 10, 9, 0).getTime()),
+    ).toBe('3 mal erledigt, zuletzt am 10. Oktober')
+  })
+
+  it('shows the count of completions briefly', () => {
+    expect(shortCompletionCountOf(3)).toBe('3× erledigt')
+  })
+})
+
 describe('deadline labels', () => {
   it('names the deadline of the running year', () => {
     expect(deadlineLabel('2026-10-17', '2026-10-10')).toBe(
@@ -111,6 +158,18 @@ describe('urgency lead labels', () => {
     ['oneYear', '1 Jahr vorher'],
   ] as const)('names %s as %s', (lead, label) => {
     expect(URGENCY_LEAD_LABELS[lead]).toBe(label)
+  })
+})
+
+describe('repeat rhythm labels', () => {
+  it.each([
+    ['weekly', 'wöchentlich'],
+    ['monthly', 'monatlich'],
+    ['quarterly', 'vierteljährlich'],
+    ['halfYearly', 'halbjährlich'],
+    ['yearly', 'jährlich'],
+  ] as const)('names %s as %s', (rhythm, label) => {
+    expect(REPEAT_RHYTHM_LABELS[rhythm]).toBe(label)
   })
 })
 

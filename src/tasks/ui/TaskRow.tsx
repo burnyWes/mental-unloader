@@ -4,16 +4,27 @@ import {
   completedOnLabel,
   deadlineLabel,
   overdueLabel,
+  recurringCompletedLabel,
+  REPEAT_RHYTHM_LABELS,
+  shortCompletionCountOf,
 } from '../domain/announcements'
 import {
   shortDateOf,
   shortDayOf,
   type CalendarDay,
 } from '../domain/calendarDay'
-import { lastCompletion, type Task } from '../domain/task'
+import type { Repetition } from '../domain/repetition'
+import {
+  isRecurring,
+  lastCompletion,
+  repetitionOf,
+  type Task,
+} from '../domain/task'
 import { isOverdueOn, isUrgentOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
 import { FlameIcon } from './FlameIcon'
+import type { TaskFilterKind } from './foldersAreaPage'
+import { RepeatIcon } from './RepeatIcon'
 
 export type TaskOrigin = {
   folderName: string
@@ -22,6 +33,7 @@ export type TaskOrigin = {
 
 type TaskRowProps = {
   task: Task
+  shownAs: TaskFilterKind
   today: CalendarDay
   origin?: TaskOrigin
   onOpen: (task: Task) => void
@@ -56,6 +68,21 @@ function UrgentTaskName({
   )
 }
 
+function SpokenRhythm({ repetition }: { repetition: Repetition | null }) {
+  if (repetition === null) return null
+  return <>, {REPEAT_RHYTHM_LABELS[repetition.rhythm]}</>
+}
+
+function ShownRhythm({ repetition }: { repetition: Repetition | null }) {
+  if (repetition === null) return null
+  return (
+    <>
+      {' '}
+      <RepeatIcon />
+    </>
+  )
+}
+
 function DeadlineTaskName({
   task,
   deadline,
@@ -68,6 +95,7 @@ function DeadlineTaskName({
   origin?: TaskOrigin
 }) {
   const shortDay = shortDayOf(deadline, today)
+  const repetition = repetitionOf(task.due)
   if (isOverdueOn(task, today))
     return (
       <>
@@ -75,11 +103,13 @@ function DeadlineTaskName({
           {task.name}
           <span className="visuallyHidden">
             , {overdueLabel(deadline, today)}
+            <SpokenRhythm repetition={repetition} />
           </span>
           <SeparatorBeforeOrigin origin={origin} />
         </span>{' '}
         <span className="taskRowDetail overdue" aria-hidden="true">
-          <CalendarIcon /> {shortDay} überfällig
+          <CalendarIcon /> {shortDay}
+          <ShownRhythm repetition={repetition} /> überfällig
         </span>
       </>
     )
@@ -90,12 +120,14 @@ function DeadlineTaskName({
         {task.name}
         <span className="visuallyHidden">
           , {deadlineLabel(deadline, today)}
+          <SpokenRhythm repetition={repetition} />
           {urgent && ', dringend'}
         </span>
         <SeparatorBeforeOrigin origin={origin} />
       </span>{' '}
       <span className="taskRowDetail" aria-hidden="true">
         <CalendarIcon /> {shortDay}
+        <ShownRhythm repetition={repetition} />
         {urgent && (
           <>
             {' '}
@@ -163,6 +195,59 @@ function CompletedTaskName({
   )
 }
 
+function RecurringCompletedTaskName({
+  completedAt,
+  task,
+  origin,
+}: {
+  completedAt: number
+  task: Task
+  origin?: TaskOrigin
+}) {
+  const count = task.completions.length
+  return (
+    <>
+      <span className="taskRowTitle">
+        {task.name}
+        <span className="visuallyHidden">
+          , {recurringCompletedLabel(count, completedAt)}
+        </span>
+        <SeparatorBeforeOrigin origin={origin} />
+      </span>{' '}
+      <span className="taskRowDetail" aria-hidden="true">
+        {shortCompletionCountOf(count)}, zuletzt {shortDateOf(completedAt)}
+      </span>
+    </>
+  )
+}
+
+function ShownTaskName({
+  task,
+  shownAs,
+  today,
+  origin,
+}: {
+  task: Task
+  shownAs: TaskFilterKind
+  today: CalendarDay
+  origin?: TaskOrigin
+}) {
+  const completedAt = lastCompletion(task)
+  if (shownAs === 'open' || completedAt === null)
+    return <OpenTaskName task={task} today={today} origin={origin} />
+  if (isRecurring(task))
+    return (
+      <RecurringCompletedTaskName
+        completedAt={completedAt}
+        task={task}
+        origin={origin}
+      />
+    )
+  return (
+    <CompletedTaskName completedAt={completedAt} task={task} origin={origin} />
+  )
+}
+
 function TaskOriginLine({ folderName, listName }: TaskOrigin) {
   return (
     <span className="taskRowOrigin">
@@ -175,6 +260,7 @@ function TaskOriginLine({ folderName, listName }: TaskOrigin) {
 
 export function TaskRow({
   task,
+  shownAs,
   today,
   origin,
   onOpen,
@@ -182,8 +268,6 @@ export function TaskRow({
   openButton,
   completeButton,
 }: TaskRowProps) {
-  const completedAt = lastCompletion(task)
-
   return (
     <div className="taskRow">
       <button
@@ -192,15 +276,12 @@ export function TaskRow({
         ref={openButton}
         onClick={() => onOpen(task)}
       >
-        {completedAt === null ? (
-          <OpenTaskName task={task} today={today} origin={origin} />
-        ) : (
-          <CompletedTaskName
-            completedAt={completedAt}
-            task={task}
-            origin={origin}
-          />
-        )}
+        <ShownTaskName
+          task={task}
+          shownAs={shownAs}
+          today={today}
+          origin={origin}
+        />
         {origin !== undefined && (
           <>
             {' '}

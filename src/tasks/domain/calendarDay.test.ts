@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   addDays,
+  addMonthsOnAnchor,
   calendarDayFrom,
   calendarDayOf,
+  dayOfMonthOf,
   daysInMonth,
   fullDayOf,
   isCalendarDay,
@@ -128,6 +130,28 @@ describe('subtractMonths', () => {
   ] as const)('takes from %s %i months giving %s', (day, count, result) => {
     expect(subtractMonths(day, count)).toBe(result)
   })
+})
+
+describe('dayOfMonthOf', () => {
+  it('finds the day within its month', () => {
+    expect(dayOfMonthOf('2026-10-05')).toBe(5)
+  })
+})
+
+describe('addMonthsOnAnchor', () => {
+  it.each([
+    ['2026-01-31', 1, 31, '2026-02-28'],
+    ['2028-01-31', 1, 31, '2028-02-29'],
+    ['2026-02-28', 1, 31, '2026-03-31'],
+    ['2026-11-30', 3, 30, '2027-02-28'],
+    ['2028-02-29', 12, 29, '2029-02-28'],
+    ['2026-11-15', 3, 15, '2027-02-15'],
+  ] as const)(
+    'adds to %s %i months on day %i giving %s',
+    (day, months, anchorDay, result) => {
+      expect(addMonthsOnAnchor(day, months, anchorDay)).toBe(result)
+    },
+  )
 })
 
 describe('isCalendarDay', () => {

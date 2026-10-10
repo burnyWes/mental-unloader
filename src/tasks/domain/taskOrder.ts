@@ -1,4 +1,4 @@
-import { isCompleted, lastCompletion, type Task } from './task'
+import { hasCompletions, isOpen, lastCompletion, type Task } from './task'
 
 function urgencyRank(task: Task): number {
   switch (task.due.kind) {
@@ -39,9 +39,9 @@ function byLatestCompletion(one: Task, other: Task): number {
 }
 
 export function openTasksInOrder(tasks: readonly Task[]): readonly Task[] {
-  return tasks.filter((task) => !isCompleted(task)).sort(byUrgencyThenAge)
+  return tasks.filter(isOpen).sort(byUrgencyThenAge)
 }
 
 export function completedTasksInOrder(tasks: readonly Task[]): readonly Task[] {
-  return tasks.filter(isCompleted).sort(byLatestCompletion)
+  return tasks.filter(hasCompletions).sort(byLatestCompletion)
 }

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
 import {
+  recurringTaskCompletedAnnouncement,
+  recurringTaskCompletionExplanation,
   TASK_COMPLETION_EXPLANATION,
   TASK_DELETION_EXPLANATION,
   taskAlreadyCompletedAnnouncement,
@@ -15,11 +17,14 @@ import {
 import type { CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
+import { DEFAULT_REPEAT_RHYTHM } from '../domain/repetition'
 import {
   createDescription,
   DEFAULT_URGENCY_LEAD,
   dueAfterChange,
+  endsRepetition,
   initialDeadlineOf,
+  nextDeadlineOf,
   type Task,
 } from '../domain/task'
 import {
@@ -47,12 +52,19 @@ type ShownEditStep = Extract<ShownTaskFlowStep, { kind: 'edit' }>
 function deadlineDraftOf(
   task: Task,
   today: CalendarDay,
-): Pick<TaskDraft, 'deadline' | 'urgentFrom'> {
+): Pick<TaskDraft, 'deadline' | 'urgentFrom' | 'repeats' | 'rhythm'> {
   if (task.due.kind === 'deadline')
-    return { deadline: task.due.deadline, urgentFrom: task.due.urgentFrom }
+    return {
+      deadline: task.due.deadline,
+      urgentFrom: task.due.urgentFrom,
+      repeats: task.due.repetition !== null,
+      rhythm: task.due.repetition?.rhythm ?? DEFAULT_REPEAT_RHYTHM,
+    }
   return {
     deadline: initialDeadlineOf(today),
     urgentFrom: DEFAULT_URGENCY_LEAD,
+    repeats: false,
+    rhythm: DEFAULT_REPEAT_RHYTHM,
   }
 }
 
@@ -63,6 +75,18 @@ function draftOf(task: Task, today: CalendarDay): TaskDraft {
     dueKind: task.due.kind,
     ...deadlineDraftOf(task, today),
   }
+}
+
+function completionExplanationOf(task: Task, today: CalendarDay): string {
+  const next = nextDeadlineOf(task, today)
+  if (next === null) return TASK_COMPLETION_EXPLANATION
+  return recurringTaskCompletionExplanation(next, today)
+}
+
+function completedAnnouncementOf(task: Task, today: CalendarDay): string {
+  const next = nextDeadlineOf(task, today)
+  if (next === null) return taskCompletedAnnouncement(task.name)
+  return recurringTaskCompletedAnnouncement(task.name, next, today)
 }
 
 function firstStep(entry: TaskFlowEntry): TaskFlowStep {
@@ -106,7 +130,12 @@ export function TaskFlow({
     const name = createName(draft.name)
     const description = createDescription(draft.description)
     const due = dueAfterChange(task.due, dueChoiceOf(draft), today)
-    organizer.changeTask(task.id, { name, description, due }, targetList.id)
+    organizer.changeTask(
+      task.id,
+      { name, description, due },
+      targetList.id,
+      endsRepetition(task.due, due),
+    )
     setStep(OVERVIEW_STEP)
     if (targetList.id === list.id) {
       announce(taskSavedAnnouncement(name))
@@ -118,8 +147,12 @@ export function TaskFlow({
 
   function complete() {
     onLeave('completed')
-    organizer.completeTask(task.id, now().getTime())
-    announce(taskCompletedAnnouncement(task.name))
+    organizer.completeTask(
+      task.id,
+      now().getTime(),
+      nextDeadlineOf(task, today),
+    )
+    announce(completedAnnouncementOf(task, today))
   }
 
   function cancelCompletion(from: CompletionAskedFrom) {
@@ -193,7 +226,7 @@ export function TaskFlow({
       return (
         <ConfirmationPage
           heading={taskCompletionHeading(task.name)}
-          explanation={TASK_COMPLETION_EXPLANATION}
+          explanation={completionExplanationOf(task, today)}
           confirmLabel="Erledigen"
           onConfirm={complete}
           onCancel={() => cancelCompletion(shownStep.from)}

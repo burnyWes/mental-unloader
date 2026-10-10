@@ -13,9 +13,19 @@ import {
   type DocumentData,
   type Firestore,
 } from 'firebase/firestore'
-import { calendarDayOf, isCalendarDay } from '../domain/calendarDay'
+import {
+  calendarDayOf,
+  dayOfMonthOf,
+  isCalendarDay,
+  type CalendarDay,
+} from '../domain/calendarDay'
 import type { Folder, FolderId } from '../domain/folder'
 import type { List, ListId } from '../domain/list'
+import {
+  isAnchorDay,
+  isRepeatRhythm,
+  type Repetition,
+} from '../domain/repetition'
 import {
   DEFAULT_URGENCY_LEAD,
   isUrgencyLead,
@@ -57,12 +67,28 @@ function toUrgentDue(stored: DocumentData, createdAt: number): Due {
   return { kind: 'urgent', since }
 }
 
+function toRepetition(
+  stored: DocumentData,
+  deadline: CalendarDay,
+): Repetition | null {
+  if (!isRepeatRhythm(stored.repeat)) return null
+  const anchorDay = isAnchorDay(stored.anchorDay)
+    ? stored.anchorDay
+    : dayOfMonthOf(deadline)
+  return { rhythm: stored.repeat, anchorDay }
+}
+
 function toDeadlineDue(stored: DocumentData): Due {
   if (!isCalendarDay(stored.deadline)) return { kind: 'someday' }
   const urgentFrom = isUrgencyLead(stored.urgentFrom)
     ? stored.urgentFrom
     : DEFAULT_URGENCY_LEAD
-  return { kind: 'deadline', deadline: stored.deadline, urgentFrom }
+  return {
+    kind: 'deadline',
+    deadline: stored.deadline,
+    urgentFrom,
+    repetition: toRepetition(stored, stored.deadline),
+  }
 }
 
 function toDue(stored: DocumentData, createdAt: number): Due {
@@ -91,12 +117,21 @@ function toTask(id: TaskId, stored: DocumentData): Task {
   }
 }
 
+function storedRepetitionFields(repetition: Repetition | null): DocumentData {
+  if (repetition === null) return {}
+  return { repeat: repetition.rhythm, anchorDay: repetition.anchorDay }
+}
+
 function storedDueFields(due: Due): DocumentData {
   switch (due.kind) {
     case 'urgent':
       return { urgentSince: due.since }
     case 'deadline':
-      return { deadline: due.deadline, urgentFrom: due.urgentFrom }
+      return {
+        deadline: due.deadline,
+        urgentFrom: due.urgentFrom,
+        ...storedRepetitionFields(due.repetition),
+      }
     case 'someday':
       return {}
   }
@@ -107,6 +142,8 @@ function removedDueFields(): DocumentData {
     urgentSince: deleteField(),
     deadline: deleteField(),
     urgentFrom: deleteField(),
+    repeat: deleteField(),
+    anchorDay: deleteField(),
   }
 }
 
@@ -122,7 +159,11 @@ function newStoredTask(task: NewTask): DocumentData {
   }
 }
 
-function changedStoredTask(content: TaskContent, listId: ListId): DocumentData {
+function changedStoredTask(
+  content: TaskContent,
+  listId: ListId,
+  completionsReset: boolean,
+): DocumentData {
   return {
     listId,
     name: content.name,
@@ -130,6 +171,17 @@ function changedStoredTask(content: TaskContent, listId: ListId): DocumentData {
     due: content.due.kind,
     ...removedDueFields(),
     ...storedDueFields(content.due),
+    ...(completionsReset ? { completions: [] } : {}),
+  }
+}
+
+function storedCompletion(
+  at: number,
+  nextDeadline: CalendarDay | null,
+): DocumentData {
+  return {
+    completions: arrayUnion(at),
+    ...(nextDeadline === null ? {} : { deadline: nextDeadline }),
   }
 }
 
@@ -266,15 +318,18 @@ export function createFirestoreOrganizerClient(
       return reference.id
     },
 
-    changeTask(id, content, listId) {
+    changeTask(id, content, listId, completionsReset) {
       writeInBackground(
-        updateDoc(taskDocument(id), changedStoredTask(content, listId)),
+        updateDoc(
+          taskDocument(id),
+          changedStoredTask(content, listId, completionsReset),
+        ),
       )
     },
 
-    completeTask(id, at) {
+    completeTask(id, at, nextDeadline) {
       writeInBackground(
-        updateDoc(taskDocument(id), { completions: arrayUnion(at) }),
+        updateDoc(taskDocument(id), storedCompletion(at, nextDeadline)),
       )
     },
 

@@ -6,7 +6,7 @@ import {
   type Organizer,
   type UrgentTask,
 } from '../domain/organizer'
-import { taskById, type Task, type TaskId } from '../domain/task'
+import { isRecurring, taskById, type Task, type TaskId } from '../domain/task'
 import type { ListPageFocus, TaskFlowEntry } from './foldersAreaPage'
 import type { TaskFlowLeaveReason } from './TaskFlow'
 
@@ -97,6 +97,19 @@ export function focusAfterLeaving(
         noLongerUrgent: false,
       }
     case 'completed':
+      if (isRecurring(task))
+        return {
+          focus: {
+            kind: 'followingPlace',
+            at: stillShown ? currentPlace : openedAt,
+            completedId: task.id,
+          },
+          noLongerUrgent: false,
+        }
+      return {
+        focus: followingTask(task, stillShown ? currentPlace : openedAt),
+        noLongerUrgent: false,
+      }
     case 'deleted':
       return {
         focus: followingTask(task, stillShown ? currentPlace : openedAt),

@@ -13,7 +13,7 @@ import { calendarDayOf, type CalendarDay } from '../domain/calendarDay'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import { urgentTasksOf } from '../domain/organizer'
-import type { Due, Task } from '../domain/task'
+import type { Due, Task, UrgencyLead } from '../domain/task'
 import {
   announced,
   button,
@@ -38,7 +38,7 @@ const wartung: List = {
 }
 
 function deadlineOn(deadline: CalendarDay): Due {
-  return { kind: 'deadline', deadline, urgentFrom: 'oneWeek' }
+  return { kind: 'deadline', deadline, urgentFrom: 'oneWeek', repetition: null }
 }
 
 function task(
@@ -214,6 +214,62 @@ describe('UrgentArea urgent page', () => {
     expect(announced()).toHaveTextContent('Müll rausbringen erledigt.')
     expect(button(REIFEN_ROW)).toHaveFocus()
     expect(screen.queryByRole('button', { name: MUELL_ROW })).toBeNull()
+  })
+
+  function weeklyFromThe12th(name: string, urgentFrom: UrgencyLead): Task {
+    return task(
+      `stored-${name}`,
+      name,
+      haushalt,
+      {
+        kind: 'deadline',
+        deadline: '2026-10-12',
+        urgentFrom,
+        repetition: { rhythm: 'weekly', anchorDay: 12 },
+      },
+      6,
+    )
+  }
+
+  it('lets a recurring task leave once its next lead lies ahead', async () => {
+    const biotonne = weeklyFromThe12th('Biotonne', 'oneWeek')
+    const { client } = renderUrgentArea([...ALL_TASKS, biotonne])
+
+    await userEvent.click(button('Biotonne erledigen'))
+    expect(
+      screen.getByText('Der nächste Stichtag ist der 19. Oktober.'),
+    ).toBeInTheDocument()
+    await userEvent.click(button('Erledigen'))
+
+    expect(storedTask(client, biotonne.id)?.due).toMatchObject({
+      deadline: '2026-10-19',
+    })
+    expect(button(OELWECHSEL_ROW)).toHaveFocus()
+    expect(screen.queryByRole('button', { name: /^Biotonne,/ })).toBeNull()
+    expect(announced()).toHaveTextContent(
+      'Biotonne erledigt, nächster Stichtag 19. Oktober.',
+    )
+  })
+
+  it('keeps a recurring task that stays urgent and focuses the row at its place', async () => {
+    const pflanzen = weeklyFromThe12th('Pflanzen gießen', 'oneMonth')
+    renderUrgentArea([...ALL_TASKS, pflanzen])
+
+    await userEvent.click(button('Pflanzen gießen erledigen'))
+    await userEvent.click(button('Erledigen'))
+
+    expect(button(OELWECHSEL_ROW)).toHaveFocus()
+    expect(
+      button(
+        'Pflanzen gießen, Stichtag 19. Oktober, wöchentlich, dringend, Familie, Haushalt',
+      ),
+    ).toBeInTheDocument()
+    expect(rowNames().map((name) => name?.replace(/,.*/, ''))).toEqual([
+      'Müll rausbringen',
+      'Reifen wechseln',
+      'Ölwechsel',
+      'Pflanzen gießen',
+    ])
   })
 
   it('returns to the check box when the completion is cancelled', async () => {

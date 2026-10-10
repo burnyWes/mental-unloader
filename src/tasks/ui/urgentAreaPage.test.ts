@@ -90,6 +90,46 @@ describe('resolveUrgentAreaPage', () => {
   )
 })
 
+describe('focusAfterLeaving a completed recurring task', () => {
+  const recurringMuell: Task = {
+    ...muell,
+    due: {
+      kind: 'deadline',
+      deadline: '2026-10-15',
+      urgentFrom: 'oneWeek',
+      repetition: { rhythm: 'weekly', anchorDay: 15 },
+    },
+  }
+
+  it('follows the place it was shown at, leaving it out while searching', () => {
+    expect(
+      focusAfterLeaving(
+        recurringMuell,
+        urgentRows(reifen, recurringMuell, zahnarzt),
+        0,
+        'completed',
+      ),
+    ).toEqual({
+      focus: { kind: 'followingPlace', at: 1, completedId: muell.id },
+      noLongerUrgent: false,
+    })
+  })
+
+  it('follows the opened place once it is no longer shown', () => {
+    expect(
+      focusAfterLeaving(
+        recurringMuell,
+        urgentRows(reifen, zahnarzt),
+        2,
+        'completed',
+      ),
+    ).toEqual({
+      focus: { kind: 'followingPlace', at: 2, completedId: muell.id },
+      noLongerUrgent: false,
+    })
+  })
+})
+
 describe('focusAfterLeaving', () => {
   const stillUrgent = urgentRows(reifen, muell, zahnarzt)
   const noLongerUrgent = urgentRows(reifen, zahnarzt)

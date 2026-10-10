@@ -2,7 +2,7 @@ import type { CalendarDay } from './calendarDay'
 import { folderById, type Folder, type FolderId } from './folder'
 import { listById, type List, type ListId } from './list'
 import { byName } from './name'
-import { isCompleted, type Task } from './task'
+import { isOpen, type Task } from './task'
 import { openTasksInOrder } from './taskOrder'
 import { isUrgentOn } from './urgency'
 
@@ -63,9 +63,7 @@ export function openTaskSummaryOfList(
   listId: ListId,
   today: CalendarDay,
 ): OpenTaskSummary {
-  const openTasks = tasksOfList(organizer, listId).filter(
-    (task) => !isCompleted(task),
-  )
+  const openTasks = tasksOfList(organizer, listId).filter(isOpen)
   return {
     open: openTasks.length,
     urgent: openTasks.filter((task) => isUrgentOn(task, today)).length,

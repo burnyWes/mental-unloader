@@ -15,7 +15,7 @@ function task(due: Due): Task {
 }
 
 function deadlineTask(deadline: string, urgentFrom: UrgencyLead = 'oneWeek') {
-  return task({ kind: 'deadline', deadline, urgentFrom })
+  return task({ kind: 'deadline', deadline, urgentFrom, repetition: null })
 }
 
 const URGENT = task({ kind: 'urgent', since: '2026-10-01' })

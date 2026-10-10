@@ -30,7 +30,7 @@ function deadlineOn(
   deadline: CalendarDay,
   urgentFrom: UrgencyLead = 'onDeadline',
 ): Due {
-  return { kind: 'deadline', deadline, urgentFrom }
+  return { kind: 'deadline', deadline, urgentFrom, repetition: null }
 }
 
 function task(id: string, name: string, due: Due, createdAt = 0): Task {
@@ -192,6 +192,7 @@ describe('FoldersArea creating a task with a deadline', () => {
       kind: 'deadline',
       deadline: '2026-10-18',
       urgentFrom: 'oneWeek',
+      repetition: null,
     })
     expect(button('Reifen wechseln, Stichtag 18. Oktober')).toHaveFocus()
     expect(rowDetailOf('Reifen wechseln, Stichtag 18. Oktober')).toBe('18.10.')
@@ -303,6 +304,7 @@ describe('FoldersArea editing a task with a deadline', () => {
       kind: 'deadline',
       deadline: '2026-10-17',
       urgentFrom: 'oneWeek',
+      repetition: null,
     })
   })
 
@@ -417,6 +419,7 @@ describe('FoldersArea urgency lead and overdue deadlines', () => {
       kind: 'deadline',
       deadline: '2026-10-17',
       urgentFrom: 'oneMonth',
+      repetition: null,
     })
     await userEvent.click(buttonNamedFirst('Reifen wechseln'))
     await userEvent.click(button('Bearbeiten'))

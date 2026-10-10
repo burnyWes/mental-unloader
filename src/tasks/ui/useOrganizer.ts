@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { NewTask, OrganizerClient } from '../api/organizerClient'
+import type { CalendarDay } from '../domain/calendarDay'
 import type { FolderId } from '../domain/folder'
 import type { ListId } from '../domain/list'
 import { byName } from '../domain/name'
@@ -18,8 +19,17 @@ export type OrganizerState = Organizer & {
   changeList: (id: ListId, name: string, folderId: FolderId) => void
   removeList: (id: ListId, taskIds: readonly TaskId[]) => void
   addTask: (task: NewTask) => TaskId
-  changeTask: (id: TaskId, content: TaskContent, listId: ListId) => void
-  completeTask: (id: TaskId, at: number) => void
+  changeTask: (
+    id: TaskId,
+    content: TaskContent,
+    listId: ListId,
+    completionsReset: boolean,
+  ) => void
+  completeTask: (
+    id: TaskId,
+    at: number,
+    nextDeadline: CalendarDay | null,
+  ) => void
   reopenTask: (id: TaskId) => void
   removeTask: (id: TaskId) => void
 }
@@ -65,13 +75,18 @@ export function useOrganizer(client: OrganizerClient): OrganizerState {
   const addTask = useCallback((task: NewTask) => client.addTask(task), [client])
 
   const changeTask = useCallback(
-    (id: TaskId, content: TaskContent, listId: ListId) =>
-      client.changeTask(id, content, listId),
+    (
+      id: TaskId,
+      content: TaskContent,
+      listId: ListId,
+      completionsReset: boolean,
+    ) => client.changeTask(id, content, listId, completionsReset),
     [client],
   )
 
   const completeTask = useCallback(
-    (id: TaskId, at: number) => client.completeTask(id, at),
+    (id: TaskId, at: number, nextDeadline: CalendarDay | null) =>
+      client.completeTask(id, at, nextDeadline),
     [client],
   )
 

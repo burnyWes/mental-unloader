@@ -5,7 +5,7 @@ branch: main
 story: MUL-008
 topic: "Wiederkehrende Aufgaben"
 tags: [plan, tasks, domain, calendarDay, firestore, taskform, taskrow, taskpage, focus]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-008 — Wiederkehrende Aufgaben
@@ -529,10 +529,10 @@ Verlauf. Der Fokus folgt der Stelle, und Abschalten der Wiederholung leert den V
 - [x] `grep -rn "isCompleted" src` liefert keine Treffer mehr
 
 **Manuelle Verifikation**:
-- [ ] Am iPhone mit VoiceOver eine monatliche Aufgabe anlegen, erledigen und prüfen:
+- [x] Am iPhone mit VoiceOver eine monatliche Aufgabe anlegen, erledigen und prüfen:
   Bestätigung und Ansage nennen den nächsten Stichtag, der Fokus landet auf der
   nachrückenden Zeile, und der Verlauf wird verständlich vorgelesen.
-- [ ] Am iPhone prüfen, ob 🔁 in Zeile und Formular gut erkennbar ist und die Zeile
+- [x] Am iPhone prüfen, ob 🔁 in Zeile und Formular gut erkennbar ist und die Zeile
   „3× erledigt, zuletzt …“ nicht umbricht oder abgeschnitten wird.
 
 ## Notizen zur Umsetzung

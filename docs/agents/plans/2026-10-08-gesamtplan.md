@@ -5,7 +5,7 @@ branch: main
 story: MUL-000
 topic: "Gesamtplan Mental Unloader"
 tags: [plan, gesamtplan, pwa, firestore, accessibility]
-status: draft
+status: done
 ---
 
 # PLAN: MUL-000 — Gesamtplan Mental Unloader
@@ -183,7 +183,7 @@ das Vorhaben in neun Teilpläne (MUL-001 bis MUL-009) auf. Jeder Teilplan entste
     Beispiel aus: nur linke und untere Kante, großer grüner Haken.
 31. **Farben:** Der Dunkelmodus ist Standard. Hell = **exakte Umkehr** jeder Farbe,
     maschinell durch einen Paletten-Test gesichert. Startwerte mit maximaler Sättigung,
-    der Feinschliff folgt am iPhone (MUL-009):
+    die Startwerte bleiben unverändert (MUL-009 entfällt, 10.10.2026):
 
     | Rolle | Dunkel | Hell |
     |---|---|---|
@@ -261,7 +261,7 @@ MUL-009 Farb-Feinschliff ◄── MUL-008 Wiederkehrend ◄──┐      ▼
 | MUL-006 | Stichtag | 📅, Stepper mit Ringlauf, „Dringend ab“, überfällig | Termine |
 | MUL-007 | Dringend-Seite | Sammelansicht, Herkunftszeile, Badge, Startseite | Kernnutzen komplett |
 | MUL-008 | Wiederkehrend | Rhythmus, Ankerdatum, Nachholen, Erledigt-Verlauf, „n× erledigt“ | Vollausbau |
-| MUL-009 | Farb-Feinschliff | Töne am iPhone ausprobieren, maximale Sättigung | – |
+| MUL-009 | ~~Farb-Feinschliff~~ | entfällt: Die Startfarben passen, Entscheidung vom 10.10.2026 | – |
 
 ## Außerhalb des Umfangs
 

@@ -7,31 +7,51 @@ import {
   folderDeletionExplanation,
   folderDeletionHeading,
   folderSavedAnnouncement,
-  LIST_DELETION_EXPLANATION,
   listCreatedAnnouncement,
   listDeletedAnnouncement,
   listDeletedElsewhereAnnouncement,
+  listDeletionExplanation,
   listDeletionHeading,
   listMovedAnnouncement,
   listSavedAnnouncement,
+  taskCreatedAnnouncement,
+  taskDeletedElsewhereAnnouncement,
 } from '../domain/announcements'
+import { calendarDayOf } from '../domain/calendarDay'
 import type { Folder, FolderId } from '../domain/folder'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
-import { listCountOfFolder, listsOfFolder } from '../domain/organizer'
+import {
+  listCountOfFolder,
+  listsOfFolder,
+  openTaskSummaryOfList,
+  taskCountOfList,
+  tasksOfFolder,
+  tasksOfList,
+} from '../domain/organizer'
+import { createDescription, dueAfterChange, type Task } from '../domain/task'
 import { FolderPage } from './FolderPage'
 import { FolderSelect } from './FolderSelect'
 import {
+  EMPTY_TASK_DRAFT,
+  filterOf,
   FOLDER_HEADING_FOCUS,
+  tasksShownIn,
+  LIST_HEADING_FOCUS,
   OVERVIEW_HEADING_FOCUS,
   resolveFoldersAreaPage,
   type FolderPageFocus,
   type FoldersAreaPage,
+  type ListPageFocus,
   type ShownFoldersAreaPage,
+  type TaskFilterKind,
+  type TaskFlowEntry,
 } from './foldersAreaPage'
 import { FoldersPage, type FoldersOverviewFocus } from './FoldersPage'
 import { ListPage } from './ListPage'
 import { NameFormPage } from './NameFormPage'
+import { TaskFlow, type TaskFlowLeaveReason } from './TaskFlow'
+import { TaskFormPage } from './TaskFormPage'
 import type { OrganizerState } from './useOrganizer'
 
 type ShownListDraftPage = Extract<
@@ -39,16 +59,28 @@ type ShownListDraftPage = Extract<
   { kind: 'editList' | 'confirmListDeletion' }
 >
 
+type ShownCreateTaskPage = Extract<ShownFoldersAreaPage, { kind: 'createTask' }>
+
+type ShownListPage = Extract<ShownFoldersAreaPage, { kind: 'list' }>
+
+type ShownTaskPage = Extract<ShownFoldersAreaPage, { kind: 'task' }>
+
+function idsOf(identified: readonly { id: string }[]): readonly string[] {
+  return identified.map((each) => each.id)
+}
+
 type FoldersAreaProps = {
   organizer: OrganizerState
   navigation: ReactNode
   announce: (text: string) => void
+  now: () => Date
 }
 
 export function FoldersArea({
   organizer,
   navigation,
   announce,
+  now,
 }: FoldersAreaProps) {
   const [page, setPage] = useState<FoldersAreaPage>({
     kind: 'overview',
@@ -57,8 +89,10 @@ export function FoldersArea({
   const { shown, vanished } = resolveFoldersAreaPage(page, organizer)
   const shownFolder = 'folder' in shown ? shown.folder : null
   const shownList = 'list' in shown ? shown.list : null
+  const shownTask = 'task' in shown ? shown.task : null
   const lastKnownFolderName = useRef('')
   const lastKnownListName = useRef('')
+  const lastKnownTaskName = useRef('')
 
   useEffect(() => {
     if (shownFolder !== null) lastKnownFolderName.current = shownFolder.name
@@ -69,10 +103,16 @@ export function FoldersArea({
   }, [shownList])
 
   useEffect(() => {
+    if (shownTask !== null) lastKnownTaskName.current = shownTask.name
+  }, [shownTask])
+
+  useEffect(() => {
     if (vanished === 'folder')
       announce(folderDeletedElsewhereAnnouncement(lastKnownFolderName.current))
     if (vanished === 'list')
       announce(listDeletedElsewhereAnnouncement(lastKnownListName.current))
+    if (vanished === 'task')
+      announce(taskDeletedElsewhereAnnouncement(lastKnownTaskName.current))
   }, [vanished, announce])
 
   function showOverview(focus: FoldersOverviewFocus = OVERVIEW_HEADING_FOCUS) {
@@ -86,8 +126,13 @@ export function FoldersArea({
     setPage({ kind: 'folder', id, focus })
   }
 
-  function showList(list: List, folderId: FolderId = list.folderId) {
-    setPage({ kind: 'list', id: list.id, folderId })
+  function showList(
+    list: List,
+    folderId: FolderId = list.folderId,
+    filter: TaskFilterKind = 'open',
+    focus: ListPageFocus = LIST_HEADING_FOCUS,
+  ) {
+    setPage({ kind: 'list', id: list.id, folderId, filter, focus })
   }
 
   function showListDraft(
@@ -127,7 +172,8 @@ export function FoldersArea({
     })
     organizer.removeFolder(
       folder.id,
-      listsOfFolder(organizer, folder.id).map((list) => list.id),
+      idsOf(listsOfFolder(organizer, folder.id)),
+      idsOf(tasksOfFolder(organizer, folder.id)),
     )
     announce(folderDeletedAnnouncement(folder.name))
   }
@@ -157,8 +203,84 @@ export function FoldersArea({
       removedAt: listsOfFolder(organizer, list.folderId).indexOf(list),
       removedId: list.id,
     })
-    organizer.removeList(list.id)
+    organizer.removeList(list.id, idsOf(tasksOfList(organizer, list.id)))
     announce(listDeletedAnnouncement(list.name))
+  }
+
+  function createTask(shownPage: ShownCreateTaskPage) {
+    const { list, folder, draft } = shownPage
+    const name = createName(draft.name)
+    const id = organizer.addTask({
+      listId: list.id,
+      name,
+      description: createDescription(draft.description),
+      due: dueAfterChange(null, draft.dueKind, calendarDayOf(now())),
+      createdAt: now().getTime(),
+    })
+    showList(list, folder.id, 'open', { kind: 'arrivingTask', id })
+    announce(taskCreatedAnnouncement(name))
+  }
+
+  function openTask(
+    shownPage: ShownListPage,
+    task: Task,
+    entry: TaskFlowEntry,
+  ) {
+    setPage({
+      kind: 'task',
+      id: task.id,
+      listId: shownPage.list.id,
+      folderId: shownPage.folder.id,
+      filter: shownPage.filter,
+      entry,
+    })
+  }
+
+  function followingTask(task: Task, filter: TaskFilterKind): ListPageFocus {
+    const shownTasks = tasksShownIn(filter, tasksOfList(organizer, task.listId))
+    return {
+      kind: 'followingTask',
+      removedAt: shownTasks.findIndex((each) => each.id === task.id),
+      removedId: task.id,
+    }
+  }
+
+  function leaveTask(shownPage: ShownTaskPage, reason: TaskFlowLeaveReason) {
+    const { task, list, folder } = shownPage
+    switch (reason) {
+      case 'back':
+        showList(list, folder.id, filterOf(task), {
+          kind: 'returningTask',
+          id: task.id,
+          button: 'open',
+        })
+        return
+      case 'cancelled':
+        showList(list, folder.id, 'open', {
+          kind: 'returningTask',
+          id: task.id,
+          button: 'complete',
+        })
+        return
+      case 'completed':
+        showList(list, folder.id, 'open', followingTask(task, 'open'))
+        return
+      case 'deleted':
+        showList(
+          list,
+          folder.id,
+          filterOf(task),
+          followingTask(task, filterOf(task)),
+        )
+    }
+  }
+
+  function followMovedTask(movedTo: List) {
+    setPage((current) =>
+      current.kind === 'task'
+        ? { ...current, listId: movedTo.id, folderId: movedTo.folderId }
+        : current,
+    )
   }
 
   switch (shown.kind) {
@@ -180,6 +302,7 @@ export function FoldersArea({
           navigation={navigation}
           folder={shown.folder}
           lists={listsOfFolder(organizer, shown.folder.id)}
+          openTaskSummary={(listId) => openTaskSummaryOfList(organizer, listId)}
           focus={shown.focus}
           onBack={() => showOverview()}
           onEdit={() =>
@@ -223,10 +346,15 @@ export function FoldersArea({
 
     case 'confirmDeletion': {
       const listCount = listCountOfFolder(organizer, shown.folder.id)
+      const taskCount = tasksOfFolder(organizer, shown.folder.id).length
       return (
         <ConfirmationPage
-          heading={folderDeletionHeading(shown.folder.name, listCount)}
-          explanation={folderDeletionExplanation(listCount)}
+          heading={folderDeletionHeading(
+            shown.folder.name,
+            listCount,
+            taskCount,
+          )}
+          explanation={folderDeletionExplanation(listCount, taskCount)}
           confirmLabel="Löschen"
           onConfirm={() => deleteFolder(shown.folder)}
           onCancel={() =>
@@ -263,6 +391,12 @@ export function FoldersArea({
         <ListPage
           navigation={navigation}
           list={shown.list}
+          tasks={tasksOfList(organizer, shown.list.id)}
+          filter={shown.filter}
+          focus={shown.focus}
+          onFilter={(filter) =>
+            showList(shown.list, shown.folder.id, filter, LIST_HEADING_FOCUS)
+          }
           onBack={() => showFolder(shown.folder.id)}
           onEdit={() =>
             setPage({
@@ -273,6 +407,53 @@ export function FoldersArea({
               draftFolderId: null,
             })
           }
+          onCreateTask={() =>
+            setPage({
+              kind: 'createTask',
+              listId: shown.list.id,
+              folderId: shown.folder.id,
+              filter: shown.filter,
+              draft: EMPTY_TASK_DRAFT,
+            })
+          }
+          onOpenTask={(task) => openTask(shown, task, 'overview')}
+          onCompleteTask={(task) => openTask(shown, task, 'completion')}
+        />
+      )
+
+    case 'task':
+      return (
+        <TaskFlow
+          key={shown.task.id}
+          task={shown.task}
+          list={shown.list}
+          folder={shown.folder}
+          organizer={organizer}
+          now={now}
+          entry={shown.entry}
+          announce={announce}
+          onLeave={(reason) => leaveTask(shown, reason)}
+          onMoved={followMovedTask}
+        />
+      )
+
+    case 'createTask':
+      return (
+        <TaskFormPage
+          heading="Aufgabe anlegen"
+          draft={shown.draft}
+          onDraftChange={(draft) =>
+            setPage({
+              kind: 'createTask',
+              listId: shown.list.id,
+              folderId: shown.folder.id,
+              filter: shown.filter,
+              draft,
+            })
+          }
+          onSave={() => createTask(shown)}
+          onBack={() => showList(shown.list, shown.folder.id, shown.filter)}
+          announce={announce}
         />
       )
 
@@ -302,8 +483,13 @@ export function FoldersArea({
     case 'confirmListDeletion':
       return (
         <ConfirmationPage
-          heading={listDeletionHeading(shown.list.name)}
-          explanation={LIST_DELETION_EXPLANATION}
+          heading={listDeletionHeading(
+            shown.list.name,
+            taskCountOfList(organizer, shown.list.id),
+          )}
+          explanation={listDeletionExplanation(
+            taskCountOfList(organizer, shown.list.id),
+          )}
           confirmLabel="Löschen"
           onConfirm={() => deleteList(shown.list)}
           onCancel={() => showListDraft('editList', shown)}

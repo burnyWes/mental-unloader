@@ -16,6 +16,8 @@ const household = {
   userId: 'household',
 }
 
+const TENTH_OF_OCTOBER_MORNING = new Date(2026, 9, 10, 9, 0)
+
 function signedInAuthClient() {
   return createInMemoryAuthClient(household, {
     status: 'signedIn',
@@ -39,6 +41,7 @@ function renderApp(
       authClient={authClient}
       createOrganizerClient={createOrganizerClient}
       storageWarning={storageWarning}
+      now={() => TENTH_OF_OCTOBER_MORNING}
     />,
   )
 }

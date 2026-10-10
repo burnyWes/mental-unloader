@@ -21,6 +21,7 @@ type AppProps = {
     onFailure: (message: string) => void,
   ) => OrganizerClient
   storageWarning?: string
+  now: () => Date
 }
 
 export function App({
@@ -29,6 +30,7 @@ export function App({
   authClient,
   createOrganizerClient,
   storageWarning = '',
+  now,
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
   const session = useSession(authClient)
@@ -61,6 +63,7 @@ export function App({
           createOrganizerClient={createOrganizerClient}
           appearance={appearance}
           announce={announce}
+          now={now}
           onSignOut={signOut}
         />
       )}

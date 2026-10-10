@@ -44,3 +44,28 @@ export async function createList(page: Page, name: string) {
   await pressButton(page, 'Speichern')
   await expect(exactButton(page, name)).toBeFocused()
 }
+
+export async function openList(page: Page, name: string) {
+  await folderButton(page, name).focus()
+  await page.keyboard.press('Enter')
+  await expect(heading(page, name)).toBeFocused()
+}
+
+export function taskRowName(name: string, { urgent = false } = {}) {
+  return urgent ? `${name}, dringend` : name
+}
+
+export async function createTask(
+  page: Page,
+  name: string,
+  { urgent = false } = {},
+) {
+  await pressButton(page, 'Aufgabe anlegen')
+  await typeInto(page, 'Name', name)
+  if (urgent) {
+    await page.getByRole('radio', { name: 'Dringend' }).focus()
+    await page.keyboard.press('Space')
+  }
+  await pressButton(page, 'Speichern')
+  await expect(exactButton(page, taskRowName(name, { urgent }))).toBeFocused()
+}

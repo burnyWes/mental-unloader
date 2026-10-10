@@ -24,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         createFirestoreOrganizerClient(firestore, onFailure)
       }
       storageWarning={storageWarning}
+      now={() => new Date()}
     />
   </StrictMode>,
 )

@@ -172,3 +172,5 @@ m Badge am Home-Bildschirm-Icon (Badging API, ohne Server oft veraltet) - Idee f
 b Farbe "Ueberfaellig" im Hellmodus (#009999 auf Weiss) hat nur ca. 3,5:1 Kontrast, Text braucht 4,5:1 - in MUL-006 klaeren
 b Speicherwarnung fehlt, wenn IndexedDB erst asynchron scheitert (try/catch um persistentLocalCache faengt nur synchrone Fehler) - Firestore faellt dann still auf Arbeitsspeicher zurueck
 b Liste ohne Ordner (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Liste in einen Ordner legt, den ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt
+b Aufgabe ohne Liste (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Aufgabe in eine Liste legt, die ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt
+b Aufgabe, die direkt nach dem eigenen Erledigen auf einem anderen Geraet wieder geoeffnet wird, bleibt unter "offen" ausgeblendet, bis die Listen-Seite verlassen oder der Filter gewechselt wird (followingTask blendet removedId aus)

@@ -1,12 +1,14 @@
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import type { Organizer } from '../domain/organizer'
+import type { Task } from '../domain/task'
 import type { OrganizerClient } from './organizerClient'
 
 export type InMemoryOrganizerClient = OrganizerClient & {
   arrivesFromElsewhere(organizer: Partial<Organizer>): void
   storedFolders(): readonly Folder[]
   storedLists(): readonly List[]
+  storedTasks(): readonly Task[]
   holdBackSnapshots(): void
   releaseSnapshots(): void
 }
@@ -14,16 +16,19 @@ export type InMemoryOrganizerClient = OrganizerClient & {
 export function createInMemoryOrganizerClient({
   folders: initialFolders = [],
   lists: initialLists = [],
+  tasks: initialTasks = [],
 }: Partial<Organizer> = {}): InMemoryOrganizerClient {
   let folders = [...initialFolders]
   let lists = [...initialLists]
+  let tasks = [...initialTasks]
   let nextFolderId = 1
   let nextListId = 1
+  let nextTaskId = 1
   let snapshotsHeldBack = false
   const listeners = new Set<(organizer: Organizer) => void>()
 
   function currentOrganizer(): Organizer {
-    return { folders: [...folders], lists: [...lists] }
+    return { folders: [...folders], lists: [...lists], tasks: [...tasks] }
   }
 
   function publish() {
@@ -50,9 +55,10 @@ export function createInMemoryOrganizerClient({
       )
       publish()
     },
-    removeFolder(id, listIds) {
+    removeFolder(id, listIds, taskIds) {
       folders = folders.filter((folder) => folder.id !== id)
       lists = lists.filter((list) => !listIds.includes(list.id))
+      tasks = tasks.filter((task) => !taskIds.includes(task.id))
       publish()
     },
     addList(folderId, name) {
@@ -68,13 +74,46 @@ export function createInMemoryOrganizerClient({
       )
       publish()
     },
-    removeList(id) {
+    removeList(id, taskIds) {
       lists = lists.filter((list) => list.id !== id)
+      tasks = tasks.filter((task) => !taskIds.includes(task.id))
+      publish()
+    },
+    addTask(newTask) {
+      const id = `task-${nextTaskId}`
+      nextTaskId += 1
+      tasks = [...tasks, { id, ...newTask, completions: [] }]
+      publish()
+      return id
+    },
+    changeTask(id, content, listId) {
+      tasks = tasks.map((task) =>
+        task.id === id ? { ...task, ...content, listId } : task,
+      )
+      publish()
+    },
+    completeTask(id, at) {
+      tasks = tasks.map((task) =>
+        task.id === id
+          ? { ...task, completions: [...task.completions, at] }
+          : task,
+      )
+      publish()
+    },
+    reopenTask(id) {
+      tasks = tasks.map((task) =>
+        task.id === id ? { ...task, completions: [] } : task,
+      )
+      publish()
+    },
+    removeTask(id) {
+      tasks = tasks.filter((task) => task.id !== id)
       publish()
     },
     arrivesFromElsewhere(arriving) {
       folders = [...(arriving.folders ?? folders)]
       lists = [...(arriving.lists ?? lists)]
+      tasks = [...(arriving.tasks ?? tasks)]
       publish()
     },
     storedFolders() {
@@ -82,6 +121,9 @@ export function createInMemoryOrganizerClient({
     },
     storedLists() {
       return [...lists]
+    },
+    storedTasks() {
+      return [...tasks]
     },
     holdBackSnapshots() {
       snapshotsHeldBack = true

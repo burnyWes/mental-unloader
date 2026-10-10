@@ -1,39 +1,18 @@
-import { act, render, screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { Announcer } from '../../shared/ui/Announcer'
-import { useAnnouncer } from '../../shared/ui/useAnnouncer'
 import { accessibilityViolations } from '../../testSupport/accessibility'
-import {
-  createInMemoryOrganizerClient,
-  type InMemoryOrganizerClient,
-} from '../api/inMemoryOrganizerClient'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
-import { FoldersArea } from './FoldersArea'
-import { useOrganizer } from './useOrganizer'
-
-function FoldersAreaHarness({ client }: { client: InMemoryOrganizerClient }) {
-  const [organizerClient] = useState(() => client)
-  const organizer = useOrganizer(organizerClient)
-  const { spokenText, announce } = useAnnouncer()
-
-  return (
-    <>
-      <FoldersArea
-        organizer={organizer}
-        navigation={
-          <nav aria-label="Bereiche">
-            <button type="button">Ordner</button>
-          </nav>
-        }
-        announce={announce}
-      />
-      <Announcer text={spokenText} />
-    </>
-  )
-}
+import type { Task } from '../domain/task'
+import {
+  announced,
+  button,
+  heading,
+  openFolder,
+  openList,
+  renderFoldersArea,
+} from './foldersAreaHarness'
 
 const familie: Folder = { id: 'stored-1', name: 'Familie' }
 const garten: Folder = { id: 'stored-2', name: 'Garten' }
@@ -61,29 +40,21 @@ const orphan: List = {
   folderId: 'stored-gone',
 }
 
-function renderFoldersArea(
-  folders: readonly Folder[] = [],
-  lists: readonly List[] = [],
-) {
-  const client = createInMemoryOrganizerClient({ folders, lists })
-  const rendered = render(<FoldersAreaHarness client={client} />)
-  return { client, container: rendered.container }
-}
-
-function heading(name: string) {
-  return screen.getByRole('heading', { level: 1, name })
-}
-
-function button(name: string) {
-  return screen.getByRole('button', { name })
-}
-
-function folderButton(name: string) {
-  return screen.getByRole('button', { name: new RegExp(`^${name}(,|$)`) })
-}
-
-function announced() {
-  return screen.getByRole('status')
+function task(
+  id: string,
+  list: List,
+  urgent: boolean,
+  completions: readonly number[] = [],
+): Task {
+  return {
+    id,
+    listId: list.id,
+    name: id,
+    description: '',
+    due: urgent ? { kind: 'urgent', since: '2026-10-01' } : { kind: 'someday' },
+    createdAt: 0,
+    completions,
+  }
 }
 
 async function startCreating() {
@@ -94,10 +65,6 @@ async function createFolder(name: string) {
   await startCreating()
   await userEvent.type(screen.getByLabelText('Name'), name)
   await userEvent.click(button('Speichern'))
-}
-
-async function openFolder(name: string) {
-  await userEvent.click(folderButton(name))
 }
 
 async function startEditing(name: string) {
@@ -129,11 +96,6 @@ async function createList(folderName: string, name: string) {
   await startCreatingList(folderName)
   await userEvent.type(screen.getByLabelText('Name'), name)
   await userEvent.click(button('Speichern'))
-}
-
-async function openList(folderName: string, name: string) {
-  await openFolder(folderName)
-  await userEvent.click(button(name))
 }
 
 async function startEditingList(folderName: string, name: string) {
@@ -524,6 +486,27 @@ describe('FoldersArea with lists', () => {
 
     expect(screen.getByRole('button', { name })).toBeInTheDocument()
   })
+
+  it.each([
+    [
+      [task('Müll', haushalt, true), task('Keller', haushalt, false)],
+      'Haushalt, 2 offen, 1 dringend',
+    ],
+    [
+      [task('Keller', haushalt, false), task('Bad', haushalt, false)],
+      'Haushalt, 2 offen',
+    ],
+    [[task('Fenster', haushalt, true, [5])], 'Haushalt'],
+  ])(
+    'names the list button after its open tasks as %#',
+    async (tasks, name) => {
+      renderFoldersArea([familie], [haushalt], tasks)
+
+      await openFolder('Familie')
+
+      expect(screen.getByRole('button', { name })).toBeInTheDocument()
+    },
+  )
 
   it('deletes the lists of a deleted folder and keeps those of others', async () => {
     const { client } = renderFoldersArea(
@@ -973,6 +956,51 @@ describe('FoldersArea editing lists', () => {
 
     expect(await accessibilityViolations(container)).toEqual([])
   })
+
+  it('names the tasks that are deleted along with the list', async () => {
+    renderFoldersArea(
+      [familie],
+      [haushalt],
+      [task('Müll', haushalt, true), task('Fenster', haushalt, false, [5])],
+    )
+
+    await requestListDeletion('Familie', 'Haushalt')
+
+    expect(heading('Liste Haushalt mit 2 Aufgaben löschen?')).toHaveFocus()
+    expect(
+      screen.getByText(
+        'Sie verschwindet mitsamt ihren Aufgaben auf allen Geräten.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('deletes the tasks of a deleted list and keeps those of others', async () => {
+    const milch = task('Milch', wocheneinkauf, false)
+    const { client } = renderFoldersArea(
+      [familie],
+      [haushalt, wocheneinkauf],
+      [
+        task('Müll', haushalt, true),
+        milch,
+        task('Fenster', haushalt, false, [5]),
+      ],
+    )
+
+    await deleteList('Familie', 'Haushalt')
+
+    expect(client.storedTasks()).toEqual([milch])
+  })
+
+  it('shows the deletion of a list with tasks without accessibility violations', async () => {
+    const { container } = renderFoldersArea(
+      [familie],
+      [haushalt],
+      [task('Müll', haushalt, true)],
+    )
+    await requestListDeletion('Familie', 'Haushalt')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
 })
 
 describe('FoldersArea deleting folders with lists', () => {
@@ -1016,6 +1044,58 @@ describe('FoldersArea deleting folders with lists', () => {
       expect(announced()).not.toHaveTextContent('Liste')
     },
   )
+
+  it('names the lists and tasks that are deleted along with the folder', async () => {
+    renderFoldersArea(
+      [familie],
+      [haushalt, wocheneinkauf],
+      [
+        task('Müll', haushalt, true),
+        task('Fenster', haushalt, false, [5]),
+        task('Milch', wocheneinkauf, false),
+      ],
+    )
+
+    await requestDeletion('Familie')
+
+    expect(
+      heading('Ordner Familie mit 2 Listen und 3 Aufgaben löschen?'),
+    ).toHaveFocus()
+    expect(
+      screen.getByText(
+        'Er verschwindet mitsamt seinen Listen und Aufgaben auf allen Geräten.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('deletes all tasks of a deleted folder and keeps those of others', async () => {
+    const rosen = task('Rosen', beete, true)
+    const { client } = renderFoldersArea(
+      [familie, garten],
+      [haushalt, wocheneinkauf, beete],
+      [
+        task('Müll', haushalt, true),
+        rosen,
+        task('Fenster', haushalt, false, [5]),
+        task('Milch', wocheneinkauf, false),
+      ],
+    )
+
+    await deleteFolder('Familie')
+
+    expect(client.storedTasks()).toEqual([rosen])
+  })
+
+  it('shows the deletion of a folder with tasks without accessibility violations', async () => {
+    const { container } = renderFoldersArea(
+      [familie],
+      [haushalt],
+      [task('Müll', haushalt, true)],
+    )
+    await requestDeletion('Familie')
+
+    expect(await accessibilityViolations(container)).toEqual([])
+  })
 
   it('shows the deletion of a folder with lists without accessibility violations', async () => {
     const { container } = renderFoldersArea([familie], [haushalt])

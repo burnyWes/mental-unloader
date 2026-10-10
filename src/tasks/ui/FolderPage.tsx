@@ -7,6 +7,7 @@ import { useFocusOnArrival } from '../../shared/ui/useFocusOnArrival'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { Folder } from '../domain/folder'
 import type { List, ListId } from '../domain/list'
+import type { OpenTaskSummary } from '../domain/organizer'
 import type { FolderPageFocus } from './foldersAreaPage'
 import { ListButton } from './ListButton'
 
@@ -22,6 +23,7 @@ type FolderPageProps = {
   navigation: ReactNode
   folder: Folder
   lists: readonly List[]
+  openTaskSummary: (listId: ListId) => OpenTaskSummary
   focus: FolderPageFocus
   onBack: () => void
   onEdit: () => void
@@ -33,6 +35,7 @@ export function FolderPage({
   navigation,
   folder,
   lists,
+  openTaskSummary,
   focus,
   onBack,
   onEdit,
@@ -98,6 +101,7 @@ export function FolderPage({
               <li key={list.id}>
                 <ListButton
                   list={list}
+                  summary={openTaskSummary(list.id)}
                   onOpen={onOpenList}
                   ref={keepListButton(list.id)}
                 />

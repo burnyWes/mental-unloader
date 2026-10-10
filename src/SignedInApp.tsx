@@ -25,6 +25,7 @@ type SignedInAppProps = {
   ) => OrganizerClient
   appearance: Appearance
   announce: (text: string) => void
+  now: () => Date
   onSignOut: () => void
 }
 
@@ -32,6 +33,7 @@ export function SignedInApp({
   createOrganizerClient,
   appearance,
   announce,
+  now,
   onSignOut,
 }: SignedInAppProps) {
   const [activeArea, setActiveArea] = useState<AreaId>('urgent')
@@ -76,6 +78,7 @@ export function SignedInApp({
             organizer={organizer}
             navigation={navigation}
             announce={announce}
+            now={now}
           />
         )
       case 'settings':

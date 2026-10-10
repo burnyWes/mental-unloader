@@ -65,16 +65,16 @@ export function FolderFormPage({
         {failureMessage}
       </p>
       <BottomBar>
+        <button type="button" onClick={saveFolder}>
+          <SaveIcon />
+          Speichern
+        </button>
         {onDelete !== undefined && (
           <button type="button" onClick={onDelete}>
             <TrashIcon />
             Löschen
           </button>
         )}
-        <button type="button" onClick={saveFolder}>
-          <SaveIcon />
-          Speichern
-        </button>
       </BottomBar>
     </main>
   )

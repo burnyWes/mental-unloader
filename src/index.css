@@ -179,23 +179,25 @@ input[type='text'] {
   border: 4px solid var(--accentLine);
   border-radius: 2rem;
   overflow: hidden;
-  background-color: var(--surface);
+  background-color: var(--accent);
   text-align: left;
 }
 
 .folderButtonName {
   flex: 1;
-  padding: 0.5rem 1rem 0.5rem 1.5rem;
-  align-self: center;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  background-color: var(--surface);
+  border-right: 4px solid var(--accentLine);
+  border-radius: 0 calc(2rem - 4px) calc(2rem - 4px) 0;
   overflow-wrap: anywhere;
 }
 
 .folderButtonArrow {
   display: flex;
   align-items: center;
-  padding: 0 1.25rem;
-  background-color: var(--accent);
-  border-left: 4px solid var(--accentLine);
+  padding: 0 1.25rem 0 1rem;
 }
 
 .itemList {

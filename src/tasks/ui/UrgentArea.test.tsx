@@ -183,16 +183,12 @@ describe('UrgentArea urgent page', () => {
     expect(screen.queryByRole('button', { name: /^Zahnriemen/ })).toBeNull()
   })
 
-  it('shows the origin as a third line hidden from assistive technology', () => {
+  it('shows the origin as a third line with the arrow hidden from assistive technology', () => {
     renderUrgentArea()
 
-    expect(screen.getByText('Familie › Haushalt')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    )
-    expect(button(MUELL_ROW)).toContainElement(
-      screen.getByText('Familie › Haushalt'),
-    )
+    const origin = button(MUELL_ROW).querySelector('.taskRowOrigin')
+    expect(origin?.textContent).toBe('Familie ›, Haushalt')
+    expect(screen.getAllByText('›')[0]).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('opens the overview and returns to the name of the task', async () => {

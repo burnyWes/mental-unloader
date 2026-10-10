@@ -614,7 +614,13 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
   bei 🔥 in `.taskRowDetail` hinter „dringend“, bei 📅 im Titel hinter dem versteckten Text.
   Grund: Die Kinder des Flex-Knopfs sind Blöcke. Chromium setzt zwischen Blöcken ein Leerzeichen
   in den zugänglichen Namen, daraus wurde „dringend , Familie“ (im E2E-Test gesehen, jsdom zeigt
-  das nicht). `.taskRowOrigin` ist damit vollständig `aria-hidden`.
+  das nicht).
+- Nachbesserung nach Rückmeldung (✓-Knöpfe rutschten bei langen Namen rechts aus der Zeile):
+  Der versteckte Herkunftstext mit `white-space: nowrap` blähte die Mindestbreite des
+  Namensknopfs auf. Jetzt wird die sichtbare Herkunftszeile selbst gesprochen. Versteckt sind nur
+  das Komma davor und das Komma statt „›“, das `aria-hidden` ist. `.taskRowName` hat zusätzlich
+  `min-width: 0`. `position: absolute` und `inline-block` für den versteckten Text scheiden aus,
+  weil Chromium dann „Name , dringend“ in den Namen setzt.
 - `withoutRemovedTask` nimmt eine Funktion für die Aufgaben-ID entgegen und `useTaskRowFocus`
   die IDs der Zeilen. So nutzen Listen-Seite (`Task`) und Dringend-Seite (`UrgentTask`) beide
   dieselbe Logik.

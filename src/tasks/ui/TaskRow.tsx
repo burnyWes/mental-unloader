@@ -30,13 +30,9 @@ type TaskRowProps = {
   completeButton?: Ref<HTMLButtonElement>
 }
 
-function SpokenOrigin({ origin }: { origin?: TaskOrigin }) {
+function SeparatorBeforeOrigin({ origin }: { origin?: TaskOrigin }) {
   if (origin === undefined) return null
-  return (
-    <span className="visuallyHidden">
-      , {origin.folderName}, {origin.listName}
-    </span>
-  )
+  return <span className="visuallyHidden">,</span>
 }
 
 function UrgentTaskName({
@@ -54,7 +50,7 @@ function UrgentTaskName({
       </span>{' '}
       <span className="taskRowDetail">
         <FlameIcon /> dringend
-        <SpokenOrigin origin={origin} />
+        <SeparatorBeforeOrigin origin={origin} />
       </span>
     </>
   )
@@ -80,7 +76,7 @@ function DeadlineTaskName({
           <span className="visuallyHidden">
             , {overdueLabel(deadline, today)}
           </span>
-          <SpokenOrigin origin={origin} />
+          <SeparatorBeforeOrigin origin={origin} />
         </span>{' '}
         <span className="taskRowDetail overdue" aria-hidden="true">
           <CalendarIcon /> {shortDay} überfällig
@@ -96,7 +92,7 @@ function DeadlineTaskName({
           , {deadlineLabel(deadline, today)}
           {urgent && ', dringend'}
         </span>
-        <SpokenOrigin origin={origin} />
+        <SeparatorBeforeOrigin origin={origin} />
       </span>{' '}
       <span className="taskRowDetail" aria-hidden="true">
         <CalendarIcon /> {shortDay}
@@ -136,7 +132,7 @@ function OpenTaskName({
       return (
         <span className="taskRowTitle">
           {task.name}
-          <SpokenOrigin origin={origin} />
+          <SeparatorBeforeOrigin origin={origin} />
         </span>
       )
   }
@@ -158,7 +154,7 @@ function CompletedTaskName({
         <span className="visuallyHidden">
           , {completedOnLabel(completedAt)}
         </span>
-        <SpokenOrigin origin={origin} />
+        <SeparatorBeforeOrigin origin={origin} />
       </span>{' '}
       <span className="taskRowDetail" aria-hidden="true">
         erledigt {shortDateOf(completedAt)}
@@ -169,8 +165,10 @@ function CompletedTaskName({
 
 function TaskOriginLine({ folderName, listName }: TaskOrigin) {
   return (
-    <span className="taskRowOrigin" aria-hidden="true">
-      {folderName} › {listName}
+    <span className="taskRowOrigin">
+      {folderName}
+      <span aria-hidden="true"> ›</span>
+      <span className="visuallyHidden">,</span> {listName}
     </span>
   )
 }
@@ -203,7 +201,12 @@ export function TaskRow({
             origin={origin}
           />
         )}
-        {origin !== undefined && <TaskOriginLine {...origin} />}
+        {origin !== undefined && (
+          <>
+            {' '}
+            <TaskOriginLine {...origin} />
+          </>
+        )}
       </button>
       {onComplete !== undefined && (
         <button

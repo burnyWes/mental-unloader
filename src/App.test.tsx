@@ -6,8 +6,8 @@ import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppe
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
 import type { AuthClient } from './shared/auth/authClient'
 import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
-import type { FoldersClient } from './tasks/api/foldersClient'
-import { createInMemoryFoldersClient } from './tasks/api/inMemoryFoldersClient'
+import { createInMemoryOrganizerClient } from './tasks/api/inMemoryOrganizerClient'
+import type { OrganizerClient } from './tasks/api/organizerClient'
 import { accessibilityViolations } from './testSupport/accessibility'
 
 const household = {
@@ -27,9 +27,9 @@ function renderApp(
   appearanceClient = createInMemoryAppearanceClient(),
   appUpdateClient = createInMemoryAppUpdateClient(),
   authClient: AuthClient = signedInAuthClient(),
-  createFoldersClient: (
+  createOrganizerClient: (
     onFailure: (message: string) => void,
-  ) => FoldersClient = () => createInMemoryFoldersClient(),
+  ) => OrganizerClient = () => createInMemoryOrganizerClient(),
   storageWarning = '',
 ) {
   return render(
@@ -37,28 +37,28 @@ function renderApp(
       appearanceClient={appearanceClient}
       appUpdateClient={appUpdateClient}
       authClient={authClient}
-      createFoldersClient={createFoldersClient}
+      createOrganizerClient={createOrganizerClient}
       storageWarning={storageWarning}
     />,
   )
 }
 
 function renderAppWithFolders(...folders: string[]) {
-  const client = createInMemoryFoldersClient(
-    folders.map((name, index) => ({ id: `stored-${index}`, name })),
-  )
+  const client = createInMemoryOrganizerClient({
+    folders: folders.map((name, index) => ({ id: `stored-${index}`, name })),
+  })
   return renderApp(undefined, undefined, undefined, () => client)
 }
 
-function failureReportingFoldersClient() {
+function failureReportingOrganizerClient() {
   const reported: { onFailure: (message: string) => void } = {
     onFailure: () => {},
   }
-  function createFoldersClient(onFailure: (message: string) => void) {
+  function createOrganizerClient(onFailure: (message: string) => void) {
     reported.onFailure = onFailure
-    return createInMemoryFoldersClient()
+    return createInMemoryOrganizerClient()
   }
-  return { reported, createFoldersClient }
+  return { reported, createOrganizerClient }
 }
 
 function setOnline(online: boolean) {
@@ -204,9 +204,10 @@ describe('App', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Wieder online.')
   })
 
-  it('announces a failure reported by the folders client', () => {
-    const { reported, createFoldersClient } = failureReportingFoldersClient()
-    renderApp(undefined, undefined, undefined, createFoldersClient)
+  it('announces a failure reported by the organizer client', () => {
+    const { reported, createOrganizerClient } =
+      failureReportingOrganizerClient()
+    renderApp(undefined, undefined, undefined, createOrganizerClient)
 
     act(() => reported.onFailure('Konnte nicht gespeichert werden.'))
 

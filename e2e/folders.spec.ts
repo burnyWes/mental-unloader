@@ -1,41 +1,21 @@
 import { expect, test, type Page } from '@playwright/test'
 import { prepareEmulators, settleWrites } from './emulatorHousehold.ts'
-import { pressButton, signIn, typeInto } from './keyboard.ts'
+import { pressButton } from './keyboard.ts'
+import {
+  createFolder,
+  exactButton,
+  heading,
+  openFolder,
+  openFolders,
+  signInAndOpenFolders,
+} from './organizer.ts'
 
 test.beforeEach(async () => {
   await prepareEmulators()
 })
 
-function heading(page: Page, name: string) {
-  return page.getByRole('heading', { level: 1, name })
-}
-
-function folderButton(page: Page, name: string) {
-  return page.getByRole('button', { name, exact: true })
-}
-
-async function openFolders(page: Page) {
-  await pressButton(page, 'Ordner')
-  await expect(heading(page, 'Ordner')).toBeVisible()
-}
-
-async function signInAndOpenFolders(page: Page) {
-  await page.goto('/')
-  await signIn(page)
-  await expect(heading(page, 'Dringend')).toBeVisible()
-  await openFolders(page)
-}
-
-async function createFolder(page: Page, name: string) {
-  await pressButton(page, 'Ordner anlegen')
-  await typeInto(page, 'Name', name)
-  await pressButton(page, 'Speichern')
-  await expect(folderButton(page, name)).toBeFocused()
-}
-
 async function editFolder(page: Page, name: string) {
-  await pressButton(page, name)
-  await expect(heading(page, name)).toBeFocused()
+  await openFolder(page, name)
   await pressButton(page, 'Ordner bearbeiten')
   await expect(page.getByLabel('Name', { exact: true })).toBeFocused()
 }
@@ -48,7 +28,7 @@ test('keeps a created folder after a reload', async ({ page }) => {
   await page.reload()
   await openFolders(page)
 
-  await expect(folderButton(page, 'Familie')).toBeVisible()
+  await expect(exactButton(page, 'Familie')).toBeVisible()
 })
 
 test('shows a folder created on another device without reloading', async ({
@@ -63,7 +43,7 @@ test('shows a folder created on another device without reloading', async ({
 
   await createFolder(deviceA, 'Familie')
 
-  await expect(folderButton(deviceB, 'Familie')).toBeVisible()
+  await expect(exactButton(deviceB, 'Familie')).toBeVisible()
   await contextA.close()
   await contextB.close()
 })
@@ -79,7 +59,7 @@ test('renames a folder', async ({ page }) => {
 
   await expect(heading(page, 'Haushalt')).toBeFocused()
   await pressButton(page, 'Zurück')
-  await expect(folderButton(page, 'Haushalt')).toBeVisible()
+  await expect(exactButton(page, 'Haushalt')).toBeVisible()
 })
 
 test('deletes a folder after confirming', async ({ page }) => {

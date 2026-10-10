@@ -1,6 +1,7 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { PlusIcon } from '../../shared/ui/PlusIcon'
 import { useFocusAfterRemoval } from '../../shared/ui/useFocusAfterRemoval'
+import { useFocusOnArrival } from '../../shared/ui/useFocusOnArrival'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { Folder, FolderId } from '../domain/folder'
 import { FolderButton } from './FolderButton'
@@ -21,6 +22,7 @@ function withoutRemovedFolder(
 type FoldersPageProps = {
   navigation: ReactNode
   folders: readonly Folder[]
+  listCount: (folderId: FolderId) => number
   focus: FoldersOverviewFocus
   onCreateFolder: () => void
   onOpenFolder: (folder: Folder) => void
@@ -29,6 +31,7 @@ type FoldersPageProps = {
 export function FoldersPage({
   navigation,
   folders,
+  listCount,
   focus,
   onCreateFolder,
   onOpenFolder,
@@ -40,34 +43,17 @@ export function FoldersPage({
     heading,
     focus.kind === 'followingFolder' ? focus.removedAt : null,
   )
-  const folderButtons = useRef(new Map<FolderId, HTMLButtonElement>())
-  const awaitedFolder = useRef(
+  const { keepArrival } = useFocusOnArrival(
     focus.kind === 'arrivingFolder' ? focus.id : null,
+    heading,
   )
-
-  function focusIsStillUnclaimed() {
-    const focused = document.activeElement
-    return focused === heading.current || focused === document.body
-  }
-
-  useEffect(() => {
-    const awaited = awaitedFolder.current
-    if (awaited === null) return
-    const arrived = folderButtons.current.get(awaited)
-    if (arrived === undefined) return
-    awaitedFolder.current = null
-    if (focusIsStillUnclaimed()) arrived.focus()
-  })
 
   function keepFolderButton(id: FolderId) {
     const keepForRemoval = keepRow(id)
+    const keepForArrival = keepArrival(id)
     return (button: HTMLButtonElement | null) => {
       keepForRemoval(button)
-      if (button === null) {
-        folderButtons.current.delete(id)
-      } else {
-        folderButtons.current.set(id, button)
-      }
+      keepForArrival(button)
     }
   }
 
@@ -96,6 +82,7 @@ export function FoldersPage({
               <li key={folder.id}>
                 <FolderButton
                   folder={folder}
+                  listCount={listCount(folder.id)}
                   onOpen={onOpenFolder}
                   ref={keepFolderButton(folder.id)}
                 />

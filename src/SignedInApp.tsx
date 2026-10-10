@@ -5,11 +5,11 @@ import { ConfirmationPage } from './shared/ui/ConfirmationPage'
 import { NavigationBar, type Area } from './shared/ui/NavigationBar'
 import { SettingsIcon } from './shared/ui/SettingsIcon'
 import { SettingsPage, type SettingsEntry } from './shared/ui/SettingsPage'
-import type { FoldersClient } from './tasks/api/foldersClient'
+import type { OrganizerClient } from './tasks/api/organizerClient'
 import { FolderIcon } from './tasks/ui/FolderIcon'
 import { FoldersArea } from './tasks/ui/FoldersArea'
 import { UrgentPage } from './tasks/ui/UrgentPage'
-import { useFolders } from './tasks/ui/useFolders'
+import { useOrganizer } from './tasks/ui/useOrganizer'
 
 const AREAS = [
   { id: 'urgent', label: 'Dringend', icon: <ChecklistIcon /> },
@@ -20,14 +20,16 @@ const AREAS = [
 type AreaId = (typeof AREAS)[number]['id']
 
 type SignedInAppProps = {
-  createFoldersClient: (onFailure: (message: string) => void) => FoldersClient
+  createOrganizerClient: (
+    onFailure: (message: string) => void,
+  ) => OrganizerClient
   appearance: Appearance
   announce: (text: string) => void
   onSignOut: () => void
 }
 
 export function SignedInApp({
-  createFoldersClient,
+  createOrganizerClient,
   appearance,
   announce,
   onSignOut,
@@ -35,8 +37,8 @@ export function SignedInApp({
   const [activeArea, setActiveArea] = useState<AreaId>('urgent')
   const [areaVisit, setAreaVisit] = useState(0)
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
-  const [foldersClient] = useState(() => createFoldersClient(announce))
-  const folders = useFolders(foldersClient)
+  const [organizerClient] = useState(() => createOrganizerClient(announce))
+  const organizer = useOrganizer(organizerClient)
 
   const settingsEntries: readonly SettingsEntry[] = [
     {
@@ -71,7 +73,7 @@ export function SignedInApp({
         return (
           <FoldersArea
             key={areaKey}
-            folders={folders}
+            organizer={organizer}
             navigation={navigation}
             announce={announce}
           />

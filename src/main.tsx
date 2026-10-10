@@ -5,7 +5,7 @@ import { createLocalStorageAppearanceClient } from './shared/appearance/localSto
 import { createServiceWorkerAppUpdateClient } from './shared/appUpdate/serviceWorkerAppUpdateClient.ts'
 import { auth, firestore, storageWarning } from './shared/auth/firebase.ts'
 import { createFirebaseAuthClient } from './shared/auth/firebaseAuthClient.ts'
-import { createFirestoreFoldersClient } from './tasks/api/firestoreFoldersClient.ts'
+import { createFirestoreOrganizerClient } from './tasks/api/firestoreOrganizerClient.ts'
 import './index.css'
 
 const appearanceClient = createLocalStorageAppearanceClient()
@@ -20,8 +20,8 @@ createRoot(document.getElementById('root')!).render(
       appearanceClient={appearanceClient}
       appUpdateClient={appUpdateClient}
       authClient={authClient}
-      createFoldersClient={(onFailure) =>
-        createFirestoreFoldersClient(firestore, onFailure)
+      createOrganizerClient={(onFailure) =>
+        createFirestoreOrganizerClient(firestore, onFailure)
       }
       storageWarning={storageWarning}
     />

@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BackIcon } from '../../shared/ui/BackIcon'
 import { BottomBar } from '../../shared/ui/BottomBar'
 import { SaveIcon } from '../../shared/ui/SaveIcon'
 import { TrashIcon } from '../../shared/ui/TrashIcon'
-import { folderNameFailureMessage } from '../domain/announcements'
-import { InvalidFolderName } from '../domain/folder'
+import { nameFailureMessage } from '../domain/announcements'
+import { InvalidName } from '../domain/name'
 
-type FolderFormPageProps = {
+type NameFormPageProps = {
   heading: string
   name: string
   onNameChange: (name: string) => void
@@ -14,9 +14,10 @@ type FolderFormPageProps = {
   onBack: () => void
   onDelete?: () => void
   announce: (text: string) => void
+  children?: ReactNode
 }
 
-export function FolderFormPage({
+export function NameFormPage({
   heading,
   name,
   onNameChange,
@@ -24,7 +25,8 @@ export function FolderFormPage({
   onBack,
   onDelete,
   announce,
-}: FolderFormPageProps) {
+  children,
+}: NameFormPageProps) {
   const [failureMessage, setFailureMessage] = useState('')
   const nameField = useRef<HTMLInputElement>(null)
 
@@ -32,12 +34,12 @@ export function FolderFormPage({
     nameField.current?.focus()
   }, [])
 
-  function saveFolder() {
+  function save() {
     try {
       onSave()
     } catch (error) {
-      if (!(error instanceof InvalidFolderName)) throw error
-      const message = folderNameFailureMessage(error.reason)
+      if (!(error instanceof InvalidName)) throw error
+      const message = nameFailureMessage(error.reason)
       setFailureMessage(message)
       announce(message)
       nameField.current?.focus()
@@ -51,21 +53,22 @@ export function FolderFormPage({
       </button>
       <h1>{heading}</h1>
       <p className="field">
-        <label htmlFor="folderName">Name</label>
+        <label htmlFor="name">Name</label>
         <input
-          id="folderName"
+          id="name"
           type="text"
           ref={nameField}
           value={name}
-          aria-describedby="folderNameFailure"
+          aria-describedby="nameFailure"
           onChange={(event) => onNameChange(event.target.value)}
         />
       </p>
-      <p id="folderNameFailure" className="failure">
+      <p id="nameFailure" className="failure">
         {failureMessage}
       </p>
+      {children}
       <BottomBar>
-        <button type="button" onClick={saveFolder}>
+        <button type="button" onClick={save}>
           <SaveIcon />
           Speichern
         </button>

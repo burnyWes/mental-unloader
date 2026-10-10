@@ -30,6 +30,22 @@ async function callEmulator(url: string, method: string, body?: unknown) {
   if (!response.ok) {
     throw new Error(`${method} ${url} failed: ${await response.text()}`)
   }
+  return response
+}
+
+type StoredDocuments = {
+  documents?: { name: string }[]
+}
+
+export async function storedDocumentIds(collection: string): Promise<string[]> {
+  const response = await callEmulator(
+    `${FIRESTORE_EMULATOR}/v1/projects/${PROJECT}/databases/(default)/documents/${collection}`,
+    'GET',
+  )
+  const stored = (await response.json()) as StoredDocuments
+  return (stored.documents ?? []).map(
+    (document) => document.name.split('/').at(-1) ?? '',
+  )
 }
 
 type PendingWrites = {

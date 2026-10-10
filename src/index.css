@@ -114,7 +114,8 @@ button {
 
 input[type='email'],
 input[type='password'],
-input[type='text'] {
+input[type='text'],
+select {
   font: inherit;
   min-height: 44px;
   box-sizing: border-box;
@@ -152,6 +153,11 @@ input[type='text'] {
   margin: 0;
 }
 
+.pageHeaderButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .headerButton {
   min-width: 44px;
   padding: 0.5rem;
@@ -186,7 +192,9 @@ input[type='text'] {
 .folderButtonName {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   padding: 0.5rem 1.5rem;
   background-color: var(--surface);
   border-right: 4px solid var(--accentLine);
@@ -194,10 +202,70 @@ input[type='text'] {
   overflow-wrap: anywhere;
 }
 
+.folderButtonCount {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
 .folderButtonArrow {
   display: flex;
   align-items: center;
-  padding: 0 1.25rem 0 1rem;
+  padding: 0 2.5rem 0 2rem;
+}
+
+.listButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.listButton:focus-visible {
+  outline: 4px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.listButtonFrame {
+  display: flex;
+  box-sizing: border-box;
+  min-height: 4rem;
+  padding: 4px;
+  background-color: var(--accentLine);
+  border-radius: 2rem 0 0 2rem;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 2rem) 0,
+    100% 50%,
+    calc(100% - 2rem) 100%,
+    0 100%
+  );
+}
+
+.listButtonFace {
+  --tipInset: calc(4px * 1.414 - 4px);
+  --tipDepth: calc(2rem - 4px);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 2.5rem 0.5rem 1.5rem;
+  background-color: var(--surface);
+  color: var(--ink);
+  border-radius: calc(2rem - 4px) 0 0 calc(2rem - 4px);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--tipInset) - var(--tipDepth)) 0,
+    calc(100% - var(--tipInset)) 50%,
+    calc(100% - var(--tipInset) - var(--tipDepth)) 100%,
+    0 100%
+  );
+  overflow-wrap: anywhere;
+}
+
+.visuallyHidden {
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .itemList {

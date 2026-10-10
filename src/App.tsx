@@ -11,13 +11,15 @@ import { useSession } from './shared/auth/useSession'
 import { Announcer } from './shared/ui/Announcer'
 import { useAnnouncer } from './shared/ui/useAnnouncer'
 import { useConnectionAnnouncements } from './shared/ui/useConnectionAnnouncements'
-import type { FoldersClient } from './tasks/api/foldersClient'
+import type { OrganizerClient } from './tasks/api/organizerClient'
 
 type AppProps = {
   appearanceClient: AppearanceClient
   appUpdateClient: AppUpdateClient
   authClient: AuthClient
-  createFoldersClient: (onFailure: (message: string) => void) => FoldersClient
+  createOrganizerClient: (
+    onFailure: (message: string) => void,
+  ) => OrganizerClient
   storageWarning?: string
 }
 
@@ -25,7 +27,7 @@ export function App({
   appearanceClient,
   appUpdateClient,
   authClient,
-  createFoldersClient,
+  createOrganizerClient,
   storageWarning = '',
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
@@ -56,7 +58,7 @@ export function App({
       )}
       {session.status === 'signedIn' && (
         <SignedInApp
-          createFoldersClient={createFoldersClient}
+          createOrganizerClient={createOrganizerClient}
           appearance={appearance}
           announce={announce}
           onSignOut={signOut}

@@ -171,3 +171,4 @@ m Push-Benachrichtigungen, wenn eine Aufgabe dringend wird (braucht FCM + Cloud 
 m Badge am Home-Bildschirm-Icon (Badging API, ohne Server oft veraltet) - Idee fuer spaeter
 b Farbe "Ueberfaellig" im Hellmodus (#009999 auf Weiss) hat nur ca. 3,5:1 Kontrast, Text braucht 4,5:1 - in MUL-006 klaeren
 b Speicherwarnung fehlt, wenn IndexedDB erst asynchron scheitert (try/catch um persistentLocalCache faengt nur synchrone Fehler) - Firestore faellt dann still auf Arbeitsspeicher zurueck
+b Liste ohne Ordner (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Liste in einen Ordner legt, den ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt

@@ -5,7 +5,7 @@ branch: main
 story: MUL-007
 topic: "Dringend-Seite: Sammelansicht aller dringenden Aufgaben mit Herkunft, Badge und Tageswechsel"
 tags: [plan, aufgaben, dringend, navigation, badge, voiceover, fokus, e2e]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-007 — Dringend-Seite
@@ -590,18 +590,18 @@ der Rückkehr aus dem Hintergrund ohne Eingabe mit dem neuen Tag.
 
 **Manuelle Verifikation** (nach dem Push auf `main`, nur auf ausdrückliche Anweisung):
 
-- [ ] Mit VoiceOver auf dem iPhone:
+- [x] Mit VoiceOver auf dem iPhone:
   - Die Startseite liest „Müll rausbringen, dringend, Familie, Haushalt“ in dieser Reihenfolge.
   - Der Navigationsknopf liest „Dringend, 1 Aufgabe“.
   - Nach dem Erledigen landet der Fokus auf der nächsten Zeile.
-- [ ] Ohne VoiceOver:
+- [x] Ohne VoiceOver:
   - Der Badge sitzt rechts oben am Dringend-Icon und ist im Dunkel- und im Hellmodus gut
     lesbar.
   - Die Herkunftszeile bricht bei langen Namen sauber um.
-- [ ] Tageswechsel: Die App am Abend mit einer 📅-Aufgabe offen lassen, deren Vorlauf am nächsten
+- [x] Tageswechsel: Die App am Abend mit einer 📅-Aufgabe offen lassen, deren Vorlauf am nächsten
   Tag beginnt. Am Morgen die App aus dem Hintergrund holen: Badge und Dringend-Seite zeigen die
   Aufgabe, ohne dass man tippt.
-- [ ] Auf iPhone A eine Aufgabe auf 🔥 stellen: Der Badge auf iPhone B zählt hoch.
+- [x] Auf iPhone A eine Aufgabe auf 🔥 stellen: Der Badge auf iPhone B zählt hoch.
 
 ## Notizen zur Umsetzung
 

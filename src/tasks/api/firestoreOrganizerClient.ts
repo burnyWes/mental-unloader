@@ -13,10 +13,17 @@ import {
   type DocumentData,
   type Firestore,
 } from 'firebase/firestore'
-import { calendarDayOf } from '../domain/calendarDay'
+import { calendarDayOf, isCalendarDay } from '../domain/calendarDay'
 import type { Folder, FolderId } from '../domain/folder'
 import type { List, ListId } from '../domain/list'
-import type { Due, Task, TaskContent, TaskId } from '../domain/task'
+import {
+  DEFAULT_URGENCY_LEAD,
+  isUrgencyLead,
+  type Due,
+  type Task,
+  type TaskContent,
+  type TaskId,
+} from '../domain/task'
 import type { NewTask, OrganizerClient } from './organizerClient'
 
 const FOLDERS = 'folders'
@@ -42,13 +49,26 @@ function toCreatedAt(stored: DocumentData): number {
   return typeof stored.createdAt === 'number' ? stored.createdAt : 0
 }
 
-function toDue(stored: DocumentData, createdAt: number): Due {
-  if (stored.due !== 'urgent') return { kind: 'someday' }
+function toUrgentDue(stored: DocumentData, createdAt: number): Due {
   const since =
     typeof stored.urgentSince === 'string'
       ? stored.urgentSince
       : calendarDayOf(new Date(createdAt))
   return { kind: 'urgent', since }
+}
+
+function toDeadlineDue(stored: DocumentData): Due {
+  if (!isCalendarDay(stored.deadline)) return { kind: 'someday' }
+  const urgentFrom = isUrgencyLead(stored.urgentFrom)
+    ? stored.urgentFrom
+    : DEFAULT_URGENCY_LEAD
+  return { kind: 'deadline', deadline: stored.deadline, urgentFrom }
+}
+
+function toDue(stored: DocumentData, createdAt: number): Due {
+  if (stored.due === 'urgent') return toUrgentDue(stored, createdAt)
+  if (stored.due === 'deadline') return toDeadlineDue(stored)
+  return { kind: 'someday' }
 }
 
 function toCompletions(stored: DocumentData): readonly number[] {
@@ -71,8 +91,23 @@ function toTask(id: TaskId, stored: DocumentData): Task {
   }
 }
 
-function storedUrgentSince(due: Due): DocumentData {
-  return due.kind === 'urgent' ? { urgentSince: due.since } : {}
+function storedDueFields(due: Due): DocumentData {
+  switch (due.kind) {
+    case 'urgent':
+      return { urgentSince: due.since }
+    case 'deadline':
+      return { deadline: due.deadline, urgentFrom: due.urgentFrom }
+    case 'someday':
+      return {}
+  }
+}
+
+function removedDueFields(): DocumentData {
+  return {
+    urgentSince: deleteField(),
+    deadline: deleteField(),
+    urgentFrom: deleteField(),
+  }
 }
 
 function newStoredTask(task: NewTask): DocumentData {
@@ -81,7 +116,7 @@ function newStoredTask(task: NewTask): DocumentData {
     name: task.name,
     description: task.description,
     due: task.due.kind,
-    ...storedUrgentSince(task.due),
+    ...storedDueFields(task.due),
     createdAt: task.createdAt,
     completions: [],
   }
@@ -93,8 +128,8 @@ function changedStoredTask(content: TaskContent, listId: ListId): DocumentData {
     name: content.name,
     description: content.description,
     due: content.due.kind,
-    urgentSince:
-      content.due.kind === 'urgent' ? content.due.since : deleteField(),
+    ...removedDueFields(),
+    ...storedDueFields(content.due),
   }
 }
 

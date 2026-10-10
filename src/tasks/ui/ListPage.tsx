@@ -5,6 +5,7 @@ import { PlusIcon } from '../../shared/ui/PlusIcon'
 import { useFocusAfterRemoval } from '../../shared/ui/useFocusAfterRemoval'
 import { useFocusOnArrival } from '../../shared/ui/useFocusOnArrival'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
+import type { CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
 import type { Task, TaskId } from '../domain/task'
 import {
@@ -54,6 +55,7 @@ type ListPageProps = {
   navigation: ReactNode
   list: List
   tasks: readonly Task[]
+  today: CalendarDay
   filter: TaskFilterKind
   focus: ListPageFocus
   onBack: () => void
@@ -68,6 +70,7 @@ export function ListPage({
   navigation,
   list,
   tasks,
+  today,
   filter,
   focus,
   onBack,
@@ -156,6 +159,7 @@ export function ListPage({
               <li key={task.id}>
                 <TaskRow
                   task={task}
+                  today={today}
                   onOpen={onOpenTask}
                   onComplete={filter === 'open' ? onCompleteTask : undefined}
                   openButton={keepOpenButton(task.id)}

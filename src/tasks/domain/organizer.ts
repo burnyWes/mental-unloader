@@ -1,7 +1,9 @@
+import type { CalendarDay } from './calendarDay'
 import { folderById, type Folder, type FolderId } from './folder'
 import { listById, type List, type ListId } from './list'
 import { byName } from './name'
 import { isCompleted, type Task } from './task'
+import { isUrgentOn } from './urgency'
 
 export type Organizer = {
   folders: readonly Folder[]
@@ -52,13 +54,14 @@ export function taskCountOfList(organizer: Organizer, listId: ListId): number {
 export function openTaskSummaryOfList(
   organizer: Organizer,
   listId: ListId,
+  today: CalendarDay,
 ): OpenTaskSummary {
   const openTasks = tasksOfList(organizer, listId).filter(
     (task) => !isCompleted(task),
   )
   return {
     open: openTasks.length,
-    urgent: openTasks.filter((task) => task.due.kind === 'urgent').length,
+    urgent: openTasks.filter((task) => isUrgentOn(task, today)).length,
   }
 }
 

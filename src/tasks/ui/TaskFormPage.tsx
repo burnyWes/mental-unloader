@@ -8,9 +8,12 @@ import {
 } from '../domain/announcements'
 import { InvalidName } from '../domain/name'
 import { InvalidDescription, type DueKind } from '../domain/task'
+import { CalendarIcon } from './CalendarIcon'
 import { CoffeeIcon } from './CoffeeIcon'
+import { DeadlineStepper } from './DeadlineStepper'
 import { FlameIcon } from './FlameIcon'
 import type { TaskDraft } from './foldersAreaPage'
+import { UrgencyLeadSelect } from './UrgencyLeadSelect'
 
 const DUE_CHOICES: readonly {
   kind: DueKind
@@ -18,6 +21,7 @@ const DUE_CHOICES: readonly {
   icon: ReactNode
 }[] = [
   { kind: 'urgent', label: 'Dringend', icon: <FlameIcon /> },
+  { kind: 'deadline', label: 'Stichtag', icon: <CalendarIcon /> },
   { kind: 'someday', label: 'Irgendwann', icon: <CoffeeIcon /> },
 ]
 
@@ -136,6 +140,18 @@ export function TaskFormPage({
           </label>
         ))}
       </fieldset>
+      {draft.dueKind === 'deadline' && (
+        <>
+          <DeadlineStepper
+            deadline={draft.deadline}
+            onChange={(deadline) => change({ deadline })}
+          />
+          <UrgencyLeadSelect
+            urgentFrom={draft.urgentFrom}
+            onChange={(urgentFrom) => change({ urgentFrom })}
+          />
+        </>
+      )}
       {children}
       <BottomBar>
         <button type="button" onClick={save}>

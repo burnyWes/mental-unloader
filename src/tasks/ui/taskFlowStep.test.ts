@@ -27,6 +27,8 @@ const draft: TaskDraft = {
   name: 'Müll rausbringen',
   description: '',
   dueKind: 'someday',
+  deadline: '2026-10-17',
+  urgentFrom: 'oneWeek',
 }
 
 const organizer: Organizer = {

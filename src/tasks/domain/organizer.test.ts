@@ -118,15 +118,39 @@ describe('taskCountOfList', () => {
 })
 
 describe('openTaskSummaryOfList', () => {
+  const today = '2026-10-10'
+
   it('counts the open and the urgent tasks but not the completed ones', () => {
-    expect(openTaskSummaryOfList(organizer, haushalt.id)).toEqual({
+    expect(openTaskSummaryOfList(organizer, haushalt.id, today)).toEqual({
       open: 2,
       urgent: 1,
     })
   })
 
+  it('counts deadline tasks as urgent only once their lead is reached', () => {
+    const deadlineOn = (deadline: string): Due => ({
+      kind: 'deadline',
+      deadline,
+      urgentFrom: 'oneWeek',
+    })
+    const withDeadlines: Organizer = {
+      ...organizer,
+      tasks: [
+        task('reached', geburtstage.id, deadlineOn('2026-10-15')),
+        task('ahead', geburtstage.id, deadlineOn('2026-10-20')),
+        task('done', geburtstage.id, deadlineOn('2026-10-15'), [5]),
+        task('fire', geburtstage.id, urgent),
+        task('coffee', geburtstage.id),
+      ],
+    }
+
+    expect(openTaskSummaryOfList(withDeadlines, geburtstage.id, today)).toEqual(
+      { open: 4, urgent: 2 },
+    )
+  })
+
   it('counts nothing for a list without tasks', () => {
-    expect(openTaskSummaryOfList(organizer, geburtstage.id)).toEqual({
+    expect(openTaskSummaryOfList(organizer, geburtstage.id, today)).toEqual({
       open: 0,
       urgent: 0,
     })

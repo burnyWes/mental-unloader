@@ -1,12 +1,17 @@
+import type { CalendarDay } from '../domain/calendarDay'
 import { folderById, type Folder, type FolderId } from '../domain/folder'
 import { listById, type List, type ListId } from '../domain/list'
 import { folderOfList, type Organizer } from '../domain/organizer'
 import {
+  DEFAULT_URGENCY_LEAD,
+  initialDeadlineOf,
   isCompleted,
   taskById,
+  type DueChoice,
   type DueKind,
   type Task,
   type TaskId,
+  type UrgencyLead,
 } from '../domain/task'
 import { completedTasksInOrder, openTasksInOrder } from '../domain/taskOrder'
 import type { FoldersOverviewFocus } from './FoldersPage'
@@ -30,6 +35,8 @@ export type TaskDraft = {
   name: string
   description: string
   dueKind: DueKind
+  deadline: CalendarDay
+  urgentFrom: UrgencyLead
 }
 
 type ListDraft = {
@@ -126,10 +133,22 @@ export const FOLDER_HEADING_FOCUS: FolderPageFocus = { kind: 'heading' }
 
 export const LIST_HEADING_FOCUS: ListPageFocus = { kind: 'heading' }
 
-export const EMPTY_TASK_DRAFT: TaskDraft = {
-  name: '',
-  description: '',
-  dueKind: 'someday',
+export function emptyTaskDraft(today: CalendarDay): TaskDraft {
+  return {
+    name: '',
+    description: '',
+    dueKind: 'someday',
+    deadline: initialDeadlineOf(today),
+    urgentFrom: DEFAULT_URGENCY_LEAD,
+  }
+}
+
+export function dueChoiceOf(draft: TaskDraft): DueChoice {
+  return {
+    kind: draft.dueKind,
+    deadline: draft.deadline,
+    urgentFrom: draft.urgentFrom,
+  }
 }
 
 export function filterOf(task: Task): TaskFilterKind {

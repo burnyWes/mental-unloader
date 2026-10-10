@@ -5,10 +5,17 @@ import { PencilIcon } from '../../shared/ui/PencilIcon'
 import { ReopenIcon } from '../../shared/ui/ReopenIcon'
 import { TrashIcon } from '../../shared/ui/TrashIcon'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
-import { spokenDateOf } from '../domain/calendarDay'
+import { URGENCY_LEAD_LABELS } from '../domain/announcements'
+import {
+  fullDayOf,
+  spokenDateOf,
+  type CalendarDay,
+} from '../domain/calendarDay'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import { lastCompletion, type Task } from '../domain/task'
+import { isOverdueOn } from '../domain/urgency'
+import { CalendarIcon } from './CalendarIcon'
 import { CoffeeIcon } from './CoffeeIcon'
 import { FlameIcon } from './FlameIcon'
 
@@ -16,6 +23,7 @@ type TaskPageProps = {
   task: Task
   list: List
   folder: Folder
+  today: CalendarDay
   onBack: () => void
   onComplete: () => void
   onReopen: () => void
@@ -23,24 +31,37 @@ type TaskPageProps = {
   onDelete: () => void
 }
 
-function DueFact({ task }: { task: Task }) {
-  if (task.due.kind === 'urgent')
-    return (
-      <>
-        <FlameIcon /> Dringend
-      </>
-    )
-  return (
-    <>
-      <CoffeeIcon /> Irgendwann
-    </>
-  )
+function DueFact({ task, today }: { task: Task; today: CalendarDay }) {
+  switch (task.due.kind) {
+    case 'urgent':
+      return (
+        <>
+          <FlameIcon /> Dringend
+        </>
+      )
+    case 'deadline':
+      return (
+        <>
+          <CalendarIcon /> Stichtag {fullDayOf(task.due.deadline)}
+          {isOverdueOn(task, today) && (
+            <span className="overdue">, überfällig</span>
+          )}
+        </>
+      )
+    case 'someday':
+      return (
+        <>
+          <CoffeeIcon /> Irgendwann
+        </>
+      )
+  }
 }
 
 export function TaskPage({
   task,
   list,
   folder,
+  today,
   onBack,
   onComplete,
   onReopen,
@@ -64,8 +85,14 @@ export function TaskPage({
       <dl className="taskFacts">
         <dt>Fälligkeit</dt>
         <dd>
-          <DueFact task={task} />
+          <DueFact task={task} today={today} />
         </dd>
+        {task.due.kind === 'deadline' && (
+          <>
+            <dt>Dringend ab</dt>
+            <dd>{URGENCY_LEAD_LABELS[task.due.urgentFrom]}</dd>
+          </>
+        )}
         <dt>Liste</dt>
         <dd>
           <span aria-hidden="true">

@@ -17,6 +17,7 @@ TODO-List
 --------- 
 DONE 
 ----------------------------------------------------------------------------------------------------------------------------------
+x Farbe "Ueberfaellig" im Hellmodus (#009999 auf Weiss) hat nur ca. 3,5:1 Kontrast, Text braucht 4,5:1 - in MUL-006 klaeren
 ----------------------------------------------------------------------------------------------------------------------------------
 TODO 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -169,7 +170,6 @@ TODO
       verschwinden nicht aus der offen-liste und der nächste Stichtag wird beim erledigen entsprechend verschoben.
 m Push-Benachrichtigungen, wenn eine Aufgabe dringend wird (braucht FCM + Cloud Functions/Blaze-Tarif) - Idee fuer spaeter, siehe docs/agents/plans/2026-10-08-gesamtplan.md
 m Badge am Home-Bildschirm-Icon (Badging API, ohne Server oft veraltet) - Idee fuer spaeter
-b Farbe "Ueberfaellig" im Hellmodus (#009999 auf Weiss) hat nur ca. 3,5:1 Kontrast, Text braucht 4,5:1 - in MUL-006 klaeren
 b Speicherwarnung fehlt, wenn IndexedDB erst asynchron scheitert (try/catch um persistentLocalCache faengt nur synchrone Fehler) - Firestore faellt dann still auf Arbeitsspeicher zurueck
 b Liste ohne Ordner (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Liste in einen Ordner legt, den ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt
 b Aufgabe ohne Liste (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Aufgabe in eine Liste legt, die ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt

@@ -8,6 +8,10 @@ function urgentSince(since: string): Due {
   return { kind: 'urgent', since }
 }
 
+function deadlineOn(deadline: string): Due {
+  return { kind: 'deadline', deadline, urgentFrom: 'oneWeek' }
+}
+
 function task(
   name: string,
   due: Due,
@@ -37,6 +41,38 @@ describe('openTasksInOrder', () => {
     ]
 
     expect(namesOf(openTasksInOrder(tasks))).toEqual(['Müll', 'Keller'])
+  })
+
+  it('puts deadline tasks between urgent and someday tasks', () => {
+    const tasks = [
+      task('Keller', SOMEDAY, 1),
+      task('Reifen', deadlineOn('2026-10-17'), 2),
+      task('Müll', urgentSince('2026-10-10'), 3),
+    ]
+
+    expect(namesOf(openTasksInOrder(tasks))).toEqual([
+      'Müll',
+      'Reifen',
+      'Keller',
+    ])
+  })
+
+  it('orders deadline tasks by their deadline across the turn of the year', () => {
+    const tasks = [
+      task('Januar', deadlineOn('2027-01-01'), 1),
+      task('Silvester', deadlineOn('2026-12-31'), 2),
+    ]
+
+    expect(namesOf(openTasksInOrder(tasks))).toEqual(['Silvester', 'Januar'])
+  })
+
+  it('orders tasks with the same deadline by their creation', () => {
+    const tasks = [
+      task('später', deadlineOn('2026-10-17'), 9),
+      task('früher', deadlineOn('2026-10-17'), 3),
+    ]
+
+    expect(namesOf(openTasksInOrder(tasks))).toEqual(['früher', 'später'])
   })
 
   it('orders urgent tasks by the day they became urgent', () => {

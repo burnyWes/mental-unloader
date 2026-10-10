@@ -12,11 +12,21 @@ import {
   taskReopenedAnnouncement,
   taskSavedAnnouncement,
 } from '../domain/announcements'
-import { calendarDayOf } from '../domain/calendarDay'
+import { calendarDayOf, type CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
-import { createDescription, dueAfterChange, type Task } from '../domain/task'
-import type { TaskDraft, TaskFlowEntry } from './foldersAreaPage'
+import {
+  createDescription,
+  DEFAULT_URGENCY_LEAD,
+  dueAfterChange,
+  initialDeadlineOf,
+  type Task,
+} from '../domain/task'
+import {
+  dueChoiceOf,
+  type TaskDraft,
+  type TaskFlowEntry,
+} from './foldersAreaPage'
 import { TaskFormPage } from './TaskFormPage'
 import {
   OVERVIEW_STEP,
@@ -34,11 +44,24 @@ export type TaskFlowLeaveReason = 'back' | 'cancelled' | 'completed' | 'deleted'
 
 type ShownEditStep = Extract<ShownTaskFlowStep, { kind: 'edit' }>
 
-function draftOf(task: Task): TaskDraft {
+function deadlineDraftOf(
+  task: Task,
+  today: CalendarDay,
+): Pick<TaskDraft, 'deadline' | 'urgentFrom'> {
+  if (task.due.kind === 'deadline')
+    return { deadline: task.due.deadline, urgentFrom: task.due.urgentFrom }
+  return {
+    deadline: initialDeadlineOf(today),
+    urgentFrom: DEFAULT_URGENCY_LEAD,
+  }
+}
+
+function draftOf(task: Task, today: CalendarDay): TaskDraft {
   return {
     name: task.name,
     description: task.description,
     dueKind: task.due.kind,
+    ...deadlineDraftOf(task, today),
   }
 }
 
@@ -69,6 +92,7 @@ export function TaskFlow({
   onMoved,
 }: TaskFlowProps) {
   const [step, setStep] = useState<TaskFlowStep>(() => firstStep(entry))
+  const today = calendarDayOf(now())
   const shownStep = resolveTaskFlowStep(step, { task, list, folder }, organizer)
   const alreadyCompleted =
     shownStep.kind === 'overview' && shownStep.alreadyCompleted
@@ -80,7 +104,7 @@ export function TaskFlow({
   function save({ draft, targetList, targetFolder }: ShownEditStep) {
     const name = createName(draft.name)
     const description = createDescription(draft.description)
-    const due = dueAfterChange(task.due, draft.dueKind, calendarDayOf(now()))
+    const due = dueAfterChange(task.due, dueChoiceOf(draft), today)
     organizer.changeTask(task.id, { name, description, due }, targetList.id)
     setStep(OVERVIEW_STEP)
     if (targetList.id === list.id) {
@@ -121,13 +145,18 @@ export function TaskFlow({
           task={task}
           list={list}
           folder={folder}
+          today={today}
           onBack={() => onLeave('back')}
           onComplete={() =>
             setStep({ kind: 'confirmCompletion', from: 'overview' })
           }
           onReopen={reopen}
           onEdit={() =>
-            setStep({ kind: 'edit', draft: draftOf(task), draftListId: null })
+            setStep({
+              kind: 'edit',
+              draft: draftOf(task, today),
+              draftListId: null,
+            })
           }
           onDelete={() => setStep({ kind: 'confirmDeletion' })}
         />

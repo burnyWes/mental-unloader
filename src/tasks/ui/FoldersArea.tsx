@@ -33,7 +33,8 @@ import { createDescription, dueAfterChange, type Task } from '../domain/task'
 import { FolderPage } from './FolderPage'
 import { FolderSelect } from './FolderSelect'
 import {
-  EMPTY_TASK_DRAFT,
+  dueChoiceOf,
+  emptyTaskDraft,
   filterOf,
   FOLDER_HEADING_FOCUS,
   tasksShownIn,
@@ -87,6 +88,7 @@ export function FoldersArea({
     focus: OVERVIEW_HEADING_FOCUS,
   })
   const { shown, vanished } = resolveFoldersAreaPage(page, organizer)
+  const today = calendarDayOf(now())
   const shownFolder = 'folder' in shown ? shown.folder : null
   const shownList = 'list' in shown ? shown.list : null
   const shownTask = 'task' in shown ? shown.task : null
@@ -214,7 +216,7 @@ export function FoldersArea({
       listId: list.id,
       name,
       description: createDescription(draft.description),
-      due: dueAfterChange(null, draft.dueKind, calendarDayOf(now())),
+      due: dueAfterChange(null, dueChoiceOf(draft), today),
       createdAt: now().getTime(),
     })
     showList(list, folder.id, 'open', { kind: 'arrivingTask', id })
@@ -302,7 +304,9 @@ export function FoldersArea({
           navigation={navigation}
           folder={shown.folder}
           lists={listsOfFolder(organizer, shown.folder.id)}
-          openTaskSummary={(listId) => openTaskSummaryOfList(organizer, listId)}
+          openTaskSummary={(listId) =>
+            openTaskSummaryOfList(organizer, listId, today)
+          }
           focus={shown.focus}
           onBack={() => showOverview()}
           onEdit={() =>
@@ -392,6 +396,7 @@ export function FoldersArea({
           navigation={navigation}
           list={shown.list}
           tasks={tasksOfList(organizer, shown.list.id)}
+          today={today}
           filter={shown.filter}
           focus={shown.focus}
           onFilter={(filter) =>
@@ -413,7 +418,7 @@ export function FoldersArea({
               listId: shown.list.id,
               folderId: shown.folder.id,
               filter: shown.filter,
-              draft: EMPTY_TASK_DRAFT,
+              draft: emptyTaskDraft(today),
             })
           }
           onOpenTask={(task) => openTask(shown, task, 'overview')}

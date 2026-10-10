@@ -1,17 +1,31 @@
 import { isCompleted, lastCompletion, type Task } from './task'
 
 function urgencyRank(task: Task): number {
-  return task.due.kind === 'urgent' ? 0 : 1
+  switch (task.due.kind) {
+    case 'urgent':
+      return 0
+    case 'deadline':
+      return 1
+    case 'someday':
+      return 2
+  }
 }
 
-function urgentSince(task: Task): string {
-  return task.due.kind === 'urgent' ? task.due.since : ''
+function sortDayOf(task: Task): string {
+  switch (task.due.kind) {
+    case 'urgent':
+      return task.due.since
+    case 'deadline':
+      return task.due.deadline
+    case 'someday':
+      return ''
+  }
 }
 
 function byUrgencyThenAge(one: Task, other: Task): number {
   return (
     urgencyRank(one) - urgencyRank(other) ||
-    urgentSince(one).localeCompare(urgentSince(other)) ||
+    sortDayOf(one).localeCompare(sortDayOf(other)) ||
     one.createdAt - other.createdAt ||
     one.id.localeCompare(other.id)
   )

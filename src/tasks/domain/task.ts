@@ -1,11 +1,41 @@
-import type { CalendarDay } from './calendarDay'
+import { addDays, type CalendarDay } from './calendarDay'
 import type { ListId } from './list'
 
 export type TaskId = string
 
-export type DueKind = 'urgent' | 'someday'
+export const URGENCY_LEADS = [
+  'immediately',
+  'onDeadline',
+  'oneDay',
+  'oneWeek',
+  'oneMonth',
+  'oneQuarter',
+  'halfYear',
+  'oneYear',
+] as const
 
-export type Due = { kind: 'urgent'; since: CalendarDay } | { kind: 'someday' }
+export type UrgencyLead = (typeof URGENCY_LEADS)[number]
+
+export const DEFAULT_URGENCY_LEAD: UrgencyLead = 'oneWeek'
+
+export function isUrgencyLead(value: unknown): value is UrgencyLead {
+  return URGENCY_LEADS.some((lead) => lead === value)
+}
+
+const DAYS_UNTIL_INITIAL_DEADLINE = 7
+
+export type DueKind = 'urgent' | 'deadline' | 'someday'
+
+export type Due =
+  | { kind: 'urgent'; since: CalendarDay }
+  | { kind: 'deadline'; deadline: CalendarDay; urgentFrom: UrgencyLead }
+  | { kind: 'someday' }
+
+export type DueChoice = {
+  kind: DueKind
+  deadline: CalendarDay
+  urgentFrom: UrgencyLead
+}
 
 export type TaskContent = {
   name: string
@@ -41,14 +71,28 @@ export function createDescription(written: string): string {
   return description
 }
 
+export function initialDeadlineOf(today: CalendarDay): CalendarDay {
+  return addDays(today, DAYS_UNTIL_INITIAL_DEADLINE)
+}
+
 export function dueAfterChange(
   previous: Due | null,
-  chosen: DueKind,
+  chosen: DueChoice,
   today: CalendarDay,
 ): Due {
-  if (chosen === 'someday') return { kind: 'someday' }
-  if (previous?.kind === 'urgent') return previous
-  return { kind: 'urgent', since: today }
+  switch (chosen.kind) {
+    case 'someday':
+      return { kind: 'someday' }
+    case 'deadline':
+      return {
+        kind: 'deadline',
+        deadline: chosen.deadline,
+        urgentFrom: chosen.urgentFrom,
+      }
+    case 'urgent':
+      if (previous?.kind === 'urgent') return previous
+      return { kind: 'urgent', since: today }
+  }
 }
 
 export function isCompleted(task: Task): boolean {

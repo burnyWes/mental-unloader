@@ -16,8 +16,10 @@ import {
   listMovedAnnouncement,
   listSavedAnnouncement,
   completedOnLabel,
+  deadlineLabel,
   nameFailureMessage,
   openTaskSummaryLabel,
+  overdueLabel,
   TASK_COMPLETION_EXPLANATION,
   TASK_DELETION_EXPLANATION,
   taskAlreadyCompletedAnnouncement,
@@ -31,6 +33,7 @@ import {
   taskMovedAnnouncement,
   taskReopenedAnnouncement,
   taskSavedAnnouncement,
+  URGENCY_LEAD_LABELS,
 } from './announcements'
 
 describe('task completion announcements', () => {
@@ -68,6 +71,43 @@ describe('task completion announcements', () => {
     expect(completedOnLabel(new Date(2026, 9, 10, 9, 0).getTime())).toBe(
       'erledigt am 10. Oktober',
     )
+  })
+})
+
+describe('deadline labels', () => {
+  it('names the deadline of the running year', () => {
+    expect(deadlineLabel('2026-10-17', '2026-10-10')).toBe(
+      'Stichtag 17. Oktober',
+    )
+  })
+
+  it('names the year of a deadline in another year', () => {
+    expect(deadlineLabel('2027-01-17', '2026-10-10')).toBe(
+      'Stichtag 17. Januar 2027',
+    )
+  })
+})
+
+describe('overdue labels', () => {
+  it('names the day a task has been overdue since', () => {
+    expect(overdueLabel('2026-10-08', '2026-10-10')).toBe(
+      'überfällig seit 8. Oktober',
+    )
+  })
+})
+
+describe('urgency lead labels', () => {
+  it.each([
+    ['immediately', 'sofort'],
+    ['onDeadline', 'am Stichtag'],
+    ['oneDay', '1 Tag vorher'],
+    ['oneWeek', '1 Woche vorher'],
+    ['oneMonth', '1 Monat vorher'],
+    ['oneQuarter', '¼ Jahr vorher'],
+    ['halfYear', '½ Jahr vorher'],
+    ['oneYear', '1 Jahr vorher'],
+  ] as const)('names %s as %s', (lead, label) => {
+    expect(URGENCY_LEAD_LABELS[lead]).toBe(label)
   })
 })
 

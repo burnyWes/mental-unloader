@@ -1,4 +1,10 @@
 import { expect, type Page } from '@playwright/test'
+import {
+  addDays,
+  calendarDayOf,
+  stepYear,
+  type CalendarDay,
+} from '../src/tasks/domain/calendarDay.ts'
 import { pressButton, signIn, typeInto } from './keyboard.ts'
 
 export function heading(page: Page, name: string) {
@@ -68,4 +74,26 @@ export async function createTask(
   }
   await pressButton(page, 'Speichern')
   await expect(exactButton(page, taskRowName(name, { urgent }))).toBeFocused()
+}
+
+export function deadlineRowName(name: string, spokenDay: string) {
+  return `${name}, Stichtag ${spokenDay}`
+}
+
+export async function browserToday(page: Page): Promise<CalendarDay> {
+  return calendarDayOf(new Date(await page.evaluate(() => Date.now())))
+}
+
+export function expectedInitialDeadline(today: CalendarDay): CalendarDay {
+  return stepYear(addDays(today, 7), 1)
+}
+
+export async function createDeadlineTask(page: Page, name: string) {
+  await pressButton(page, 'Aufgabe anlegen')
+  await typeInto(page, 'Name', name)
+  await page.getByRole('radio', { name: 'Stichtag' }).focus()
+  await page.keyboard.press('Space')
+  await page.getByRole('spinbutton', { name: 'Jahr' }).focus()
+  await page.keyboard.press('ArrowUp')
+  await pressButton(page, 'Speichern')
 }

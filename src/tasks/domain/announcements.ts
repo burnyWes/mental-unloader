@@ -1,7 +1,7 @@
-import { spokenDateOf } from './calendarDay'
+import { spokenDateOf, spokenDayOf, type CalendarDay } from './calendarDay'
 import { MAXIMUM_NAME_LENGTH, type InvalidNameReason } from './name'
 import type { OpenTaskSummary } from './organizer'
-import { MAXIMUM_DESCRIPTION_LENGTH } from './task'
+import { MAXIMUM_DESCRIPTION_LENGTH, type UrgencyLead } from './task'
 
 export function folderCreatedAnnouncement(name: string): string {
   return `Ordner ${name} angelegt.`
@@ -130,6 +130,31 @@ export function taskAlreadyCompletedAnnouncement(name: string): string {
 
 export function completedOnLabel(at: number): string {
   return `erledigt am ${spokenDateOf(at)}`
+}
+
+export function deadlineLabel(
+  deadline: CalendarDay,
+  today: CalendarDay,
+): string {
+  return `Stichtag ${spokenDayOf(deadline, today)}`
+}
+
+export function overdueLabel(
+  deadline: CalendarDay,
+  today: CalendarDay,
+): string {
+  return `überfällig seit ${spokenDayOf(deadline, today)}`
+}
+
+export const URGENCY_LEAD_LABELS: Record<UrgencyLead, string> = {
+  immediately: 'sofort',
+  onDeadline: 'am Stichtag',
+  oneDay: '1 Tag vorher',
+  oneWeek: '1 Woche vorher',
+  oneMonth: '1 Monat vorher',
+  oneQuarter: '¼ Jahr vorher',
+  halfYear: '½ Jahr vorher',
+  oneYear: '1 Jahr vorher',
 }
 
 export function taskDeletionHeading(name: string): string {

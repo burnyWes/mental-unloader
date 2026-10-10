@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import {
   createDescription,
+  DEFAULT_URGENCY_LEAD,
   dueAfterChange,
+  initialDeadlineOf,
   InvalidDescription,
   isCompleted,
+  isUrgencyLead,
   lastCompletion,
   MAXIMUM_DESCRIPTION_LENGTH,
   taskById,
+  URGENCY_LEADS,
+  type Due,
+  type DueChoice,
+  type DueKind,
   type Task,
 } from './task'
 
@@ -56,9 +63,18 @@ describe('createDescription', () => {
 
 describe('dueAfterChange', () => {
   const today = '2026-10-10'
+  const deadlineTask: Due = {
+    kind: 'deadline',
+    deadline: '2026-10-20',
+    urgentFrom: 'onDeadline',
+  }
+
+  function chosen(kind: DueKind): DueChoice {
+    return { kind, deadline: '2026-10-17', urgentFrom: 'oneMonth' }
+  }
 
   it('makes a new urgent task urgent since today', () => {
-    expect(dueAfterChange(null, 'urgent', today)).toEqual({
+    expect(dueAfterChange(null, chosen('urgent'), today)).toEqual({
       kind: 'urgent',
       since: today,
     })
@@ -66,12 +82,18 @@ describe('dueAfterChange', () => {
 
   it('keeps the day an urgent task became urgent', () => {
     expect(
-      dueAfterChange({ kind: 'urgent', since: '2026-10-01' }, 'urgent', today),
+      dueAfterChange(
+        { kind: 'urgent', since: '2026-10-01' },
+        chosen('urgent'),
+        today,
+      ),
     ).toEqual({ kind: 'urgent', since: '2026-10-01' })
   })
 
   it('makes a task urgent since today once it turns urgent', () => {
-    expect(dueAfterChange({ kind: 'someday' }, 'urgent', today)).toEqual({
+    expect(
+      dueAfterChange({ kind: 'someday' }, chosen('urgent'), today),
+    ).toEqual({
       kind: 'urgent',
       since: today,
     })
@@ -79,12 +101,86 @@ describe('dueAfterChange', () => {
 
   it('forgets the urgency once a task turns someday', () => {
     expect(
-      dueAfterChange({ kind: 'urgent', since: '2026-10-01' }, 'someday', today),
+      dueAfterChange(
+        { kind: 'urgent', since: '2026-10-01' },
+        chosen('someday'),
+        today,
+      ),
     ).toEqual({ kind: 'someday' })
   })
 
   it('makes a new someday task someday', () => {
-    expect(dueAfterChange(null, 'someday', today)).toEqual({ kind: 'someday' })
+    expect(dueAfterChange(null, chosen('someday'), today)).toEqual({
+      kind: 'someday',
+    })
+  })
+
+  it('gives a new deadline task the chosen deadline and lead', () => {
+    expect(dueAfterChange(null, chosen('deadline'), today)).toEqual({
+      kind: 'deadline',
+      deadline: '2026-10-17',
+      urgentFrom: 'oneMonth',
+    })
+  })
+
+  it('makes a deadline task urgent since today once it turns urgent', () => {
+    expect(dueAfterChange(deadlineTask, chosen('urgent'), today)).toEqual({
+      kind: 'urgent',
+      since: today,
+    })
+  })
+
+  it('forgets the urgency once an urgent task gets a deadline', () => {
+    expect(
+      dueAfterChange(
+        { kind: 'urgent', since: '2026-10-01' },
+        chosen('deadline'),
+        today,
+      ),
+    ).toEqual({
+      kind: 'deadline',
+      deadline: '2026-10-17',
+      urgentFrom: 'oneMonth',
+    })
+  })
+
+  it('forgets the deadline once a task turns someday', () => {
+    expect(dueAfterChange(deadlineTask, chosen('someday'), today)).toEqual({
+      kind: 'someday',
+    })
+  })
+})
+
+describe('initialDeadlineOf', () => {
+  it('lies a week after today', () => {
+    expect(initialDeadlineOf('2026-10-10')).toBe('2026-10-17')
+  })
+})
+
+describe('urgency leads', () => {
+  it('offers the eight leads from the shortest to the longest', () => {
+    expect(URGENCY_LEADS).toEqual([
+      'immediately',
+      'onDeadline',
+      'oneDay',
+      'oneWeek',
+      'oneMonth',
+      'oneQuarter',
+      'halfYear',
+      'oneYear',
+    ])
+  })
+
+  it('starts with one week', () => {
+    expect(DEFAULT_URGENCY_LEAD).toBe('oneWeek')
+  })
+
+  it('recognizes a known lead', () => {
+    expect(isUrgencyLead('oneQuarter')).toBe(true)
+  })
+
+  it.each(['twoWeeks', '', 7, null])('rejects %o as a lead', (value) => {
+    expect(isUrgencyLead(value)).toBe(false)
   })
 })
 

@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs'
+import type { Page } from '@playwright/test'
 import { firebaseConfig } from '../src/shared/auth/firebaseConfig.ts'
 
 const PROJECT = firebaseConfig.projectId
 const AUTH_EMULATOR = 'http://127.0.0.1:9099'
+const FIRESTORE_EMULATOR = 'http://127.0.0.1:8080'
 
 export const household = {
   email: 'haushalt@example.com',
@@ -30,7 +32,21 @@ async function callEmulator(url: string, method: string, body?: unknown) {
   }
 }
 
+type PendingWrites = {
+  waitForPendingWrites?: () => Promise<void>
+}
+
+export async function settleWrites(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    (globalThis as PendingWrites).waitForPendingWrites?.(),
+  )
+}
+
 export async function prepareEmulators(): Promise<void> {
+  await callEmulator(
+    `${FIRESTORE_EMULATOR}/emulator/v1/projects/${PROJECT}/databases/(default)/documents`,
+    'DELETE',
+  )
   await callEmulator(
     `${AUTH_EMULATOR}/emulator/v1/projects/${PROJECT}/accounts`,
     'DELETE',

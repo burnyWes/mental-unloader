@@ -33,7 +33,7 @@ Die Dauerregeln stehen in [CLAUDE.md](CLAUDE.md), die projektspezifischen Angabe
 npm run dev         Entwicklungsserver
 npm run test        Unit- und Komponententests, Architekturtest
 npm run test:rules  Firestore-Regeln gegen den Emulator
-npm run test:e2e    Playwright-Abläufe gegen den Auth-Emulator
+npm run test:e2e    Playwright-Abläufe gegen Auth- und Firestore-Emulator
 npm run lint        ESLint einschließlich Schicht- und Kontextgrenzen
 npm run format      Prettier
 npm run build       Typprüfung und Produktions-Build nach dist/

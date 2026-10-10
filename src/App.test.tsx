@@ -6,6 +6,8 @@ import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppe
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
 import type { AuthClient } from './shared/auth/authClient'
 import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
+import type { FoldersClient } from './tasks/api/foldersClient'
+import { createInMemoryFoldersClient } from './tasks/api/inMemoryFoldersClient'
 import { accessibilityViolations } from './testSupport/accessibility'
 
 const household = {
@@ -25,14 +27,46 @@ function renderApp(
   appearanceClient = createInMemoryAppearanceClient(),
   appUpdateClient = createInMemoryAppUpdateClient(),
   authClient: AuthClient = signedInAuthClient(),
+  createFoldersClient: (
+    onFailure: (message: string) => void,
+  ) => FoldersClient = () => createInMemoryFoldersClient(),
+  storageWarning = '',
 ) {
   return render(
     <App
       appearanceClient={appearanceClient}
       appUpdateClient={appUpdateClient}
       authClient={authClient}
+      createFoldersClient={createFoldersClient}
+      storageWarning={storageWarning}
     />,
   )
+}
+
+function renderAppWithFolders(...folders: string[]) {
+  const client = createInMemoryFoldersClient(
+    folders.map((name, index) => ({ id: `stored-${index}`, name })),
+  )
+  return renderApp(undefined, undefined, undefined, () => client)
+}
+
+function failureReportingFoldersClient() {
+  const reported: { onFailure: (message: string) => void } = {
+    onFailure: () => {},
+  }
+  function createFoldersClient(onFailure: (message: string) => void) {
+    reported.onFailure = onFailure
+    return createInMemoryFoldersClient()
+  }
+  return { reported, createFoldersClient }
+}
+
+function setOnline(online: boolean) {
+  Object.defineProperty(navigator, 'onLine', {
+    configurable: true,
+    value: online,
+  })
+  window.dispatchEvent(new Event(online ? 'online' : 'offline'))
 }
 
 function renderSignedOutApp() {
@@ -124,6 +158,61 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'Ordner' })).toHaveFocus()
     expect(screen.getByText('Noch keine Ordner.')).toBeInTheDocument()
+  })
+
+  it('shows a folder that was stored before the start', async () => {
+    renderAppWithFolders('Familie')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+
+    expect(screen.getByRole('button', { name: 'Familie' })).toBeInTheDocument()
+  })
+
+  it('returns from an open folder to the overview with the folders button', async () => {
+    renderAppWithFolders('Familie')
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Familie' }))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+
+    expect(screen.getByRole('heading', { name: 'Ordner' })).toHaveFocus()
+  })
+
+  it('announces a missing storage on this device', () => {
+    renderApp(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Ohne Speicher auf diesem Gerät. Änderungen gehen beim Schließen verloren.',
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Ohne Speicher auf diesem Gerät. Änderungen gehen beim Schließen verloren.',
+    )
+  })
+
+  it('announces losing and regaining the connection', () => {
+    renderApp()
+
+    act(() => setOnline(false))
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Offline. Änderungen werden gespeichert.',
+    )
+
+    act(() => setOnline(true))
+    expect(screen.getByRole('status')).toHaveTextContent('Wieder online.')
+  })
+
+  it('announces a failure reported by the folders client', () => {
+    const { reported, createFoldersClient } = failureReportingFoldersClient()
+    renderApp(undefined, undefined, undefined, createFoldersClient)
+
+    act(() => reported.onFailure('Konnte nicht gespeichert werden.'))
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Konnte nicht gespeichert werden.',
+    )
   })
 
   it('focuses the heading of the settings once they are chosen', async () => {

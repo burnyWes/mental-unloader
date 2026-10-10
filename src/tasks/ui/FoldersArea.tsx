@@ -17,7 +17,7 @@ import {
   taskCreatedAnnouncement,
   taskDeletedElsewhereAnnouncement,
 } from '../domain/announcements'
-import { calendarDayOf } from '../domain/calendarDay'
+import type { CalendarDay } from '../domain/calendarDay'
 import type { Folder, FolderId } from '../domain/folder'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
@@ -74,6 +74,7 @@ type FoldersAreaProps = {
   organizer: OrganizerState
   navigation: ReactNode
   announce: (text: string) => void
+  today: CalendarDay
   now: () => Date
 }
 
@@ -81,6 +82,7 @@ export function FoldersArea({
   organizer,
   navigation,
   announce,
+  today,
   now,
 }: FoldersAreaProps) {
   const [page, setPage] = useState<FoldersAreaPage>({
@@ -88,7 +90,6 @@ export function FoldersArea({
     focus: OVERVIEW_HEADING_FOCUS,
   })
   const { shown, vanished } = resolveFoldersAreaPage(page, organizer)
-  const today = calendarDayOf(now())
   const shownFolder = 'folder' in shown ? shown.folder : null
   const shownList = 'list' in shown ? shown.list : null
   const shownTask = 'task' in shown ? shown.task : null
@@ -434,6 +435,7 @@ export function FoldersArea({
           list={shown.list}
           folder={shown.folder}
           organizer={organizer}
+          today={today}
           now={now}
           entry={shown.entry}
           announce={announce}

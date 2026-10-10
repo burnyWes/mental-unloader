@@ -12,7 +12,7 @@ import {
   taskReopenedAnnouncement,
   taskSavedAnnouncement,
 } from '../domain/announcements'
-import { calendarDayOf, type CalendarDay } from '../domain/calendarDay'
+import type { CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
 import {
@@ -73,11 +73,12 @@ function firstStep(entry: TaskFlowEntry): TaskFlowStep {
 
 type TaskFlowProps = ShownTask & {
   organizer: OrganizerState
+  today: CalendarDay
   now: () => Date
   entry: TaskFlowEntry
   announce: (text: string) => void
   onLeave: (reason: TaskFlowLeaveReason) => void
-  onMoved: (list: List) => void
+  onMoved?: (list: List) => void
 }
 
 export function TaskFlow({
@@ -85,6 +86,7 @@ export function TaskFlow({
   list,
   folder,
   organizer,
+  today,
   now,
   entry,
   announce,
@@ -92,7 +94,6 @@ export function TaskFlow({
   onMoved,
 }: TaskFlowProps) {
   const [step, setStep] = useState<TaskFlowStep>(() => firstStep(entry))
-  const today = calendarDayOf(now())
   const shownStep = resolveTaskFlowStep(step, { task, list, folder }, organizer)
   const alreadyCompleted =
     shownStep.kind === 'overview' && shownStep.alreadyCompleted
@@ -111,7 +112,7 @@ export function TaskFlow({
       announce(taskSavedAnnouncement(name))
       return
     }
-    onMoved(targetList)
+    onMoved?.(targetList)
     announce(taskMovedAnnouncement(name, targetFolder.name, targetList.name))
   }
 

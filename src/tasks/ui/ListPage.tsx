@@ -2,8 +2,6 @@ import type { ReactNode } from 'react'
 import { BackIcon } from '../../shared/ui/BackIcon'
 import { PencilIcon } from '../../shared/ui/PencilIcon'
 import { PlusIcon } from '../../shared/ui/PlusIcon'
-import { useFocusAfterRemoval } from '../../shared/ui/useFocusAfterRemoval'
-import { useFocusOnArrival } from '../../shared/ui/useFocusOnArrival'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
@@ -15,40 +13,15 @@ import {
 } from './foldersAreaPage'
 import { TaskFilterButtons } from './TaskFilterButtons'
 import { TaskRow } from './TaskRow'
+import { useTaskRowFocus, withoutRemovedTask } from './useTaskRowFocus'
 
 const EMPTY_FILTER_TEXTS: Record<TaskFilterKind, string> = {
   open: 'Keine offenen Aufgaben.',
   completed: 'Noch nichts erledigt.',
 }
 
-function openButtonKey(id: TaskId) {
-  return `${id}:open`
-}
-
-function completeButtonKey(id: TaskId) {
-  return `${id}:complete`
-}
-
-function awaitedButton(focus: ListPageFocus): string | null {
-  switch (focus.kind) {
-    case 'arrivingTask':
-      return openButtonKey(focus.id)
-    case 'returningTask':
-      return focus.button === 'open'
-        ? openButtonKey(focus.id)
-        : completeButtonKey(focus.id)
-    case 'heading':
-    case 'followingTask':
-      return null
-  }
-}
-
-function withoutRemovedTask(
-  tasks: readonly Task[],
-  focus: ListPageFocus,
-): readonly Task[] {
-  if (focus.kind !== 'followingTask') return tasks
-  return tasks.filter((task) => task.id !== focus.removedId)
+function idOf(task: Task): TaskId {
+  return task.id
 }
 
 type ListPageProps = {
@@ -84,7 +57,7 @@ export function ListPage({
 
   function rowsOf(kind: TaskFilterKind): readonly Task[] {
     const shown = tasksShownIn(kind, tasks)
-    return kind === filter ? withoutRemovedTask(shown, focus) : shown
+    return kind === filter ? withoutRemovedTask(shown, focus, idOf) : shown
   }
 
   const counts: Record<TaskFilterKind, number> = {
@@ -92,24 +65,11 @@ export function ListPage({
     completed: rowsOf('completed').length,
   }
   const rows = rowsOf(filter)
-  const { keepRow } = useFocusAfterRemoval(
-    rows.map((task) => task.id),
-    heading,
-    focus.kind === 'followingTask' ? focus.removedAt : null,
-  )
-  const { keepArrival } = useFocusOnArrival<string>(
-    awaitedButton(focus),
+  const { openButton, completeButton } = useTaskRowFocus(
+    rows.map(idOf),
+    focus,
     heading,
   )
-
-  function keepOpenButton(id: TaskId) {
-    const keepForRemoval = keepRow(id)
-    const keepForArrival = keepArrival(openButtonKey(id))
-    return (button: HTMLButtonElement | null) => {
-      keepForRemoval(button)
-      keepForArrival(button)
-    }
-  }
 
   function emptyText(): string {
     if (counts.open + counts.completed === 0) return 'Noch keine Aufgaben.'
@@ -162,8 +122,8 @@ export function ListPage({
                   today={today}
                   onOpen={onOpenTask}
                   onComplete={filter === 'open' ? onCompleteTask : undefined}
-                  openButton={keepOpenButton(task.id)}
-                  completeButton={keepArrival(completeButtonKey(task.id))}
+                  openButton={openButton(task.id)}
+                  completeButton={completeButton(task.id)}
                 />
               </li>
             ))}

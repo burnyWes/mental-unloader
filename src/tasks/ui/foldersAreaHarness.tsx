@@ -7,6 +7,7 @@ import {
   createInMemoryOrganizerClient,
   type InMemoryOrganizerClient,
 } from '../api/inMemoryOrganizerClient'
+import { calendarDayOf } from '../domain/calendarDay'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import type { Task } from '../domain/task'
@@ -34,6 +35,7 @@ export function FoldersAreaHarness({
           </nav>
         }
         announce={announce}
+        today={calendarDayOf(TENTH_OF_OCTOBER_MORNING)}
         now={() => TENTH_OF_OCTOBER_MORNING}
       />
       <Announcer text={spokenText} />

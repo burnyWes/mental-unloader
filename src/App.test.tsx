@@ -8,6 +8,7 @@ import type { AuthClient } from './shared/auth/authClient'
 import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
 import { createInMemoryOrganizerClient } from './tasks/api/inMemoryOrganizerClient'
 import type { OrganizerClient } from './tasks/api/organizerClient'
+import type { Due, Task } from './tasks/domain/task'
 import { accessibilityViolations } from './testSupport/accessibility'
 
 const household = {
@@ -33,6 +34,7 @@ function renderApp(
     onFailure: (message: string) => void,
   ) => OrganizerClient = () => createInMemoryOrganizerClient(),
   storageWarning = '',
+  now: () => Date = () => TENTH_OF_OCTOBER_MORNING,
 ) {
   return render(
     <App
@@ -41,7 +43,7 @@ function renderApp(
       authClient={authClient}
       createOrganizerClient={createOrganizerClient}
       storageWarning={storageWarning}
-      now={() => TENTH_OF_OCTOBER_MORNING}
+      now={now}
     />,
   )
 }
@@ -107,6 +109,54 @@ async function confirmSignOut() {
 
 const areaButtons = ['Dringend', 'Ordner', 'Einstellungen']
 
+const haushalt = { id: 'stored-list-1', name: 'Haushalt', folderId: 'stored-1' }
+
+function storedTask(id: string, name: string, due: Due): Task {
+  return {
+    id,
+    listId: haushalt.id,
+    name,
+    description: '',
+    due,
+    createdAt: 1,
+    completions: [],
+  }
+}
+
+const muell = storedTask('stored-task-1', 'Müll rausbringen', {
+  kind: 'urgent',
+  since: '2026-10-01',
+})
+
+function deadlineTask(name: string, deadline: string) {
+  return storedTask(`stored-${name}`, name, {
+    kind: 'deadline',
+    deadline,
+    urgentFrom: 'oneWeek',
+  })
+}
+
+function renderAppWithTasks(...tasks: Task[]) {
+  return renderAppWithTasksAt(() => TENTH_OF_OCTOBER_MORNING, ...tasks)
+}
+
+function renderAppWithTasksAt(now: () => Date, ...tasks: Task[]) {
+  const client = createInMemoryOrganizerClient({
+    folders: [{ id: 'stored-1', name: 'Familie' }],
+    lists: [haushalt],
+    tasks,
+  })
+  return renderApp(undefined, undefined, undefined, () => client, '', now)
+}
+
+function urgentAreaButton(name: string) {
+  return screen.getByRole('button', { name })
+}
+
+function navigationBadge() {
+  return document.querySelector('.navigationBadge')
+}
+
 function darkModeOnTheDocument() {
   return document.documentElement.dataset.darkMode
 }
@@ -125,6 +175,70 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'Dringend' })).toHaveFocus()
     expect(screen.getByText('Nichts Dringendes.')).toBeInTheDocument()
+  })
+
+  it('shows an urgent task with its origin on the start page', () => {
+    renderAppWithTasks(muell)
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Müll rausbringen, dringend, Familie, Haushalt',
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('counts the urgent tasks at the urgent area in every area', async () => {
+    renderAppWithTasks(muell, deadlineTask('Reifen wechseln', '2026-10-15'))
+
+    expect(urgentAreaButton('Dringend, 2 Aufgaben')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+
+    expect(urgentAreaButton('Dringend, 2 Aufgaben')).toBeInTheDocument()
+  })
+
+  it('counts one task less after completing it on the urgent page', async () => {
+    renderAppWithTasks(muell, deadlineTask('Reifen wechseln', '2026-10-15'))
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Müll rausbringen erledigen' }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Erledigen' }))
+
+    expect(urgentAreaButton('Dringend, 1 Aufgabe')).toBeInTheDocument()
+  })
+
+  it('shows no badge while nothing is urgent', () => {
+    renderApp()
+
+    expect(urgentAreaButton('Dringend')).toBeInTheDocument()
+    expect(navigationBadge()).toBeNull()
+  })
+
+  it('turns to the new day once the app becomes visible again', () => {
+    let moment = TENTH_OF_OCTOBER_MORNING
+    renderAppWithTasksAt(
+      () => moment,
+      deadlineTask('Reifen wechseln', '2026-10-18'),
+    )
+    expect(urgentAreaButton('Dringend')).toBeInTheDocument()
+
+    moment = new Date(2026, 9, 11, 7, 30)
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      value: 'visible',
+    })
+    act(() => {
+      document.dispatchEvent(new Event('visibilitychange'))
+    })
+    Reflect.deleteProperty(document, 'visibilityState')
+
+    expect(urgentAreaButton('Dringend, 1 Aufgabe')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Reifen wechseln, Stichtag 18. Oktober, dringend, Familie, Haushalt',
+      }),
+    ).toBeInTheDocument()
   })
 
   it('offers every area in the navigation', () => {

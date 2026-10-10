@@ -15,16 +15,37 @@ import { isOverdueOn, isUrgentOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
 import { FlameIcon } from './FlameIcon'
 
+export type TaskOrigin = {
+  folderName: string
+  listName: string
+}
+
 type TaskRowProps = {
   task: Task
   today: CalendarDay
+  origin?: TaskOrigin
   onOpen: (task: Task) => void
   onComplete?: (task: Task) => void
   openButton?: Ref<HTMLButtonElement>
   completeButton?: Ref<HTMLButtonElement>
 }
 
-function UrgentTaskName({ name }: { name: string }) {
+function SpokenOrigin({ origin }: { origin?: TaskOrigin }) {
+  if (origin === undefined) return null
+  return (
+    <span className="visuallyHidden">
+      , {origin.folderName}, {origin.listName}
+    </span>
+  )
+}
+
+function UrgentTaskName({
+  name,
+  origin,
+}: {
+  name: string
+  origin?: TaskOrigin
+}) {
   return (
     <>
       <span className="taskRowTitle">
@@ -33,6 +54,7 @@ function UrgentTaskName({ name }: { name: string }) {
       </span>{' '}
       <span className="taskRowDetail">
         <FlameIcon /> dringend
+        <SpokenOrigin origin={origin} />
       </span>
     </>
   )
@@ -42,10 +64,12 @@ function DeadlineTaskName({
   task,
   deadline,
   today,
+  origin,
 }: {
   task: Task
   deadline: CalendarDay
   today: CalendarDay
+  origin?: TaskOrigin
 }) {
   const shortDay = shortDayOf(deadline, today)
   if (isOverdueOn(task, today))
@@ -56,6 +80,7 @@ function DeadlineTaskName({
           <span className="visuallyHidden">
             , {overdueLabel(deadline, today)}
           </span>
+          <SpokenOrigin origin={origin} />
         </span>{' '}
         <span className="taskRowDetail overdue" aria-hidden="true">
           <CalendarIcon /> {shortDay} überfällig
@@ -71,6 +96,7 @@ function DeadlineTaskName({
           , {deadlineLabel(deadline, today)}
           {urgent && ', dringend'}
         </span>
+        <SpokenOrigin origin={origin} />
       </span>{' '}
       <span className="taskRowDetail" aria-hidden="true">
         <CalendarIcon /> {shortDay}
@@ -85,29 +111,45 @@ function DeadlineTaskName({
   )
 }
 
-function OpenTaskName({ task, today }: { task: Task; today: CalendarDay }) {
+function OpenTaskName({
+  task,
+  today,
+  origin,
+}: {
+  task: Task
+  today: CalendarDay
+  origin?: TaskOrigin
+}) {
   switch (task.due.kind) {
     case 'urgent':
-      return <UrgentTaskName name={task.name} />
+      return <UrgentTaskName name={task.name} origin={origin} />
     case 'deadline':
       return (
         <DeadlineTaskName
           task={task}
           deadline={task.due.deadline}
           today={today}
+          origin={origin}
         />
       )
     case 'someday':
-      return <span className="taskRowTitle">{task.name}</span>
+      return (
+        <span className="taskRowTitle">
+          {task.name}
+          <SpokenOrigin origin={origin} />
+        </span>
+      )
   }
 }
 
 function CompletedTaskName({
   completedAt,
   task,
+  origin,
 }: {
   completedAt: number
   task: Task
+  origin?: TaskOrigin
 }) {
   return (
     <>
@@ -116,6 +158,7 @@ function CompletedTaskName({
         <span className="visuallyHidden">
           , {completedOnLabel(completedAt)}
         </span>
+        <SpokenOrigin origin={origin} />
       </span>{' '}
       <span className="taskRowDetail" aria-hidden="true">
         erledigt {shortDateOf(completedAt)}
@@ -124,9 +167,18 @@ function CompletedTaskName({
   )
 }
 
+function TaskOriginLine({ folderName, listName }: TaskOrigin) {
+  return (
+    <span className="taskRowOrigin" aria-hidden="true">
+      {folderName} › {listName}
+    </span>
+  )
+}
+
 export function TaskRow({
   task,
   today,
+  origin,
   onOpen,
   onComplete,
   openButton,
@@ -143,10 +195,15 @@ export function TaskRow({
         onClick={() => onOpen(task)}
       >
         {completedAt === null ? (
-          <OpenTaskName task={task} today={today} />
+          <OpenTaskName task={task} today={today} origin={origin} />
         ) : (
-          <CompletedTaskName completedAt={completedAt} task={task} />
+          <CompletedTaskName
+            completedAt={completedAt}
+            task={task}
+            origin={origin}
+          />
         )}
+        {origin !== undefined && <TaskOriginLine {...origin} />}
       </button>
       {onComplete !== undefined && (
         <button

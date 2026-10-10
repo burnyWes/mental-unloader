@@ -6,18 +6,33 @@ import { NavigationBar, type Area } from './shared/ui/NavigationBar'
 import { SettingsIcon } from './shared/ui/SettingsIcon'
 import { SettingsPage, type SettingsEntry } from './shared/ui/SettingsPage'
 import type { OrganizerClient } from './tasks/api/organizerClient'
+import { URGENT_AREA_NAME, urgentAreaLabel } from './tasks/domain/announcements'
+import { urgentTasksOf } from './tasks/domain/organizer'
 import { FolderIcon } from './tasks/ui/FolderIcon'
 import { FoldersArea } from './tasks/ui/FoldersArea'
-import { UrgentPage } from './tasks/ui/UrgentPage'
+import { UrgentArea } from './tasks/ui/UrgentArea'
 import { useOrganizer } from './tasks/ui/useOrganizer'
+import { useToday } from './tasks/ui/useToday'
 
-const AREAS = [
-  { id: 'urgent', label: 'Dringend', icon: <ChecklistIcon /> },
-  { id: 'folders', label: 'Ordner', icon: <FolderIcon /> },
-  { id: 'settings', label: 'Einstellungen', icon: <SettingsIcon /> },
-] as const satisfies readonly Area<string>[]
+type AreaId = 'urgent' | 'folders' | 'settings'
 
-type AreaId = (typeof AREAS)[number]['id']
+function areasWithUrgentCount(
+  urgentTaskCount: number,
+): readonly Area<AreaId>[] {
+  return [
+    {
+      id: 'urgent',
+      label: URGENT_AREA_NAME,
+      icon: <ChecklistIcon />,
+      badge: {
+        count: urgentTaskCount,
+        label: urgentAreaLabel(urgentTaskCount),
+      },
+    },
+    { id: 'folders', label: 'Ordner', icon: <FolderIcon /> },
+    { id: 'settings', label: 'Einstellungen', icon: <SettingsIcon /> },
+  ]
+}
 
 type SignedInAppProps = {
   createOrganizerClient: (
@@ -41,6 +56,8 @@ export function SignedInApp({
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
   const [organizerClient] = useState(() => createOrganizerClient(announce))
   const organizer = useOrganizer(organizerClient)
+  const today = useToday(now)
+  const urgentTasks = urgentTasksOf(organizer, today)
 
   const settingsEntries: readonly SettingsEntry[] = [
     {
@@ -59,7 +76,7 @@ export function SignedInApp({
 
   const navigation = (
     <NavigationBar
-      areas={AREAS}
+      areas={areasWithUrgentCount(urgentTasks.length)}
       activeArea={activeArea}
       onSelectArea={selectArea}
     />
@@ -70,7 +87,17 @@ export function SignedInApp({
   function areaPage() {
     switch (activeArea) {
       case 'urgent':
-        return <UrgentPage key={areaKey} navigation={navigation} />
+        return (
+          <UrgentArea
+            key={areaKey}
+            organizer={organizer}
+            urgentTasks={urgentTasks}
+            navigation={navigation}
+            announce={announce}
+            today={today}
+            now={now}
+          />
+        )
       case 'folders':
         return (
           <FoldersArea
@@ -78,6 +105,7 @@ export function SignedInApp({
             organizer={organizer}
             navigation={navigation}
             announce={announce}
+            today={today}
             now={now}
           />
         )

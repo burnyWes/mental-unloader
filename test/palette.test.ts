@@ -60,6 +60,7 @@ const TEXT_ON_ITS_BACKGROUND = [
   ['--ink', '--surface'],
   ['--failure', '--surface'],
   ['--overdue', '--surface'],
+  ['--surface', '--accentLine'],
 ]
 
 const LINES_AGAINST_THEIR_GROUND = [

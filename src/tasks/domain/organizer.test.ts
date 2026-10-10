@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Folder } from './folder'
 import type { List } from './list'
 import {
+  EMPTY_ORGANIZER,
   folderOfList,
   listCountOfFolder,
   listOfTask,
@@ -11,6 +12,7 @@ import {
   taskCountOfList,
   tasksOfFolder,
   tasksOfList,
+  urgentTasksOf,
   type Organizer,
 } from './organizer'
 import type { Due, Task } from './task'
@@ -179,5 +181,118 @@ describe('listOfTask', () => {
 
   it('finds no list for an orphaned task', () => {
     expect(listOfTask(organizer, lost)).toBeNull()
+  })
+})
+
+describe('urgentTasksOf', () => {
+  const today = '2026-10-10'
+  const wartung = list('list-6', 'Wartung', garten.id)
+
+  function created(
+    id: string,
+    listId: string,
+    due: Due,
+    createdAt: number,
+    completions: readonly number[] = [],
+  ): Task {
+    return { ...task(id, listId, due, completions), createdAt }
+  }
+
+  function deadlineOn(
+    deadline: string,
+    urgentFrom: 'oneWeek' | 'immediately' = 'oneWeek',
+  ): Due {
+    return { kind: 'deadline', deadline, urgentFrom }
+  }
+
+  function urgentSince(since: string): Due {
+    return { kind: 'urgent', since }
+  }
+
+  function idsOf(organizer: Organizer) {
+    return urgentTasksOf(organizer, today).map(({ task }) => task.id)
+  }
+
+  it('gathers the urgent tasks of all folders and lists with their origin', () => {
+    const fire = created('fire', haushalt.id, urgent, 1)
+    const reached = created('reached', wartung.id, deadlineOn('2026-10-15'), 2)
+    const overdue = created('overdue', beete.id, deadlineOn('2026-10-08'), 3)
+    const immediately = created(
+      'immediately',
+      wocheneinkauf.id,
+      deadlineOn('2027-05-01', 'immediately'),
+      4,
+    )
+
+    expect(
+      urgentTasksOf(
+        {
+          folders: [familie, garten],
+          lists: [haushalt, wocheneinkauf, beete, wartung],
+          tasks: [reached, immediately, overdue, fire],
+        },
+        today,
+      ),
+    ).toEqual([
+      { task: fire, list: haushalt, folder: familie },
+      { task: overdue, list: beete, folder: garten },
+      { task: reached, list: wartung, folder: garten },
+      { task: immediately, list: wocheneinkauf, folder: familie },
+    ])
+  })
+
+  it('leaves out someday, deadlines ahead of their lead and completed tasks', () => {
+    expect(
+      idsOf({
+        folders: [familie],
+        lists: [haushalt],
+        tasks: [
+          created('coffee', haushalt.id, { kind: 'someday' }, 1),
+          created('ahead', haushalt.id, deadlineOn('2026-10-20'), 2),
+          created('done', haushalt.id, urgent, 3, [5]),
+          created('fire', haushalt.id, urgent, 4),
+        ],
+      }),
+    ).toEqual(['fire'])
+  })
+
+  it('orders across lists: older urgency first, then deadlines, then creation', () => {
+    expect(
+      idsOf({
+        folders: [familie, garten],
+        lists: [haushalt, beete],
+        tasks: [
+          created('late deadline', beete.id, deadlineOn('2026-10-12'), 1),
+          created('young fire', haushalt.id, urgentSince('2026-10-09'), 2),
+          created('early deadline', haushalt.id, deadlineOn('2026-10-11'), 9),
+          created('old fire', beete.id, urgentSince('2026-10-01'), 3),
+          created('same deadline', beete.id, deadlineOn('2026-10-11'), 4),
+        ],
+      }),
+    ).toEqual([
+      'old fire',
+      'young fire',
+      'same deadline',
+      'early deadline',
+      'late deadline',
+    ])
+  })
+
+  it('leaves out tasks without a list and tasks of a list without a folder', () => {
+    expect(
+      idsOf({
+        folders: [familie],
+        lists: [haushalt, orphan],
+        tasks: [
+          created('lost', 'list-gone', urgent, 1),
+          created('orphaned', orphan.id, urgent, 2),
+          created('fire', haushalt.id, urgent, 3),
+        ],
+      }),
+    ).toEqual(['fire'])
+  })
+
+  it('gathers nothing from an empty organizer', () => {
+    expect(urgentTasksOf(EMPTY_ORGANIZER, today)).toEqual([])
   })
 })

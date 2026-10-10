@@ -31,9 +31,12 @@ import {
   taskDeletedElsewhereAnnouncement,
   taskDeletionHeading,
   taskMovedAnnouncement,
+  taskNoLongerUrgentAnnouncement,
   taskReopenedAnnouncement,
   taskSavedAnnouncement,
   URGENCY_LEAD_LABELS,
+  URGENT_AREA_NAME,
+  urgentAreaLabel,
 } from './announcements'
 
 describe('task completion announcements', () => {
@@ -300,6 +303,26 @@ describe('task announcements', () => {
   it('names the maximum length of a description that is too long', () => {
     expect(descriptionFailureMessage()).toBe(
       'Die Beschreibung darf höchstens 2000 Zeichen lang sein.',
+    )
+  })
+})
+
+describe('urgent page announcements', () => {
+  it('names the urgent area', () => {
+    expect(URGENT_AREA_NAME).toBe('Dringend')
+  })
+
+  it.each([
+    [0, 'Dringend'],
+    [1, 'Dringend, 1 Aufgabe'],
+    [3, 'Dringend, 3 Aufgaben'],
+  ])('names the urgent area with %i urgent tasks %s', (count, label) => {
+    expect(urgentAreaLabel(count)).toBe(label)
+  })
+
+  it('tells that a task left the urgent page', () => {
+    expect(taskNoLongerUrgentAnnouncement('Reifen wechseln')).toBe(
+      'Reifen wechseln ist nicht mehr dringend.',
     )
   })
 })

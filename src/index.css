@@ -102,6 +102,21 @@ button {
   background-color: var(--accent);
 }
 
+.navigationBadge {
+  align-self: flex-start;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  margin-left: 0.25rem;
+  padding: 0 0.25rem;
+  border-radius: 0.75rem;
+  background-color: var(--accentLine);
+  color: var(--surface);
+  font-size: 0.875rem;
+  font-weight: bold;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
 :focus-visible {
   outline: 4px solid var(--ink);
   outline-offset: 2px;
@@ -334,9 +349,15 @@ fieldset.field legend {
 }
 
 .listButtonCount,
-.taskRowDetail {
+.taskRowDetail,
+.taskRowOrigin {
   font-size: 1rem;
   font-weight: normal;
+}
+
+.taskRowOrigin {
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .listButtonCount .buttonIcon,

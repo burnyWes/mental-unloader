@@ -109,6 +109,17 @@ export function taskDeletedElsewhereAnnouncement(name: string): string {
   return `Aufgabe ${name} wurde gelöscht.`
 }
 
+export const URGENT_AREA_NAME = 'Dringend'
+
+export function urgentAreaLabel(urgentTaskCount: number): string {
+  if (urgentTaskCount === 0) return URGENT_AREA_NAME
+  return `${URGENT_AREA_NAME}, ${taskCountLabel(urgentTaskCount)}`
+}
+
+export function taskNoLongerUrgentAnnouncement(name: string): string {
+  return `${name} ist nicht mehr dringend.`
+}
+
 export function taskCompletionHeading(name: string): string {
   return `${name} erledigen?`
 }

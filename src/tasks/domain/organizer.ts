@@ -3,6 +3,7 @@ import { folderById, type Folder, type FolderId } from './folder'
 import { listById, type List, type ListId } from './list'
 import { byName } from './name'
 import { isCompleted, type Task } from './task'
+import { openTasksInOrder } from './taskOrder'
 import { isUrgentOn } from './urgency'
 
 export type Organizer = {
@@ -14,6 +15,12 @@ export type Organizer = {
 export type OpenTaskSummary = {
   open: number
   urgent: number
+}
+
+export type UrgentTask = {
+  task: Task
+  list: List
+  folder: Folder
 }
 
 export const EMPTY_ORGANIZER: Organizer = { folders: [], lists: [], tasks: [] }
@@ -76,4 +83,22 @@ export function tasksOfFolder(
 
 export function listOfTask(organizer: Organizer, task: Task): List | null {
   return listById(organizer.lists, task.listId)
+}
+
+function withOrigin(organizer: Organizer, task: Task): UrgentTask | null {
+  const list = listOfTask(organizer, task)
+  if (list === null) return null
+  const folder = folderOfList(organizer, list)
+  if (folder === null) return null
+  return { task, list, folder }
+}
+
+export function urgentTasksOf(
+  organizer: Organizer,
+  today: CalendarDay,
+): readonly UrgentTask[] {
+  return openTasksInOrder(organizer.tasks)
+    .filter((task) => isUrgentOn(task, today))
+    .map((task) => withOrigin(organizer, task))
+    .filter((urgentTask) => urgentTask !== null)
 }

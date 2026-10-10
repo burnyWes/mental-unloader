@@ -24,6 +24,11 @@ export async function openFolders(page: Page) {
   await expect(heading(page, 'Ordner')).toBeVisible()
 }
 
+export async function openUrgent(page: Page, buttonName = 'Dringend') {
+  await pressButton(page, buttonName)
+  await expect(heading(page, 'Dringend')).toBeFocused()
+}
+
 export async function signInAndOpenFolders(page: Page) {
   await page.goto('/')
   await signIn(page)
@@ -59,6 +64,14 @@ export async function openList(page: Page, name: string) {
 
 export function taskRowName(name: string, { urgent = false } = {}) {
   return urgent ? `${name}, dringend` : name
+}
+
+export function urgentRowName(
+  name: string,
+  folderName: string,
+  listName: string,
+) {
+  return `${name}, dringend, ${folderName}, ${listName}`
 }
 
 export async function createTask(

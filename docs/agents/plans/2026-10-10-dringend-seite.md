@@ -413,7 +413,7 @@ Dringend-Seite. Der Tag wird in dieser Phase noch je Render aus `now()` gebildet
 
 **Aufgaben**:
 
-- [ ] `src/tasks/domain/organizer.test.ts` und `organizer.ts` (test-getrieben, heute
+- [x] `src/tasks/domain/organizer.test.ts` und `organizer.ts` (test-getrieben, heute
   `'2026-10-10'`): `urgentTasksOf`
   - liefert 🔥 und 📅 mit erreichtem Vorlauf (auch überfällig, auch „sofort“) aus zwei Ordnern
     und mehreren Listen, jeweils mit `list` und `folder`
@@ -422,15 +422,15 @@ Dringend-Seite. Der Tag wird in dieser Phase noch je Render aus `now()` gebildet
     nach `createdAt`
   - lässt eine Aufgabe ohne Liste und eine Aufgabe, deren Liste keinen Ordner hat, weg
   - ein leerer Organizer ergibt `[]`
-- [ ] `src/tasks/domain/announcements.test.ts` und `announcements.ts` (test-getrieben):
+- [x] `src/tasks/domain/announcements.test.ts` und `announcements.ts` (test-getrieben):
   - `taskNoLongerUrgentAnnouncement('Reifen wechseln')` → „Reifen wechseln ist nicht mehr
     dringend.“
-- [ ] `src/tasks/ui/useTaskRowFocus.ts` aus `ListPage.tsx` herauslösen und `ListPage` darauf
+- [x] `src/tasks/ui/useTaskRowFocus.ts` aus `ListPage.tsx` herauslösen und `ListPage` darauf
   umstellen. Die bestehenden Tests in `FoldersAreaTasks.test.tsx` und `FoldersAreaDeadline.test.tsx`
   bleiben unverändert grün.
-- [ ] `src/tasks/ui/TaskRow.tsx`: Prop `origin` mit Herkunftszeile und Sprechtext nach dem Markup
+- [x] `src/tasks/ui/TaskRow.tsx`: Prop `origin` mit Herkunftszeile und Sprechtext nach dem Markup
   im Zielbild. `.taskRowOrigin` in `src/index.css`.
-- [ ] `src/tasks/ui/urgentAreaPage.test.ts` und `urgentAreaPage.ts` (test-getrieben, rein):
+- [x] `src/tasks/ui/urgentAreaPage.test.ts` und `urgentAreaPage.ts` (test-getrieben, rein):
   - `resolveUrgentAreaPage`:
     - `overview` wird unverändert durchgereicht.
     - `task` mit vorhandener Aufgabe, Liste und Ordner ergibt `shown.kind === 'task'` samt
@@ -440,15 +440,15 @@ Dringend-Seite. Der Tag wird in dieser Phase noch je Render aus `now()` gebildet
   - `focusAfterLeaving`: alle Zeilen der Tabelle aus *Abstraktionen*, darunter `back` nach
     Umstellung auf ☕ mit `openedAt: 1` → `followingTask` mit `removedAt: 1` und
     `noLongerUrgent: true`.
-- [ ] `src/tasks/ui/UrgentPage.tsx` auf Zeilen umbauen (Props wie in *Abstraktionen*). Leer
+- [x] `src/tasks/ui/UrgentPage.tsx` auf Zeilen umbauen (Props wie in *Abstraktionen*). Leer
   bleibt „Nichts Dringendes.“.
-- [ ] `src/tasks/ui/TaskFlow.tsx`: `onMoved` wird optional (`onMoved?.(targetList)`).
-- [ ] `src/tasks/ui/UrgentArea.tsx` neu nach *Abstraktionen*. Der Tag in dieser Phase ist
+- [x] `src/tasks/ui/TaskFlow.tsx`: `onMoved` wird optional (`onMoved?.(targetList)`).
+- [x] `src/tasks/ui/UrgentArea.tsx` neu nach *Abstraktionen*. Der Tag in dieser Phase ist
   `calendarDayOf(now())`.
-- [ ] `src/SignedInApp.tsx`: `UrgentArea` statt `UrgentPage`, mit `organizer`, `urgentTasks`,
+- [x] `src/SignedInApp.tsx`: `UrgentArea` statt `UrgentPage`, mit `organizer`, `urgentTasks`,
   `announce` und `now`. `urgentTasks` wird je Render über `urgentTasksOf(organizer,
   calendarDayOf(now()))` gebildet.
-- [ ] `src/tasks/ui/UrgentArea.test.tsx` (neu, test-getrieben, heute = 10.10.2026,
+- [x] `src/tasks/ui/UrgentArea.test.tsx` (neu, test-getrieben, heute = 10.10.2026,
   `TENTH_OF_OCTOBER_MORNING` und die Helfer aus `foldersAreaHarness.tsx`). Eine kleine eigene
   Harness-Funktion `renderUrgentArea(folders, lists, tasks)` im Test baut `useOrganizer`,
   `urgentTasksOf`, `UrgentArea` und `Announcer` zusammen.
@@ -484,14 +484,14 @@ Dringend-Seite. Der Tag wird in dieser Phase noch je Render aus `now()` gebildet
     erscheint, die Überschrift ist fokussiert, und die Ansage lautet „Aufgabe Müll rausbringen
     wurde gelöscht.“ Dasselbe gilt, wenn nur ihre Liste entfernt wird.
   - axe meldet keine Verstöße auf der leeren Seite und auf der Seite mit den drei Zeilen.
-- [ ] `src/App.test.tsx`: Der Starttest prüft weiter Überschrift und „Nichts Dringendes.“ bei
+- [x] `src/App.test.tsx`: Der Starttest prüft weiter Überschrift und „Nichts Dringendes.“ bei
   leerem Organizer. Neu: Ein Organizer mit einer 🔥-Aufgabe zeigt deren Zeile mit Herkunft auf
   der Startseite.
-- [ ] `e2e/organizer.ts`:
+- [x] `e2e/organizer.ts`:
   - `urgentRowName(name, folderName, listName)` → „Müll rausbringen, dringend, Familie, Haushalt“
   - `openUrgent(page, badgeLabel = 'Dringend')`: `pressButton(page, badgeLabel)`, Überschrift
     „Dringend“ fokussiert
-- [ ] `e2e/urgent.spec.ts` (neu, nur per Tastatur, `beforeEach`: `prepareEmulators()`):
+- [x] `e2e/urgent.spec.ts` (neu, nur per Tastatur, `beforeEach`: `prepareEmulators()`):
   1. Ordner „Familie“ mit Liste „Haushalt“ anlegen und öffnen.
   2. `createTask(page, 'Müll rausbringen', { urgent: true })`
   3. `openUrgent(page)`: Die Zeile `urgentRowName(…)` ist sichtbar.
@@ -504,14 +504,14 @@ Dringend-Seite. Der Tag wird in dieser Phase noch je Render aus `now()` gebildet
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, einschließlich `organizer.test.ts`, `announcements.test.ts`,
+- [x] `npm run test` läuft grün, einschließlich `organizer.test.ts`, `announcements.test.ts`,
   `urgentAreaPage.test.ts`, `UrgentArea.test.tsx`, `App.test.tsx`, der unveränderten
   `FoldersAreaTasks.test.tsx` und `FoldersAreaDeadline.test.tsx` und
   `test/domainLayerBoundary.test.ts`
-- [ ] `npm run test:rules` läuft grün
-- [ ] `npm run test:e2e` läuft grün mit `urgent.spec.ts` und allen bisherigen Abläufen
-- [ ] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
-- [ ] `grep -rn "awaitedButton" src/tasks/ui/ListPage.tsx` liefert nichts
+- [x] `npm run test:rules` läuft grün
+- [x] `npm run test:e2e` läuft grün mit `urgent.spec.ts` und allen bisherigen Abläufen
+- [x] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
+- [x] `grep -rn "awaitedButton" src/tasks/ui/ListPage.tsx` liefert nichts
 
 ### Phase 2: Badge in der Navigation und Tageswechsel
 
@@ -522,20 +522,20 @@ der Rückkehr aus dem Hintergrund ohne Eingabe mit dem neuen Tag.
 
 **Aufgaben**:
 
-- [ ] `src/shared/ui/NavigationBar.test.tsx` (neu) und `NavigationBar.tsx` (test-getrieben):
+- [x] `src/shared/ui/NavigationBar.test.tsx` (neu) und `NavigationBar.tsx` (test-getrieben):
   - ohne `badge` bzw. mit `count: 0`: Knopf „Dringend“, kein `.navigationBadge` im DOM
   - `count: 3`, `label: 'Dringend, 3 Aufgaben'`: Knopf mit genau diesem Namen. Der Badge zeigt
     „3“, ist `aria-hidden` und hat die Klasse `navigationBadge`.
   - `count: 100`: Der Badge zeigt „99+“, der Name bleibt `label`.
   - `aria-current` bleibt unverändert.
   - axe meldet keine Verstöße mit Badge.
-- [ ] `.navigationBadge` in `src/index.css` nach dem Zielbild.
-- [ ] `src/tasks/domain/announcements.test.ts` und `announcements.ts` (test-getrieben):
+- [x] `.navigationBadge` in `src/index.css` nach dem Zielbild.
+- [x] `src/tasks/domain/announcements.test.ts` und `announcements.ts` (test-getrieben):
   `URGENT_AREA_NAME` und `urgentAreaLabel` mit 0 → „Dringend“, mit 1 → „Dringend, 1 Aufgabe“,
   mit 3 → „Dringend, 3 Aufgaben“.
-- [ ] `test/palette.test.ts`: `['--surface', '--accentLine']` in `TEXT_ON_ITS_BACKGROUND`
+- [x] `test/palette.test.ts`: `['--surface', '--accentLine']` in `TEXT_ON_ITS_BACKGROUND`
   aufnehmen (Badge-Zahl auf Badge-Fläche, mindestens 4,5:1).
-- [ ] `src/tasks/ui/useToday.test.tsx` und `useToday.ts` (test-getrieben, `vi.useFakeTimers()`,
+- [x] `src/tasks/ui/useToday.test.tsx` und `useToday.ts` (test-getrieben, `vi.useFakeTimers()`,
   veränderliche Uhr `let moment = new Date(2026, 9, 10, 23, 59)`):
   - Der Startwert ist `'2026-10-10'`.
   - Uhr auf 11.10., 00:00 stellen und `vi.advanceTimersByTime` bis über Mitternacht: Ergebnis
@@ -547,19 +547,19 @@ der Rückkehr aus dem Hintergrund ohne Eingabe mit dem neuen Tag.
   - Bei `visibilityState === 'hidden'` ändert sich nichts.
   - Nach dem Unmount löst kein Timer mehr aus (`vi.getTimerCount() === 0`).
   - `millisecondsUntilNextMidnight(new Date(2026, 9, 10, 23, 59))` → `60_000`
-- [ ] `src/tasks/ui/TaskFlow.tsx`: `today` als Prop, `calendarDayOf(now())` entfällt.
-- [ ] `src/tasks/ui/FoldersArea.tsx`: `today` als Prop, Z. 91 entfällt.
+- [x] `src/tasks/ui/TaskFlow.tsx`: `today` als Prop, `calendarDayOf(now())` entfällt.
+- [x] `src/tasks/ui/FoldersArea.tsx`: `today` als Prop, Z. 91 entfällt.
   `foldersAreaHarness.tsx` übergibt `today={calendarDayOf(TENTH_OF_OCTOBER_MORNING)}`.
-- [ ] `src/tasks/ui/UrgentArea.tsx`: `today` als Prop. Die Harness in `UrgentArea.test.tsx`
+- [x] `src/tasks/ui/UrgentArea.tsx`: `today` als Prop. Die Harness in `UrgentArea.test.tsx`
   übergibt ihn.
-- [ ] `src/SignedInApp.tsx`:
+- [x] `src/SignedInApp.tsx`:
   - `const today = useToday(now)`
   - `urgentTasks = urgentTasksOf(organizer, today)`
   - `areas` je Render, mit `badge: { count: urgentTasks.length, label:
     urgentAreaLabel(urgentTasks.length) }` am Dringend-Eintrag
   - `today` an `UrgentArea` und `FoldersArea`
   - `URGENT_AREA_NAME` als `label` des Eintrags
-- [ ] `src/App.test.tsx`:
+- [x] `src/App.test.tsx`:
   - `renderApp` bekommt einen optionalen Parameter `now` (Standard
     `() => TENTH_OF_OCTOBER_MORNING`), damit der Tageswechsel-Test eine veränderliche Uhr
     übergeben kann.
@@ -572,20 +572,20 @@ der Rückkehr aus dem Hintergrund ohne Eingabe mit dem neuen Tag.
     dringend. Die veränderliche `now` wird auf den 11.10. gestellt, dann folgt
     `visibilitychange`. Danach heißt der Knopf „Dringend, 1 Aufgabe“, und die Zeile steht auf der
     Dringend-Seite.
-- [ ] `e2e/urgent.spec.ts` ergänzen:
+- [x] `e2e/urgent.spec.ts` ergänzen:
   - Nach `createTask(… urgent)` heißt der Navigationsknopf „Dringend, 1 Aufgabe“
     (`openUrgent(page, 'Dringend, 1 Aufgabe')`).
   - Nach dem Erledigen heißt er wieder „Dringend“.
 
 **Automatisierte Verifikation**:
 
-- [ ] `npm run test` läuft grün, einschließlich `NavigationBar.test.tsx`, `useToday.test.tsx`,
+- [x] `npm run test` läuft grün, einschließlich `NavigationBar.test.tsx`, `useToday.test.tsx`,
   `App.test.tsx`, `UrgentArea.test.tsx`, aller `FoldersArea*.test.tsx` und
   `test/palette.test.ts`
-- [ ] `npm run test:rules` läuft grün
-- [ ] `npm run test:e2e` läuft grün mit allen Abläufen
-- [ ] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
-- [ ] `grep -n "calendarDayOf(now())" src/tasks/ui/FoldersArea.tsx src/tasks/ui/TaskFlow.tsx
+- [x] `npm run test:rules` läuft grün
+- [x] `npm run test:e2e` läuft grün mit allen Abläufen
+- [x] `npm run lint`, `npm run format:check` und `npm run build` laufen grün
+- [x] `grep -n "calendarDayOf(now())" src/tasks/ui/FoldersArea.tsx src/tasks/ui/TaskFlow.tsx
   src/tasks/ui/UrgentArea.tsx src/SignedInApp.tsx` liefert nichts
 
 **Manuelle Verifikation** (nach dem Push auf `main`, nur auf ausdrückliche Anweisung):
@@ -609,6 +609,19 @@ Hier während der Umsetzung Rückmeldungen, Probleme und Entscheidungen festhalt
 
 - Der bekannte Bug „followingTask blendet removedId aus“ (`docs/notes.txt`) gilt auf der
   Dringend-Seite genauso, weil sie dieselbe Fokuslogik nutzt. Er wird hier nicht behoben.
+- Herkunft (Abweichung von Entscheidung 3): Der versteckte Sprechtext „, Familie, Haushalt“ steht
+  nicht als eigenes Kind am Ende des Knopfs, sondern am Ende des zuletzt gesprochenen Elements:
+  bei 🔥 in `.taskRowDetail` hinter „dringend“, bei 📅 im Titel hinter dem versteckten Text.
+  Grund: Die Kinder des Flex-Knopfs sind Blöcke. Chromium setzt zwischen Blöcken ein Leerzeichen
+  in den zugänglichen Namen, daraus wurde „dringend , Familie“ (im E2E-Test gesehen, jsdom zeigt
+  das nicht). `.taskRowOrigin` ist damit vollständig `aria-hidden`.
+- `withoutRemovedTask` nimmt eine Funktion für die Aufgaben-ID entgegen und `useTaskRowFocus`
+  die IDs der Zeilen. So nutzen Listen-Seite (`Task`) und Dringend-Seite (`UrgentTask`) beide
+  dieselbe Logik.
+- Die Erledigt-Ansage lautet im Code „Müll rausbringen erledigt.“ (`taskCompletedAnnouncement`),
+  nicht „Aufgabe … erledigt.“ wie im Plan. Die Tests folgen dem Code.
+- Test „rutscht an eine andere Stelle“: Stichtag 07.10. statt 09.10. Mit 09.10. bliebe Ölwechsel
+  hinter Reifen wechseln (08.10.) auf derselben Stelle 2, und der Test bewiese nichts.
 
 ## Verweise
 

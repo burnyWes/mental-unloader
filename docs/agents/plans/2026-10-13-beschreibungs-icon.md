@@ -5,7 +5,7 @@ branch: main
 story: MUL-011
 topic: "Icon für die Beschreibung einer Aufgabe"
 tags: [plan, tasks, domain, announcements, taskrow, taskform, taskpage]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-011 — Icon für die Beschreibung einer Aufgabe
@@ -245,14 +245,14 @@ einschliesslich der Ansage für den Screenreader.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem Handy: Das Icon sitzt neben „Beschreibung“ im Formular auf einer Linie mit
+- [x] Auf dem Handy: Das Icon sitzt neben „Beschreibung“ im Formular auf einer Linie mit
   dem Text.
-- [ ] In einer Liste stehen Aufgaben mit und ohne Beschreibung untereinander. Das Icon
+- [x] In einer Liste stehen Aufgaben mit und ohne Beschreibung untereinander. Das Icon
   sitzt hinter dem Namen, auch wenn ein langer Name umbricht. Die Detailzeile ist
   unverändert.
-- [ ] Auf der Detailseite mit mehrzeiliger Beschreibung beginnen die Folgezeilen bündig
+- [x] Auf der Detailseite mit mehrzeiliger Beschreibung beginnen die Folgezeilen bündig
   unter dem Text. Das Icon steht auf Höhe der ersten Zeile.
-- [ ] Hell- und Dunkelmodus: Das Icon hat die Textfarbe.
+- [x] Hell- und Dunkelmodus: Das Icon hat die Textfarbe.
 
 ## Notizen zur Umsetzung
 

@@ -183,6 +183,16 @@ describe('FoldersArea creating tasks', () => {
     expect(screen.queryByLabelText('Liste')).not.toBeInTheDocument()
   })
 
+  it('shows an icon beside the description label', async () => {
+    renderFoldersArea([familie], [haushalt])
+
+    await startCreatingTask()
+
+    expect(descriptionField()).toBeInTheDocument()
+    const label = document.querySelector('label[for="description"]')
+    expect(label?.querySelectorAll('svg')).toHaveLength(1)
+  })
+
   it('creates an urgent task, focuses its row and announces it', async () => {
     const { client } = renderFoldersArea([familie], [haushalt])
     await startCreatingTask()
@@ -203,7 +213,7 @@ describe('FoldersArea creating tasks', () => {
       },
     ])
     expect(heading('Haushalt')).toBeInTheDocument()
-    expect(button('Müll rausbringen, dringend')).toHaveFocus()
+    expect(button('Müll rausbringen, mit Beschreibung, dringend')).toHaveFocus()
     expect(announced()).toHaveTextContent('Aufgabe Müll rausbringen angelegt.')
   })
 
@@ -334,6 +344,80 @@ describe('FoldersArea creating tasks', () => {
   })
 })
 
+describe('FoldersArea task row with a description', () => {
+  const DESCRIPTION = 'Gelbe Tonne auch.'
+
+  function described(undescribed: Task): Task {
+    return { ...undescribed, description: DESCRIPTION }
+  }
+
+  function iconsInTitleOf(row: HTMLElement) {
+    return row.querySelectorAll('.taskRowTitle svg')
+  }
+
+  it('shows an icon behind the name and tells about the description', async () => {
+    renderFoldersArea([familie], [haushalt], [described(muell)])
+
+    await openList('Familie', 'Haushalt')
+
+    const row = button('Müll rausbringen, mit Beschreibung, dringend')
+    expect(iconsInTitleOf(row)).toHaveLength(1)
+  })
+
+  it('shows neither icon nor mention without a description', async () => {
+    renderFoldersArea([familie], [haushalt], [muell])
+
+    await openList('Familie', 'Haushalt')
+
+    const row = button('Müll rausbringen, dringend')
+    expect(iconsInTitleOf(row)).toHaveLength(0)
+  })
+
+  it('marks a someday task with a description', async () => {
+    renderFoldersArea([familie], [haushalt], [described(keller)])
+
+    await openList('Familie', 'Haushalt')
+
+    const row = button('Keller aufräumen, mit Beschreibung')
+    expect(iconsInTitleOf(row)).toHaveLength(1)
+  })
+
+  it('marks a completed task with a description', async () => {
+    const completed: Task = {
+      ...described(keller),
+      completions: [TENTH_OF_OCTOBER_MORNING.getTime()],
+    }
+    renderFoldersArea([familie], [haushalt], [completed])
+
+    await openCompletedList('Familie', 'Haushalt')
+    await userEvent.click(button('erledigt (1)'))
+
+    const row = button(
+      'Keller aufräumen, mit Beschreibung, erledigt am 10. Oktober',
+    )
+    expect(iconsInTitleOf(row)).toHaveLength(1)
+  })
+
+  it('tells about the description before the deadline and keeps the deadline icons', async () => {
+    const deadlineTask = task('t-1', 'Fenster putzen', haushalt, {
+      kind: 'deadline',
+      deadline: '2026-10-20',
+      urgentFrom: 'oneWeek',
+      repetition: null,
+    })
+    renderFoldersArea([familie], [haushalt], [described(deadlineTask)])
+
+    await openList('Familie', 'Haushalt')
+
+    const row = buttonNamedFirst('Fenster putzen')
+    expect(row).toHaveAccessibleName(
+      /^Fenster putzen, mit Beschreibung, Stichtag /,
+    )
+    expect(iconsInTitleOf(row)).toHaveLength(1)
+    expect(row.querySelectorAll('.taskRowDetail svg')).toHaveLength(1)
+  })
+})
+
 describe('FoldersArea task overview and editing', () => {
   const described: Task = {
     ...muell,
@@ -400,6 +484,7 @@ describe('FoldersArea task overview and editing', () => {
     expect(document.querySelector('.taskDescription')?.textContent).toBe(
       'Gelbe Tonne auch.\nUnd die blaue.',
     )
+    expect(document.querySelectorAll('.taskDescription svg')).toHaveLength(1)
     expect(screen.getByText('Fälligkeit')).toBeInTheDocument()
     expect(screen.getByText('Dringend')).toBeInTheDocument()
     expect(screen.getByText('Familie › Haushalt')).toHaveAttribute(
@@ -504,7 +589,7 @@ describe('FoldersArea task overview and editing', () => {
     )
     await userEvent.click(button('Zurück'))
     expect(heading('Beete')).toBeInTheDocument()
-    expect(button('Müll rausbringen, dringend')).toHaveFocus()
+    expect(button('Müll rausbringen, mit Beschreibung, dringend')).toHaveFocus()
   })
 
   it.each([

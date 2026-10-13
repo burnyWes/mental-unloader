@@ -145,6 +145,10 @@ export function hasCompletions(task: Task): boolean {
   return task.completions.length > 0
 }
 
+export function hasDescription(task: Task): boolean {
+  return task.description !== ''
+}
+
 export function isOpen(task: Task): boolean {
   return isRecurring(task) || !hasCompletions(task)
 }

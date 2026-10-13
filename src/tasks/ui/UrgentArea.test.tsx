@@ -183,6 +183,15 @@ describe('UrgentArea urgent page', () => {
     expect(screen.queryByRole('button', { name: /^Zahnriemen/ })).toBeNull()
   })
 
+  it('marks an urgent task with a description by an icon behind its name', () => {
+    renderUrgentArea([{ ...muell, description: 'Gelbe Tonne auch.' }])
+
+    const row = button(
+      'Müll rausbringen, mit Beschreibung, dringend, Familie, Haushalt',
+    )
+    expect(row.querySelectorAll('.taskRowTitle svg')).toHaveLength(1)
+  })
+
   it('shows the origin as a third line with the arrow hidden from assistive technology', () => {
     renderUrgentArea()
 

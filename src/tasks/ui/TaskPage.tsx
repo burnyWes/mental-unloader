@@ -21,6 +21,7 @@ import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
 import {
   completionsNewestFirst,
+  hasDescription,
   isOpen,
   isRecurring,
   lastCompletion,
@@ -29,6 +30,7 @@ import {
 import { isOverdueOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
 import { CoffeeIcon } from './CoffeeIcon'
+import { DescriptionIcon } from './DescriptionIcon'
 import { FlameIcon } from './FlameIcon'
 import { RepeatIcon } from './RepeatIcon'
 
@@ -121,8 +123,11 @@ export function TaskPage({
       <h1 ref={heading} tabIndex={-1}>
         {task.name}
       </h1>
-      {task.description !== '' && (
-        <p className="taskDescription">{task.description}</p>
+      {hasDescription(task) && (
+        <div className="taskDescription">
+          <DescriptionIcon />
+          <p>{task.description}</p>
+        </div>
       )}
       <dl className="taskFacts">
         <dt>Fälligkeit</dt>

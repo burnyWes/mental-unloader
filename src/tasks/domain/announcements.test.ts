@@ -44,6 +44,7 @@ import {
   URGENCY_LEAD_LABELS,
   URGENT_AREA_NAME,
   urgentAreaLabel,
+  WITH_DESCRIPTION_LABEL,
 } from './announcements'
 
 describe('task completion announcements', () => {
@@ -388,5 +389,11 @@ describe('urgent page announcements', () => {
     expect(taskNoLongerUrgentAnnouncement('Reifen wechseln')).toBe(
       'Reifen wechseln ist nicht mehr dringend.',
     )
+  })
+})
+
+describe('task row labels', () => {
+  it('tells that a task has a description', () => {
+    expect(WITH_DESCRIPTION_LABEL).toBe('mit Beschreibung')
   })
 })

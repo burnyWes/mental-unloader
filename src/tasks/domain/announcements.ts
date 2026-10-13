@@ -171,6 +171,8 @@ export function recurringCompletedLabel(count: number, lastAt: number): string {
   return `${completionCountLabel(count)}, zuletzt am ${spokenDateOf(lastAt)}`
 }
 
+export const WITH_DESCRIPTION_LABEL = 'mit Beschreibung'
+
 export function completedOnLabel(at: number): string {
   return `erledigt am ${spokenDateOf(at)}`
 }

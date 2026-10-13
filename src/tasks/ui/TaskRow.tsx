@@ -7,6 +7,7 @@ import {
   recurringCompletedLabel,
   REPEAT_RHYTHM_LABELS,
   shortCompletionCountOf,
+  WITH_DESCRIPTION_LABEL,
 } from '../domain/announcements'
 import {
   shortDateOf,
@@ -15,6 +16,7 @@ import {
 } from '../domain/calendarDay'
 import type { Repetition } from '../domain/repetition'
 import {
+  hasDescription,
   isRecurring,
   lastCompletion,
   repetitionOf,
@@ -22,6 +24,7 @@ import {
 } from '../domain/task'
 import { isOverdueOn, isUrgentOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
+import { DescriptionIcon } from './DescriptionIcon'
 import { FlameIcon } from './FlameIcon'
 import type { StatusFilter } from './foldersAreaPage'
 import { RepeatIcon } from './RepeatIcon'
@@ -47,17 +50,22 @@ function SeparatorBeforeOrigin({ origin }: { origin?: TaskOrigin }) {
   return <span className="visuallyHidden">,</span>
 }
 
-function UrgentTaskName({
-  name,
-  origin,
-}: {
-  name: string
-  origin?: TaskOrigin
-}) {
+function DescriptionMark({ task }: { task: Task }) {
+  if (!hasDescription(task)) return null
+  return (
+    <>
+      <DescriptionIcon />
+      <span className="visuallyHidden">, {WITH_DESCRIPTION_LABEL}</span>
+    </>
+  )
+}
+
+function UrgentTaskName({ task, origin }: { task: Task; origin?: TaskOrigin }) {
   return (
     <>
       <span className="taskRowTitle">
-        {name}
+        {task.name}
+        <DescriptionMark task={task} />
         <span className="visuallyHidden">,</span>
       </span>{' '}
       <span className="taskRowDetail">
@@ -101,6 +109,7 @@ function DeadlineTaskName({
       <>
         <span className="taskRowTitle">
           {task.name}
+          <DescriptionMark task={task} />
           <span className="visuallyHidden">
             , {overdueLabel(deadline, today)}
             <SpokenRhythm repetition={repetition} />
@@ -118,6 +127,7 @@ function DeadlineTaskName({
     <>
       <span className="taskRowTitle">
         {task.name}
+        <DescriptionMark task={task} />
         <span className="visuallyHidden">
           , {deadlineLabel(deadline, today)}
           <SpokenRhythm repetition={repetition} />
@@ -150,7 +160,7 @@ function OpenTaskName({
 }) {
   switch (task.due.kind) {
     case 'urgent':
-      return <UrgentTaskName name={task.name} origin={origin} />
+      return <UrgentTaskName task={task} origin={origin} />
     case 'deadline':
       return (
         <DeadlineTaskName
@@ -164,6 +174,7 @@ function OpenTaskName({
       return (
         <span className="taskRowTitle">
           {task.name}
+          <DescriptionMark task={task} />
           <SeparatorBeforeOrigin origin={origin} />
         </span>
       )
@@ -183,6 +194,7 @@ function CompletedTaskName({
     <>
       <span className="taskRowTitle">
         {task.name}
+        <DescriptionMark task={task} />
         <span className="visuallyHidden">
           , {completedOnLabel(completedAt)}
         </span>
@@ -209,6 +221,7 @@ function RecurringCompletedTaskName({
     <>
       <span className="taskRowTitle">
         {task.name}
+        <DescriptionMark task={task} />
         <span className="visuallyHidden">
           , {recurringCompletedLabel(count, completedAt)}
         </span>

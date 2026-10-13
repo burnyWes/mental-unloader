@@ -6,6 +6,7 @@ import {
   dueAfterChange,
   endsRepetition,
   hasCompletions,
+  hasDescription,
   initialDeadlineOf,
   InvalidDescription,
   isOpen,
@@ -324,6 +325,18 @@ describe('hasCompletions', () => {
 
   it('sees a task with a completion as completed', () => {
     expect(hasCompletions(task('Müll', [5]))).toBe(true)
+  })
+})
+
+describe('hasDescription', () => {
+  it('sees a task with an empty description as undescribed', () => {
+    expect(hasDescription(task('Müll'))).toBe(false)
+  })
+
+  it('sees a task with a written description as described', () => {
+    expect(
+      hasDescription({ ...task('Müll'), description: 'Gelbe Tonne auch.' }),
+    ).toBe(true)
   })
 })
 

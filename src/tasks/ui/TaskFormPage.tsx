@@ -11,6 +11,7 @@ import { InvalidDescription, type DueKind } from '../domain/task'
 import { CalendarIcon } from './CalendarIcon'
 import { CoffeeIcon } from './CoffeeIcon'
 import { DeadlineStepper } from './DeadlineStepper'
+import { DescriptionIcon } from './DescriptionIcon'
 import { FlameIcon } from './FlameIcon'
 import type { TaskDraft } from './foldersAreaPage'
 import { RepeatFields } from './RepeatFields'
@@ -111,7 +112,9 @@ export function TaskFormPage({
         {nameFailure}
       </p>
       <p className="field">
-        <label htmlFor="description">Beschreibung</label>
+        <label htmlFor="description" className="labelWithIcon">
+          <DescriptionIcon /> Beschreibung
+        </label>
         <textarea
           id="description"
           rows={4}

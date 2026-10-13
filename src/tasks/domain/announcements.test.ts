@@ -7,6 +7,7 @@ import {
   folderDeletionExplanation,
   folderDeletionHeading,
   folderSavedAnnouncement,
+  listCompletedAnnouncement,
   listCountLabel,
   listCreatedAnnouncement,
   listDeletedAnnouncement,
@@ -287,6 +288,10 @@ describe('list announcements', () => {
 
   it('announces a list deleted here', () => {
     expect(listDeletedAnnouncement('Haushalt')).toBe('Liste Haushalt gelöscht.')
+  })
+
+  it('announces a list whose last open task was completed', () => {
+    expect(listCompletedAnnouncement('Umzug')).toBe('Liste Umzug erledigt.')
   })
 
   it('announces a list deleted on another device', () => {

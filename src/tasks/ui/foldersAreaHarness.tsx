@@ -77,3 +77,13 @@ export async function openList(folderName: string, name: string) {
   await openFolder(folderName)
   await userEvent.click(buttonNamedFirst(name))
 }
+
+export function filterButtonNamed(name: string) {
+  return screen.getByRole('button', { name: new RegExp(`^${name} \\(`) })
+}
+
+export async function openCompletedList(folderName: string, name: string) {
+  await openFolder(folderName)
+  await userEvent.click(filterButtonNamed('erledigt'))
+  await userEvent.click(buttonNamedFirst(name))
+}

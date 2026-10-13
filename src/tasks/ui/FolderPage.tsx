@@ -8,8 +8,14 @@ import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { Folder } from '../domain/folder'
 import type { List, ListId } from '../domain/list'
 import type { OpenTaskSummary } from '../domain/organizer'
-import type { FolderPageFocus } from './foldersAreaPage'
+import type { FolderPageFocus, StatusFilter } from './foldersAreaPage'
 import { ListButton } from './ListButton'
+import { StatusFilterButtons } from './StatusFilterButtons'
+
+const EMPTY_FILTER_TEXTS: Record<StatusFilter, string> = {
+  open: 'Keine offenen Listen.',
+  completed: 'Noch keine Liste erledigt.',
+}
 
 function withoutRemovedList(
   lists: readonly List[],
@@ -19,14 +25,27 @@ function withoutRemovedList(
   return lists.filter((list) => list.id !== focus.removedId)
 }
 
+function awaitedList(focus: FolderPageFocus): ListId | null {
+  switch (focus.kind) {
+    case 'arrivingList':
+    case 'returningList':
+      return focus.id
+    case 'heading':
+    case 'followingList':
+      return null
+  }
+}
+
 type FolderPageProps = {
   navigation: ReactNode
   folder: Folder
-  lists: readonly List[]
+  listsByFilter: Record<StatusFilter, readonly List[]>
+  filter: StatusFilter
   openTaskSummary: (listId: ListId) => OpenTaskSummary
   focus: FolderPageFocus
   onBack: () => void
   onEdit: () => void
+  onFilter: (filter: StatusFilter) => void
   onCreateList: () => void
   onOpenList: (list: List) => void
 }
@@ -34,25 +53,34 @@ type FolderPageProps = {
 export function FolderPage({
   navigation,
   folder,
-  lists,
+  listsByFilter,
+  filter,
   openTaskSummary,
   focus,
   onBack,
   onEdit,
+  onFilter,
   onCreateList,
   onOpenList,
 }: FolderPageProps) {
   const heading = useHeadingFocus()
-  const shownLists = withoutRemovedList(lists, focus)
+
+  function listsIn(kind: StatusFilter): readonly List[] {
+    const lists = listsByFilter[kind]
+    return kind === filter ? withoutRemovedList(lists, focus) : lists
+  }
+
+  const counts: Record<StatusFilter, number> = {
+    open: listsIn('open').length,
+    completed: listsIn('completed').length,
+  }
+  const shownLists = listsIn(filter)
   const { keepRow } = useFocusAfterRemoval(
     shownLists.map((list) => list.id),
     heading,
     focus.kind === 'followingList' ? focus.removedAt : null,
   )
-  const { keepArrival } = useFocusOnArrival<ListId>(
-    focus.kind === 'arrivingList' ? focus.id : null,
-    heading,
-  )
+  const { keepArrival } = useFocusOnArrival<ListId>(awaitedList(focus), heading)
 
   function keepListButton(id: ListId) {
     const keepForRemoval = keepRow(id)
@@ -61,6 +89,11 @@ export function FolderPage({
       keepForRemoval(button)
       keepForArrival(button)
     }
+  }
+
+  function emptyText(): string {
+    if (counts.open + counts.completed === 0) return 'Noch keine Listen.'
+    return EMPTY_FILTER_TEXTS[filter]
   }
 
   return (
@@ -93,8 +126,13 @@ export function FolderPage({
             </button>
           </div>
         </div>
+        <StatusFilterButtons
+          chosen={filter}
+          counts={counts}
+          onChoose={onFilter}
+        />
         {shownLists.length === 0 ? (
-          <p>Noch keine Listen.</p>
+          <p>{emptyText()}</p>
         ) : (
           <ul className="folderList">
             {shownLists.map((list) => (

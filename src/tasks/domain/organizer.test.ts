@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { Folder } from './folder'
 import type { List } from './list'
 import {
+  completesList,
   EMPTY_ORGANIZER,
   folderOfList,
+  isListCompleted,
   listCountOfFolder,
   listOfTask,
   listsOfFolder,
@@ -323,5 +325,80 @@ describe('urgentTasksOf', () => {
 
   it('gathers nothing from an empty organizer', () => {
     expect(urgentTasksOf(EMPTY_ORGANIZER, today)).toEqual([])
+  })
+})
+
+describe('isListCompleted', () => {
+  function organizerWith(tasks: readonly Task[]): Organizer {
+    return { folders: [familie], lists: [haushalt, wocheneinkauf], tasks }
+  }
+
+  it('keeps an empty list open', () => {
+    expect(isListCompleted(organizerWith([]), haushalt.id)).toBe(false)
+  })
+
+  it('completes a list whose tasks are all completed', () => {
+    const tasks = [
+      task('done-1', haushalt.id, urgent, [1]),
+      task('done-2', haushalt.id, { kind: 'someday' }, [2]),
+    ]
+    expect(isListCompleted(organizerWith(tasks), haushalt.id)).toBe(true)
+  })
+
+  it('keeps a list with an open task open', () => {
+    const tasks = [
+      task('done', haushalt.id, urgent, [1]),
+      task('open', haushalt.id),
+    ]
+    expect(isListCompleted(organizerWith(tasks), haushalt.id)).toBe(false)
+  })
+
+  it('keeps a list with a recurring task open even after it was completed', () => {
+    const tasks = [task('recurring', haushalt.id, weeklyOnThe15th, [1])]
+    expect(isListCompleted(organizerWith(tasks), haushalt.id)).toBe(false)
+  })
+
+  it('ignores the tasks of other lists', () => {
+    const tasks = [
+      task('done', haushalt.id, urgent, [1]),
+      task('elsewhere', wocheneinkauf.id),
+    ]
+    expect(isListCompleted(organizerWith(tasks), haushalt.id)).toBe(true)
+  })
+})
+
+describe('completesList', () => {
+  const lastOpen = task('last-open', haushalt.id)
+  const done = task('done', haushalt.id, urgent, [1])
+
+  function organizerWith(tasks: readonly Task[]): Organizer {
+    return { folders: [familie], lists: [haushalt, wocheneinkauf], tasks }
+  }
+
+  it('is true for the only open task beside completed ones', () => {
+    expect(completesList(organizerWith([done, lastOpen]), lastOpen)).toBe(true)
+  })
+
+  it('is false while another task of the list stays open', () => {
+    const other = task('other', haushalt.id)
+    expect(completesList(organizerWith([lastOpen, other]), lastOpen)).toBe(
+      false,
+    )
+  })
+
+  it('ignores open tasks of other lists', () => {
+    const elsewhere = task('elsewhere', wocheneinkauf.id)
+    expect(completesList(organizerWith([lastOpen, elsewhere]), lastOpen)).toBe(
+      true,
+    )
+  })
+
+  it('is false for a recurring task', () => {
+    const recurring = task('recurring', haushalt.id, weeklyOnThe15th)
+    expect(completesList(organizerWith([recurring]), recurring)).toBe(false)
+  })
+
+  it('is false for a task that is already completed', () => {
+    expect(completesList(organizerWith([done]), done)).toBe(false)
   })
 })

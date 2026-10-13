@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
 import {
+  listCompletedAnnouncement,
   recurringTaskCompletedAnnouncement,
   recurringTaskCompletionExplanation,
   TASK_COMPLETION_EXPLANATION,
@@ -17,6 +18,7 @@ import {
 import type { CalendarDay } from '../domain/calendarDay'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
+import { completesList } from '../domain/organizer'
 import { DEFAULT_REPEAT_RHYTHM } from '../domain/repetition'
 import {
   createDescription,
@@ -89,6 +91,17 @@ function completedAnnouncementOf(task: Task, today: CalendarDay): string {
   return recurringTaskCompletedAnnouncement(task.name, next, today)
 }
 
+function completionAnnouncementOf(
+  task: Task,
+  list: List,
+  closesList: boolean,
+  today: CalendarDay,
+): string {
+  const taskAnnouncement = completedAnnouncementOf(task, today)
+  if (!closesList) return taskAnnouncement
+  return `${taskAnnouncement} ${listCompletedAnnouncement(list.name)}`
+}
+
 function firstStep(entry: TaskFlowEntry): TaskFlowStep {
   return entry === 'completion'
     ? { kind: 'confirmCompletion', from: 'row' }
@@ -146,13 +159,14 @@ export function TaskFlow({
   }
 
   function complete() {
+    const closesList = completesList(organizer, task)
     onLeave('completed')
     organizer.completeTask(
       task.id,
       now().getTime(),
       nextDeadlineOf(task, today),
     )
-    announce(completedAnnouncementOf(task, today))
+    announce(completionAnnouncementOf(task, list, closesList, today))
   }
 
   function cancelCompletion(from: CompletionAskedFrom) {

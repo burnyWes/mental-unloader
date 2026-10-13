@@ -9,13 +9,13 @@ import type { Task, TaskId } from '../domain/task'
 import {
   tasksShownIn,
   type ListPageFocus,
-  type TaskFilterKind,
+  type StatusFilter,
 } from './foldersAreaPage'
-import { TaskFilterButtons } from './TaskFilterButtons'
+import { StatusFilterButtons } from './StatusFilterButtons'
 import { TaskRow } from './TaskRow'
 import { useTaskRowFocus, withoutRemovedTask } from './useTaskRowFocus'
 
-const EMPTY_FILTER_TEXTS: Record<TaskFilterKind, string> = {
+const EMPTY_FILTER_TEXTS: Record<StatusFilter, string> = {
   open: 'Keine offenen Aufgaben.',
   completed: 'Noch nichts erledigt.',
 }
@@ -29,11 +29,11 @@ type ListPageProps = {
   list: List
   tasks: readonly Task[]
   today: CalendarDay
-  filter: TaskFilterKind
+  filter: StatusFilter
   focus: ListPageFocus
   onBack: () => void
   onEdit: () => void
-  onFilter: (filter: TaskFilterKind) => void
+  onFilter: (filter: StatusFilter) => void
   onCreateTask: () => void
   onOpenTask: (task: Task) => void
   onCompleteTask: (task: Task) => void
@@ -55,12 +55,12 @@ export function ListPage({
 }: ListPageProps) {
   const heading = useHeadingFocus()
 
-  function rowsOf(kind: TaskFilterKind): readonly Task[] {
+  function rowsOf(kind: StatusFilter): readonly Task[] {
     const shown = tasksShownIn(kind, tasks)
     return kind === filter ? withoutRemovedTask(shown, focus, idOf) : shown
   }
 
-  const counts: Record<TaskFilterKind, number> = {
+  const counts: Record<StatusFilter, number> = {
     open: rowsOf('open').length,
     completed: rowsOf('completed').length,
   }
@@ -106,7 +106,7 @@ export function ListPage({
             </button>
           </div>
         </div>
-        <TaskFilterButtons
+        <StatusFilterButtons
           chosen={filter}
           counts={counts}
           onChoose={onFilter}

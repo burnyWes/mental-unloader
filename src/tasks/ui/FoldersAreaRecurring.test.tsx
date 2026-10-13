@@ -12,6 +12,7 @@ import {
   button,
   buttonNamedFirst,
   heading,
+  openCompletedList,
   openList,
   renderFoldersArea,
   TENTH_OF_OCTOBER_MORNING,
@@ -473,7 +474,7 @@ describe('FoldersArea ending or starting a repetition', () => {
     renderTasks([
       task('stored-task-1', 'Müll rausbringen', onceOn('2026-10-20'), [NOW], 1),
     ])
-    await openList('Familie', 'Haushalt')
+    await openCompletedList('Familie', 'Haushalt')
     await userEvent.click(filterButton('erledigt'))
     await userEvent.click(buttonNamedFirst('Müll rausbringen'))
     await userEvent.click(button('Bearbeiten'))

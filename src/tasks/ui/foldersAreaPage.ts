@@ -1,7 +1,12 @@
 import type { CalendarDay } from '../domain/calendarDay'
 import { folderById, type Folder, type FolderId } from '../domain/folder'
 import { listById, type List, type ListId } from '../domain/list'
-import { folderOfList, type Organizer } from '../domain/organizer'
+import {
+  folderOfList,
+  isListCompleted,
+  listsOfFolder,
+  type Organizer,
+} from '../domain/organizer'
 import {
   DEFAULT_URGENCY_LEAD,
   initialDeadlineOf,
@@ -21,9 +26,10 @@ import type { FoldersOverviewFocus } from './FoldersPage'
 export type FolderPageFocus =
   | { kind: 'heading' }
   | { kind: 'arrivingList'; id: ListId }
+  | { kind: 'returningList'; id: ListId }
   | { kind: 'followingList'; removedAt: number; removedId: ListId }
 
-export type TaskFilterKind = 'open' | 'completed'
+export type StatusFilter = 'open' | 'completed'
 
 export type ListPageFocus =
   | { kind: 'heading' }
@@ -54,7 +60,12 @@ type ListDraft = {
 export type FoldersAreaPage =
   | { kind: 'overview'; focus: FoldersOverviewFocus }
   | { kind: 'create'; draftName: string }
-  | { kind: 'folder'; id: FolderId; focus: FolderPageFocus }
+  | {
+      kind: 'folder'
+      id: FolderId
+      filter: StatusFilter
+      focus: FolderPageFocus
+    }
   | { kind: 'edit'; id: FolderId; draftName: string }
   | { kind: 'confirmDeletion'; id: FolderId; draftName: string }
   | { kind: 'createList'; folderId: FolderId; draftName: string }
@@ -62,14 +73,14 @@ export type FoldersAreaPage =
       kind: 'list'
       id: ListId
       folderId: FolderId
-      filter: TaskFilterKind
+      filter: StatusFilter
       focus: ListPageFocus
     }
   | {
       kind: 'createTask'
       listId: ListId
       folderId: FolderId
-      filter: TaskFilterKind
+      filter: StatusFilter
       draft: TaskDraft
     }
   | {
@@ -77,7 +88,7 @@ export type FoldersAreaPage =
       id: TaskId
       listId: ListId
       folderId: FolderId
-      filter: TaskFilterKind
+      filter: StatusFilter
       entry: TaskFlowEntry
     }
   | ({ kind: 'editList' } & ListDraft)
@@ -94,7 +105,12 @@ type ShownListDraft = {
 export type ShownFoldersAreaPage =
   | { kind: 'overview'; focus: FoldersOverviewFocus }
   | { kind: 'create'; draftName: string }
-  | { kind: 'folder'; folder: Folder; focus: FolderPageFocus }
+  | {
+      kind: 'folder'
+      folder: Folder
+      filter: StatusFilter
+      focus: FolderPageFocus
+    }
   | { kind: 'edit'; folder: Folder; draftName: string }
   | { kind: 'confirmDeletion'; folder: Folder; draftName: string }
   | { kind: 'createList'; folder: Folder; draftName: string }
@@ -102,14 +118,14 @@ export type ShownFoldersAreaPage =
       kind: 'list'
       list: List
       folder: Folder
-      filter: TaskFilterKind
+      filter: StatusFilter
       focus: ListPageFocus
     }
   | {
       kind: 'createTask'
       list: List
       folder: Folder
-      filter: TaskFilterKind
+      filter: StatusFilter
       draft: TaskDraft
     }
   | {
@@ -117,7 +133,7 @@ export type ShownFoldersAreaPage =
       task: Task
       list: List
       folder: Folder
-      filter: TaskFilterKind
+      filter: StatusFilter
       entry: TaskFlowEntry
     }
   | ({ kind: 'editList' } & ShownListDraft)
@@ -160,18 +176,36 @@ export function dueChoiceOf(draft: TaskDraft): DueChoice {
   }
 }
 
-export function filterOf(task: Task, cameFrom: TaskFilterKind): TaskFilterKind {
+export function filterOf(task: Task, cameFrom: StatusFilter): StatusFilter {
   if (isRecurring(task)) return cameFrom
   return hasCompletions(task) ? 'completed' : 'open'
 }
 
 export function tasksShownIn(
-  filter: TaskFilterKind,
+  filter: StatusFilter,
   tasks: readonly Task[],
 ): readonly Task[] {
   return filter === 'open'
     ? openTasksInOrder(tasks)
     : completedTasksInOrder(tasks)
+}
+
+export function listsShownIn(
+  filter: StatusFilter,
+  organizer: Organizer,
+  folderId: FolderId,
+): readonly List[] {
+  const showsCompleted = filter === 'completed'
+  return listsOfFolder(organizer, folderId).filter(
+    (list) => isListCompleted(organizer, list.id) === showsCompleted,
+  )
+}
+
+export function listFilterOf(
+  organizer: Organizer,
+  listId: ListId,
+): StatusFilter {
+  return isListCompleted(organizer, listId) ? 'completed' : 'open'
 }
 
 const OVERVIEW_AFTER_FOLDER_VANISHED: ResolvedFoldersAreaPage = {
@@ -194,7 +228,12 @@ function folderPageAfterListVanished(
   const folder = folderById(organizer.folders, lastKnownFolderId)
   if (folder === null) return OVERVIEW_AFTER_FOLDER_VANISHED
   return {
-    shown: { kind: 'folder', folder, focus: FOLDER_HEADING_FOCUS },
+    shown: {
+      kind: 'folder',
+      folder,
+      filter: 'open',
+      focus: FOLDER_HEADING_FOCUS,
+    },
     vanished: 'list',
   }
 }

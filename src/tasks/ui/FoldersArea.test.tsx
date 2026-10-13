@@ -8,6 +8,7 @@ import type { Task } from '../domain/task'
 import {
   announced,
   button,
+  filterButtonNamed,
   heading,
   openFolder,
   openList,
@@ -496,7 +497,6 @@ describe('FoldersArea with lists', () => {
       [task('Keller', haushalt, false), task('Bad', haushalt, false)],
       'Haushalt, 2 offen',
     ],
-    [[task('Fenster', haushalt, true, [5])], 'Haushalt'],
   ])(
     'names the list button after its open tasks as %#',
     async (tasks, name) => {
@@ -507,6 +507,19 @@ describe('FoldersArea with lists', () => {
       expect(screen.getByRole('button', { name })).toBeInTheDocument()
     },
   )
+
+  it('names a completed list button only by its name', async () => {
+    renderFoldersArea(
+      [familie],
+      [haushalt],
+      [task('Fenster', haushalt, true, [5])],
+    )
+
+    await openFolder('Familie')
+    await userEvent.click(filterButtonNamed('erledigt'))
+
+    expect(button('Haushalt')).toBeInTheDocument()
+  })
 
   it('deletes the lists of a deleted folder and keeps those of others', async () => {
     const { client } = renderFoldersArea(
@@ -615,13 +628,14 @@ describe('FoldersArea with lists', () => {
     expect(screen.getByRole('navigation')).toBeInTheDocument()
   })
 
-  it('returns from a list to its folder', async () => {
+  it('returns from a list to its folder with the list button focused', async () => {
     renderFoldersArea([familie], [haushalt])
     await openList('Familie', 'Haushalt')
 
     await userEvent.click(button('Zurück'))
 
-    expect(heading('Familie')).toHaveFocus()
+    expect(heading('Familie')).toBeInTheDocument()
+    expect(button('Haushalt')).toHaveFocus()
   })
 
   it('shows a list created elsewhere in the open folder', async () => {
@@ -748,8 +762,8 @@ describe('FoldersArea editing lists', () => {
       'Liste Haushalt nach Garten verschoben.',
     )
     await userEvent.click(button('Zurück'))
-    expect(heading('Garten')).toHaveFocus()
-    expect(button('Haushalt')).toBeInTheDocument()
+    expect(heading('Garten')).toBeInTheDocument()
+    expect(button('Haushalt')).toHaveFocus()
   })
 
   it('announces a move together with a rename under the new name', async () => {
@@ -895,7 +909,8 @@ describe('FoldersArea editing lists', () => {
 
     expect(heading('Haushalt')).toHaveFocus()
     await userEvent.click(button('Zurück'))
-    expect(heading('Garten')).toHaveFocus()
+    expect(heading('Garten')).toBeInTheDocument()
+    expect(button('Haushalt')).toHaveFocus()
   })
 
   it('keeps the input and the own folder choice when the list is moved elsewhere', async () => {

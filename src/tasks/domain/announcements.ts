@@ -64,6 +64,10 @@ export function listDeletedAnnouncement(name: string): string {
   return `Liste ${name} gelöscht.`
 }
 
+export function listCompletedAnnouncement(name: string): string {
+  return `Liste ${name} erledigt.`
+}
+
 export function listDeletedElsewhereAnnouncement(name: string): string {
   return `Liste ${name} wurde gelöscht.`
 }

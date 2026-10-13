@@ -202,6 +202,17 @@ describe('UrgentArea urgent page', () => {
     expect(button(MUELL_ROW)).toHaveFocus()
   })
 
+  it('announces the list too when its last open task is completed', async () => {
+    renderUrgentArea([muell, reifen])
+
+    await userEvent.click(button('Müll rausbringen erledigen'))
+    await userEvent.click(button('Erledigen'))
+
+    expect(announced()).toHaveTextContent(
+      'Müll rausbringen erledigt. Liste Haushalt erledigt.',
+    )
+  })
+
   it('completes a task, focuses the following row and announces it', async () => {
     const { client } = renderUrgentArea()
 

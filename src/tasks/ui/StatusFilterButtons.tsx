@@ -1,21 +1,21 @@
-import type { TaskFilterKind } from './foldersAreaPage'
+import type { StatusFilter } from './foldersAreaPage'
 
-const FILTER_LABELS: readonly { kind: TaskFilterKind; label: string }[] = [
+const FILTER_LABELS: readonly { kind: StatusFilter; label: string }[] = [
   { kind: 'open', label: 'offen' },
   { kind: 'completed', label: 'erledigt' },
 ]
 
-type TaskFilterButtonsProps = {
-  chosen: TaskFilterKind
-  counts: Record<TaskFilterKind, number>
-  onChoose: (filter: TaskFilterKind) => void
+type StatusFilterButtonsProps = {
+  chosen: StatusFilter
+  counts: Record<StatusFilter, number>
+  onChoose: (filter: StatusFilter) => void
 }
 
-export function TaskFilterButtons({
+export function StatusFilterButtons({
   chosen,
   counts,
   onChoose,
-}: TaskFilterButtonsProps) {
+}: StatusFilterButtonsProps) {
   return (
     <div role="group" aria-label="Filter" className="taskFilter">
       {FILTER_LABELS.map(({ kind, label }) => (

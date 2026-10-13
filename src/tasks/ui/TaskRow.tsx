@@ -23,7 +23,7 @@ import {
 import { isOverdueOn, isUrgentOn } from '../domain/urgency'
 import { CalendarIcon } from './CalendarIcon'
 import { FlameIcon } from './FlameIcon'
-import type { TaskFilterKind } from './foldersAreaPage'
+import type { StatusFilter } from './foldersAreaPage'
 import { RepeatIcon } from './RepeatIcon'
 
 export type TaskOrigin = {
@@ -33,7 +33,7 @@ export type TaskOrigin = {
 
 type TaskRowProps = {
   task: Task
-  shownAs: TaskFilterKind
+  shownAs: StatusFilter
   today: CalendarDay
   origin?: TaskOrigin
   onOpen: (task: Task) => void
@@ -228,7 +228,7 @@ function ShownTaskName({
   origin,
 }: {
   task: Task
-  shownAs: TaskFilterKind
+  shownAs: StatusFilter
   today: CalendarDay
   origin?: TaskOrigin
 }) {

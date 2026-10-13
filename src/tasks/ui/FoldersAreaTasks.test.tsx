@@ -10,6 +10,7 @@ import {
   button,
   buttonNamedFirst,
   heading,
+  openCompletedList,
   openList,
   renderFoldersArea,
   TENTH_OF_OCTOBER_MORNING,
@@ -842,7 +843,8 @@ describe('FoldersArea completing, reopening and deleting tasks', () => {
     it('tells when nothing is open', async () => {
       renderTasks([fenster])
 
-      await openList('Familie', 'Haushalt')
+      await openCompletedList('Familie', 'Haushalt')
+      await chooseFilter('offen')
 
       expect(screen.getByText('Keine offenen Aufgaben.')).toBeInTheDocument()
     })

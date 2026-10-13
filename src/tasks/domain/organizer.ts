@@ -2,7 +2,7 @@ import type { CalendarDay } from './calendarDay'
 import { folderById, type Folder, type FolderId } from './folder'
 import { listById, type List, type ListId } from './list'
 import { byName } from './name'
-import { isOpen, type Task } from './task'
+import { isOpen, isRecurring, type Task } from './task'
 import { openTasksInOrder } from './taskOrder'
 import { isUrgentOn } from './urgency'
 
@@ -56,6 +56,18 @@ export function tasksOfList(
 
 export function taskCountOfList(organizer: Organizer, listId: ListId): number {
   return tasksOfList(organizer, listId).length
+}
+
+export function isListCompleted(organizer: Organizer, listId: ListId): boolean {
+  const tasks = tasksOfList(organizer, listId)
+  return tasks.length > 0 && !tasks.some(isOpen)
+}
+
+export function completesList(organizer: Organizer, task: Task): boolean {
+  if (!isOpen(task) || isRecurring(task)) return false
+  return tasksOfList(organizer, task.listId)
+    .filter(isOpen)
+    .every((each) => each.id === task.id)
 }
 
 export function openTaskSummaryOfList(

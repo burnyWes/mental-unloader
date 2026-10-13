@@ -42,6 +42,8 @@ import {
   emptyTaskDraft,
   filterOf,
   FOLDER_HEADING_FOCUS,
+  listFilterOf,
+  listsShownIn,
   tasksShownIn,
   LIST_HEADING_FOCUS,
   OVERVIEW_HEADING_FOCUS,
@@ -50,7 +52,7 @@ import {
   type FoldersAreaPage,
   type ListPageFocus,
   type ShownFoldersAreaPage,
-  type TaskFilterKind,
+  type StatusFilter,
   type TaskFlowEntry,
 } from './foldersAreaPage'
 import { FoldersPage, type FoldersOverviewFocus } from './FoldersPage'
@@ -129,15 +131,16 @@ export function FoldersArea({
 
   function showFolder(
     id: FolderId,
+    filter: StatusFilter = 'open',
     focus: FolderPageFocus = FOLDER_HEADING_FOCUS,
   ) {
-    setPage({ kind: 'folder', id, focus })
+    setPage({ kind: 'folder', id, filter, focus })
   }
 
   function showList(
     list: List,
     folderId: FolderId = list.folderId,
-    filter: TaskFilterKind = 'open',
+    filter: StatusFilter = 'open',
     focus: ListPageFocus = LIST_HEADING_FOCUS,
   ) {
     setPage({ kind: 'list', id: list.id, folderId, filter, focus })
@@ -189,7 +192,7 @@ export function FoldersArea({
   function createList(folder: Folder, draftName: string) {
     const name = createName(draftName)
     const id = organizer.addList(folder.id, name)
-    showFolder(folder.id, { kind: 'arrivingList', id })
+    showFolder(folder.id, 'open', { kind: 'arrivingList', id })
     announce(listCreatedAnnouncement(name))
   }
 
@@ -206,9 +209,10 @@ export function FoldersArea({
   }
 
   function deleteList(list: List) {
-    showFolder(list.folderId, {
+    const filter = listFilterOf(organizer, list.id)
+    showFolder(list.folderId, filter, {
       kind: 'followingList',
-      removedAt: listsOfFolder(organizer, list.folderId).indexOf(list),
+      removedAt: listsShownIn(filter, organizer, list.folderId).indexOf(list),
       removedId: list.id,
     })
     organizer.removeList(list.id, idsOf(tasksOfList(organizer, list.id)))
@@ -244,7 +248,7 @@ export function FoldersArea({
     })
   }
 
-  function followingTask(task: Task, filter: TaskFilterKind): ListPageFocus {
+  function followingTask(task: Task, filter: StatusFilter): ListPageFocus {
     const shownTasks = tasksShownIn(filter, tasksOfList(organizer, task.listId))
     return {
       kind: 'followingTask',
@@ -336,12 +340,17 @@ export function FoldersArea({
         <FolderPage
           navigation={navigation}
           folder={shown.folder}
-          lists={listsOfFolder(organizer, shown.folder.id)}
+          listsByFilter={{
+            open: listsShownIn('open', organizer, shown.folder.id),
+            completed: listsShownIn('completed', organizer, shown.folder.id),
+          }}
+          filter={shown.filter}
           openTaskSummary={(listId) =>
             openTaskSummaryOfList(organizer, listId, today)
           }
           focus={shown.focus}
           onBack={() => showOverview()}
+          onFilter={(filter) => showFolder(shown.folder.id, filter)}
           onEdit={() =>
             setPage({
               kind: 'edit',
@@ -435,7 +444,13 @@ export function FoldersArea({
           onFilter={(filter) =>
             showList(shown.list, shown.folder.id, filter, LIST_HEADING_FOCUS)
           }
-          onBack={() => showFolder(shown.folder.id)}
+          onBack={() =>
+            showFolder(
+              shown.folder.id,
+              listFilterOf(organizer, shown.list.id),
+              { kind: 'returningList', id: shown.list.id },
+            )
+          }
           onEdit={() =>
             setPage({
               kind: 'editList',

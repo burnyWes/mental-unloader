@@ -5,7 +5,7 @@ branch: main
 story: MUL-010
 topic: "Offen/erledigt-Filter für Listen"
 tags: [plan, tasks, domain, organizer, folderpage, focus, announcements]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-010 — Offen/erledigt-Filter für Listen
@@ -306,10 +306,10 @@ und führt den Rückweg in den passenden Filter.
 - [x] `git grep -n "TaskFilterKind\|TaskFilterButtons" src` findet nichts mehr.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver: Ordner öffnen, die letzte Aufgabe einer Liste
+- [x] Auf dem iPhone mit VoiceOver: Ordner öffnen, die letzte Aufgabe einer Liste
   erledigen, „Zurück“. VoiceOver landet auf der Liste unter „erledigt“, und die Knöpfe
   lesen sich als „offen (n)“ und „erledigt (m)“, gedrückt oder nicht gedrückt.
-- [ ] Zwei Geräte: Auf Gerät A eine Aufgabe einer erledigten Liste wieder öffnen. Auf
+- [x] Zwei Geräte: Auf Gerät A eine Aufgabe einer erledigten Liste wieder öffnen. Auf
   Gerät B springt die Liste ohne Neuladen von „erledigt“ nach „offen“.
 
 ### Phase 2: Ansage „Liste … erledigt.“
@@ -356,7 +356,7 @@ ist.
 - [x] `npm run build` läuft durch.
 
 **Manuelle Verifikation**:
-- [ ] Auf dem iPhone mit VoiceOver auf der Dringend-Seite die letzte offene Aufgabe einer
+- [x] Auf dem iPhone mit VoiceOver auf der Dringend-Seite die letzte offene Aufgabe einer
   Liste erledigen. Zu hören ist „… erledigt. Liste … erledigt.“.
 
 ## Notizen zur Umsetzung

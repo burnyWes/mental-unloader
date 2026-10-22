@@ -4,6 +4,7 @@ import { useFocusAfterRemoval } from '../../shared/ui/useFocusAfterRemoval'
 import { useFocusOnArrival } from '../../shared/ui/useFocusOnArrival'
 import { useHeadingFocus } from '../../shared/ui/useHeadingFocus'
 import type { Folder, FolderId } from '../domain/folder'
+import type { FolderSummary } from '../domain/organizer'
 import { FolderButton } from './FolderButton'
 
 export type FoldersOverviewFocus =
@@ -22,7 +23,7 @@ function withoutRemovedFolder(
 type FoldersPageProps = {
   navigation: ReactNode
   folders: readonly Folder[]
-  listCount: (folderId: FolderId) => number
+  summary: (folderId: FolderId) => FolderSummary
   focus: FoldersOverviewFocus
   onCreateFolder: () => void
   onOpenFolder: (folder: Folder) => void
@@ -31,7 +32,7 @@ type FoldersPageProps = {
 export function FoldersPage({
   navigation,
   folders,
-  listCount,
+  summary,
   focus,
   onCreateFolder,
   onOpenFolder,
@@ -82,7 +83,7 @@ export function FoldersPage({
               <li key={folder.id}>
                 <FolderButton
                   folder={folder}
-                  listCount={listCount(folder.id)}
+                  summary={summary(folder.id)}
                   onOpen={onOpenFolder}
                   ref={keepFolderButton(folder.id)}
                 />

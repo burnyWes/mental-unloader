@@ -7,6 +7,7 @@ import {
   folderDeletionExplanation,
   folderDeletionHeading,
   folderSavedAnnouncement,
+  folderSummaryLabel,
   listCompletedAnnouncement,
   listCountLabel,
   listCreatedAnnouncement,
@@ -259,6 +260,17 @@ describe('folder announcements', () => {
     expect(nameFailureMessage('tooLong')).toBe(
       'Der Name darf höchstens 100 Zeichen lang sein.',
     )
+  })
+})
+
+describe('folderSummaryLabel', () => {
+  it.each([
+    [{ lists: 1, urgent: 0 }, '1 Liste'],
+    [{ lists: 3, urgent: 0 }, '3 Listen'],
+    [{ lists: 3, urgent: 1 }, '3 Listen, 1 dringend'],
+    [{ lists: 3, urgent: 4 }, '3 Listen, 4 dringend'],
+  ])('sums up %o as %s', (summary, label) => {
+    expect(folderSummaryLabel(summary)).toBe(label)
   })
 })
 

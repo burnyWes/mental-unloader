@@ -17,6 +17,11 @@ export type OpenTaskSummary = {
   urgent: number
 }
 
+export type FolderSummary = {
+  lists: number
+  urgent: number
+}
+
 export type UrgentTask = {
   task: Task
   list: List
@@ -89,6 +94,19 @@ export function tasksOfFolder(
   return listsOfFolder(organizer, folderId).flatMap((list) =>
     tasksOfList(organizer, list.id),
   )
+}
+
+export function folderSummaryOf(
+  organizer: Organizer,
+  folderId: FolderId,
+  today: CalendarDay,
+): FolderSummary {
+  return {
+    lists: listCountOfFolder(organizer, folderId),
+    urgent: tasksOfFolder(organizer, folderId)
+      .filter(isOpen)
+      .filter((task) => isUrgentOn(task, today)).length,
+  }
 }
 
 export function listOfTask(organizer: Organizer, task: Task): List | null {

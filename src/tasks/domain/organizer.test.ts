@@ -5,6 +5,7 @@ import {
   completesList,
   EMPTY_ORGANIZER,
   folderOfList,
+  folderSummaryOf,
   isListCompleted,
   listCountOfFolder,
   listOfTask,
@@ -192,6 +193,78 @@ describe('tasksOfFolder', () => {
 
   it('gathers nothing for a folder without lists', () => {
     expect(tasksOfFolder(organizer, arbeit.id)).toEqual([])
+  })
+})
+
+describe('folderSummaryOf', () => {
+  const today = '2026-10-10'
+
+  it('counts nothing for a folder without lists', () => {
+    expect(folderSummaryOf(organizer, arbeit.id, today)).toEqual({
+      lists: 0,
+      urgent: 0,
+    })
+  })
+
+  it('sums the open urgent tasks of all lists of the folder', () => {
+    const withUrgentTasks: Organizer = {
+      ...organizer,
+      tasks: [
+        task('fire', haushalt.id, urgent),
+        task('more fire', haushalt.id, urgent),
+        task('done', haushalt.id, urgent, [5]),
+        task('coffee', haushalt.id),
+        task('shopping', wocheneinkauf.id, urgent),
+      ],
+    }
+
+    expect(folderSummaryOf(withUrgentTasks, familie.id, today)).toEqual({
+      lists: 3,
+      urgent: 3,
+    })
+  })
+
+  it('counts deadline tasks once their lead is reached, overdue ones too', () => {
+    const deadlineOn = (deadline: string): Due => ({
+      kind: 'deadline',
+      deadline,
+      urgentFrom: 'oneWeek',
+      repetition: null,
+    })
+    const withDeadlines: Organizer = {
+      ...organizer,
+      tasks: [
+        task('reached', geburtstage.id, deadlineOn('2026-10-15')),
+        task('overdue', geburtstage.id, deadlineOn('2026-10-08')),
+        task('ahead', geburtstage.id, deadlineOn('2026-10-20')),
+        task('recurring', haushalt.id, weeklyOnThe15th, [5]),
+      ],
+    }
+
+    expect(folderSummaryOf(withDeadlines, familie.id, today).urgent).toBe(3)
+  })
+
+  it('ignores urgent tasks of other folders and of orphaned lists', () => {
+    const elsewhere: Organizer = {
+      ...organizer,
+      tasks: [
+        task('roses', beete.id, urgent),
+        task('orphaned', orphan.id, urgent),
+        task('lost', 'list-gone', urgent),
+      ],
+    }
+
+    expect(folderSummaryOf(elsewhere, familie.id, today).urgent).toBe(0)
+  })
+
+  it('matches the sum of the urgent counts of its lists', () => {
+    const urgentOfLists = listsOfFolder(organizer, familie.id)
+      .map((list) => openTaskSummaryOfList(organizer, list.id, today).urgent)
+      .reduce((sum, count) => sum + count, 0)
+
+    expect(folderSummaryOf(organizer, familie.id, today).urgent).toBe(
+      urgentOfLists,
+    )
   })
 })
 

@@ -8,6 +8,7 @@ import type { Task } from '../domain/task'
 import {
   announced,
   button,
+  buttonNamedFirst,
   filterButtonNamed,
   heading,
   openFolder,
@@ -479,13 +480,66 @@ describe('FoldersArea with lists', () => {
   })
 
   it.each([
-    [[haushalt, wocheneinkauf, geburtstage], 'Familie, 3 Listen'],
-    [[haushalt], 'Familie, 1 Liste'],
-    [[], 'Familie'],
-  ])('names the folder button after its lists as %#', (lists, name) => {
-    renderFoldersArea([familie], lists)
+    [[haushalt, wocheneinkauf, geburtstage], [], 'Familie, 3 Listen'],
+    [[haushalt], [], 'Familie, 1 Liste'],
+    [[], [], 'Familie'],
+    [
+      [haushalt, wocheneinkauf],
+      [
+        task('Müll', haushalt, true),
+        task('Bad', haushalt, true),
+        task('Milch', wocheneinkauf, true),
+      ],
+      'Familie, 2 Listen, 3 dringend',
+    ],
+    [
+      [haushalt],
+      [task('Fenster', haushalt, true, [5]), task('Keller', haushalt, false)],
+      'Familie, 1 Liste',
+    ],
+  ])(
+    'names the folder button after its lists and urgent tasks as %#',
+    (lists, tasks, name) => {
+      renderFoldersArea([familie], lists, tasks)
 
-    expect(screen.getByRole('button', { name })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name })).toBeInTheDocument()
+    },
+  )
+
+  it('shows a flame beside the list count of a folder with urgent tasks', () => {
+    renderFoldersArea([familie], [haushalt], [task('Müll', haushalt, true)])
+
+    const count =
+      buttonNamedFirst('Familie').querySelector('.folderButtonCount')
+
+    expect(count).toHaveAttribute('aria-hidden', 'true')
+    expect(count?.querySelectorAll('svg')).toHaveLength(1)
+  })
+
+  it('shows no flame on a folder without urgent tasks', () => {
+    renderFoldersArea([familie], [haushalt], [task('Keller', haushalt, false)])
+
+    const count =
+      buttonNamedFirst('Familie').querySelector('.folderButtonCount')
+
+    expect(count?.querySelectorAll('svg')).toHaveLength(0)
+  })
+
+  it('updates the urgent count when a task is completed elsewhere', () => {
+    const { client } = renderFoldersArea(
+      [familie],
+      [haushalt],
+      [task('Müll', haushalt, true)],
+    )
+    expect(button('Familie, 1 Liste, 1 dringend')).toBeInTheDocument()
+
+    act(() =>
+      client.arrivesFromElsewhere({
+        tasks: [task('Müll', haushalt, true, [5])],
+      }),
+    )
+
+    expect(button('Familie, 1 Liste')).toBeInTheDocument()
   })
 
   it.each([

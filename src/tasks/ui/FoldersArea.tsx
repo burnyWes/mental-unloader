@@ -22,6 +22,7 @@ import type { Folder, FolderId } from '../domain/folder'
 import type { List } from '../domain/list'
 import { createName } from '../domain/name'
 import {
+  folderSummaryOf,
   listCountOfFolder,
   listsOfFolder,
   openTaskSummaryOfList,
@@ -555,7 +556,7 @@ export function FoldersArea({
         <FoldersPage
           navigation={navigation}
           folders={organizer.folders}
-          listCount={(folderId) => listCountOfFolder(organizer, folderId)}
+          summary={(folderId) => folderSummaryOf(organizer, folderId, today)}
           focus={shown.focus}
           onCreateFolder={() => setPage({ kind: 'create', draftName: '' })}
           onOpenFolder={(folder) => showFolder(folder.id)}

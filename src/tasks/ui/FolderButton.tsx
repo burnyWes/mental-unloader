@@ -1,22 +1,24 @@
 import type { Ref } from 'react'
-import { listCountLabel } from '../domain/announcements'
+import { folderSummaryLabel, listCountLabel } from '../domain/announcements'
 import type { Folder } from '../domain/folder'
+import type { FolderSummary } from '../domain/organizer'
 import { ArrowIcon } from './ArrowIcon'
+import { FlameIcon } from './FlameIcon'
 
 type FolderButtonProps = {
   folder: Folder
-  listCount: number
+  summary: FolderSummary
   onOpen: (folder: Folder) => void
   ref?: Ref<HTMLButtonElement>
 }
 
 export function FolderButton({
   folder,
-  listCount,
+  summary,
   onOpen,
   ref,
 }: FolderButtonProps) {
-  const hasLists = listCount > 0
+  const hasLists = summary.lists > 0
 
   return (
     <button
@@ -28,15 +30,21 @@ export function FolderButton({
       <span className="folderButtonName">
         <span className="folderButtonTitle">
           {folder.name}
-          {hasLists && <span className="visuallyHidden">,</span>}
+          {hasLists && (
+            <span className="visuallyHidden">
+              , {folderSummaryLabel(summary)}
+            </span>
+          )}
         </span>
         {hasLists && (
-          <>
-            {' '}
-            <span className="folderButtonCount">
-              {listCountLabel(listCount)}
-            </span>
-          </>
+          <span className="folderButtonCount" aria-hidden="true">
+            {listCountLabel(summary.lists)}
+            {summary.urgent > 0 && (
+              <>
+                , <FlameIcon /> {summary.urgent}
+              </>
+            )}
+          </span>
         )}
       </span>
       <span className="folderButtonArrow">

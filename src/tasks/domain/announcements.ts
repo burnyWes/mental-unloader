@@ -1,6 +1,6 @@
 import { spokenDateOf, spokenDayOf, type CalendarDay } from './calendarDay'
 import { MAXIMUM_NAME_LENGTH, type InvalidNameReason } from './name'
-import type { OpenTaskSummary } from './organizer'
+import type { FolderSummary, OpenTaskSummary } from './organizer'
 import type { RepeatRhythm } from './repetition'
 import { MAXIMUM_DESCRIPTION_LENGTH, type UrgencyLead } from './task'
 
@@ -43,6 +43,11 @@ export function folderDeletionExplanation(
 
 export function listCountLabel(count: number): string {
   return count === 1 ? '1 Liste' : `${count} Listen`
+}
+
+export function folderSummaryLabel({ lists, urgent }: FolderSummary): string {
+  if (urgent === 0) return listCountLabel(lists)
+  return `${listCountLabel(lists)}, ${urgent} dringend`
 }
 
 export function listCreatedAnnouncement(name: string): string {

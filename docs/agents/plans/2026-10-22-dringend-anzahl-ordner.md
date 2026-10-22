@@ -5,7 +5,7 @@ branch: main
 story: MUL-012
 topic: "Dringend-Anzahl auf dem Ordner-Button"
 tags: [plan, tasks, domain, announcements, folderbutton, folderspage]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-012 — Dringend-Anzahl auf dem Ordner-Button
@@ -259,7 +259,7 @@ Flamme und für den Screenreader als Text.
 
 **Manuelle Verifikation**:
 
-- [ ] Auf dem iPhone unter iOS-VoiceOver liest der Ordner-Button
+- [x] Auf dem iPhone unter iOS-VoiceOver liest der Ordner-Button
   „Familie, 3 Listen, 4 dringend, Taste“. Die Flamme sitzt im Hell- wie im Dunkelmodus
   auf Höhe der Schrift, wie auf dem Listen-Button.
 

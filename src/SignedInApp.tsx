@@ -3,7 +3,12 @@ import type { Appearance } from './shared/appearance/useAppearance'
 import { ChecklistIcon } from './shared/ui/ChecklistIcon'
 import { ConfirmationPage } from './shared/ui/ConfirmationPage'
 import { NavigationBar, type Area } from './shared/ui/NavigationBar'
-import { slideBack, slideForward } from './shared/ui/pageSlide'
+import {
+  directionBetween,
+  slideBack,
+  slideForward,
+  slidePage,
+} from './shared/ui/pageSlide'
 import { SettingsIcon } from './shared/ui/SettingsIcon'
 import { SettingsPage, type SettingsEntry } from './shared/ui/SettingsPage'
 import type { OrganizerClient } from './tasks/api/organizerClient'
@@ -70,14 +75,26 @@ export function SignedInApp({
     },
   ]
 
-  function selectArea(area: AreaId) {
+  const areas = areasWithUrgentCount(urgentTasks.length)
+
+  function positionOf(area: AreaId): number {
+    return areas.findIndex((each) => each.id === area)
+  }
+
+  function showArea(area: AreaId) {
     setActiveArea(area)
     setAreaVisit((visit) => visit + 1)
   }
 
+  function selectArea(area: AreaId) {
+    const direction = directionBetween(positionOf(activeArea), positionOf(area))
+    if (direction === null) showArea(area)
+    else slidePage(direction, () => showArea(area))
+  }
+
   const navigation = (
     <NavigationBar
-      areas={areasWithUrgentCount(urgentTasks.length)}
+      areas={areas}
       activeArea={activeArea}
       onSelectArea={selectArea}
     />

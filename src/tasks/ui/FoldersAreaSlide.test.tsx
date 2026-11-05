@@ -101,11 +101,43 @@ describe('sliding between the pages of the folders area', () => {
     ])
   })
 
-  it('does not slide when switching the status filter', async () => {
+  it('slides the lists of a folder sideways when switching the status filter', async () => {
     renderFoldersArea([familie], [haushalt])
     await slideBy(buttonNamedFirst('Familie'))
 
-    await userEvent.click(filterButtonNamed('erledigt'))
+    await slideBy(filterButtonNamed('erledigt'))
+    expect(screen.getByText('Noch keine Liste erledigt.')).toBeInTheDocument()
+    await slideBy(filterButtonNamed('offen'))
+
+    expect(buttonNamedFirst('Haushalt')).toBeInTheDocument()
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'itemsForward',
+      'itemsBack',
+    ])
+  })
+
+  it('slides the tasks of a list sideways when switching the status filter', async () => {
+    renderFoldersArea([familie], [haushalt], [keller])
+    await slideIntoList()
+
+    await slideBy(filterButtonNamed('erledigt'))
+    await slideBy(filterButtonNamed('offen'))
+
+    expect(buttonNamedFirst('Keller aufräumen')).toBeInTheDocument()
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'forward',
+      'itemsForward',
+      'itemsBack',
+    ])
+  })
+
+  it('does not slide when choosing the filter already shown', async () => {
+    renderFoldersArea([familie], [haushalt])
+    await slideBy(buttonNamedFirst('Familie'))
+
+    await userEvent.click(filterButtonNamed('offen'))
 
     expect(viewTransitions.directions()).toEqual(['forward'])
   })

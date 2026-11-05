@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
-import { slideBack, slideForward } from '../../shared/ui/pageSlide'
+import {
+  directionBetween,
+  slideBack,
+  slideForward,
+  slideItems,
+} from '../../shared/ui/pageSlide'
 import {
   folderCreatedAnnouncement,
   folderDeletedAnnouncement,
@@ -50,6 +55,7 @@ import {
   LIST_HEADING_FOCUS,
   OVERVIEW_HEADING_FOCUS,
   resolveFoldersAreaPage,
+  STATUS_FILTER_ORDER,
   type FolderPageFocus,
   type FoldersAreaPage,
   type ListPageFocus,
@@ -74,6 +80,19 @@ type ShownCreateTaskPage = Extract<ShownFoldersAreaPage, { kind: 'createTask' }>
 type ShownListPage = Extract<ShownFoldersAreaPage, { kind: 'list' }>
 
 type ShownTaskPage = Extract<ShownFoldersAreaPage, { kind: 'task' }>
+
+function switchFilter(
+  from: StatusFilter,
+  to: StatusFilter,
+  action: () => void,
+) {
+  const direction = directionBetween(
+    STATUS_FILTER_ORDER.indexOf(from),
+    STATUS_FILTER_ORDER.indexOf(to),
+  )
+  if (direction === null) action()
+  else slideItems(direction, action)
+}
 
 function idsOf(identified: readonly { id: string }[]): readonly string[] {
   return identified.map((each) => each.id)
@@ -352,7 +371,11 @@ export function FoldersArea({
           }
           focus={shown.focus}
           onBack={() => slideBack(() => showOverview())}
-          onFilter={(filter) => showFolder(shown.folder.id, filter)}
+          onFilter={(filter) =>
+            switchFilter(shown.filter, filter, () =>
+              showFolder(shown.folder.id, filter),
+            )
+          }
           onEdit={() =>
             slideForward(() =>
               setPage({
@@ -456,7 +479,9 @@ export function FoldersArea({
           filter={shown.filter}
           focus={shown.focus}
           onFilter={(filter) =>
-            showList(shown.list, shown.folder.id, filter, LIST_HEADING_FOCUS)
+            switchFilter(shown.filter, filter, () =>
+              showList(shown.list, shown.folder.id, filter, LIST_HEADING_FOCUS),
+            )
           }
           onBack={() =>
             slideBack(() =>

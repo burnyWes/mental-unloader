@@ -131,22 +131,24 @@ export function FolderPage({
           counts={counts}
           onChoose={onFilter}
         />
-        {shownLists.length === 0 ? (
-          <p>{emptyText()}</p>
-        ) : (
-          <ul className="folderList">
-            {shownLists.map((list) => (
-              <li key={list.id}>
-                <ListButton
-                  list={list}
-                  summary={openTaskSummary(list.id)}
-                  onOpen={onOpenList}
-                  ref={keepListButton(list.id)}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="filteredItems">
+          {shownLists.length === 0 ? (
+            <p>{emptyText()}</p>
+          ) : (
+            <ul className="folderList">
+              {shownLists.map((list) => (
+                <li key={list.id}>
+                  <ListButton
+                    list={list}
+                    summary={openTaskSummary(list.id)}
+                    onOpen={onOpenList}
+                    ref={keepListButton(list.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </main>
     </>
   )

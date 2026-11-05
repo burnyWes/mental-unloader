@@ -560,20 +560,30 @@ describe('App sliding', () => {
 
   it('slides into the sign out confirmation and back on cancel', async () => {
     renderApp()
-    await openSettings()
+    await slideBy('Einstellungen')
 
     await slideBy('Abmelden')
     await slideBy('Abbrechen')
 
     expect(screen.getByRole('heading', { name: 'Einstellungen' })).toHaveFocus()
-    expect(viewTransitions.directions()).toEqual(['forward', 'back'])
+    expect(viewTransitions.directions()).toEqual(['forward', 'forward', 'back'])
   })
 
-  it('does not slide when switching areas', async () => {
+  it('slides between the areas in the order of their buttons', async () => {
     renderApp()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
-    await openSettings()
+    await slideBy('Ordner')
+    await slideBy('Einstellungen')
+    await slideBy('Dringend')
+
+    expect(screen.getByRole('heading', { name: 'Dringend' })).toHaveFocus()
+    expect(viewTransitions.directions()).toEqual(['forward', 'forward', 'back'])
+  })
+
+  it('does not slide when choosing the area already shown', async () => {
+    renderApp()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dringend' }))
 
     expect(viewTransitions.directions()).toEqual([])
   })

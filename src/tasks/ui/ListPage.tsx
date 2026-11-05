@@ -111,25 +111,27 @@ export function ListPage({
           counts={counts}
           onChoose={onFilter}
         />
-        {rows.length === 0 ? (
-          <p>{emptyText()}</p>
-        ) : (
-          <ul className="folderList">
-            {rows.map((task) => (
-              <li key={task.id}>
-                <TaskRow
-                  task={task}
-                  shownAs={filter}
-                  today={today}
-                  onOpen={onOpenTask}
-                  onComplete={filter === 'open' ? onCompleteTask : undefined}
-                  openButton={openButton(task.id)}
-                  completeButton={completeButton(task.id)}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="filteredItems">
+          {rows.length === 0 ? (
+            <p>{emptyText()}</p>
+          ) : (
+            <ul className="folderList">
+              {rows.map((task) => (
+                <li key={task.id}>
+                  <TaskRow
+                    task={task}
+                    shownAs={filter}
+                    today={today}
+                    onOpen={onOpenTask}
+                    onComplete={filter === 'open' ? onCompleteTask : undefined}
+                    openButton={openButton(task.id)}
+                    completeButton={completeButton(task.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </main>
     </>
   )

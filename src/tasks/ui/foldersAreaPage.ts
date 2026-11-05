@@ -31,6 +31,11 @@ export type FolderPageFocus =
 
 export type StatusFilter = 'open' | 'completed'
 
+export const STATUS_FILTER_ORDER: readonly StatusFilter[] = [
+  'open',
+  'completed',
+]
+
 export type ListPageFocus =
   | { kind: 'heading' }
   | { kind: 'arrivingTask'; id: TaskId }

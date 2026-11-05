@@ -127,9 +127,9 @@ describe('sliding between the steps of a task', () => {
   it('does not slide when reopening a task', async () => {
     renderFoldersArea([familie], [haushalt], [KELLER_COMPLETED])
     await slideBy(buttonNamedFirst('Familie'))
-    await userEvent.click(filterButtonNamed('erledigt'))
+    await slideBy(filterButtonNamed('erledigt'))
     await slideBy(buttonNamedFirst('Haushalt'))
-    await userEvent.click(filterButtonNamed('erledigt'))
+    await slideBy(filterButtonNamed('erledigt'))
     await slideBy(buttonNamedFirst('Keller aufräumen'))
 
     await userEvent.click(button('Wieder öffnen'))
@@ -137,7 +137,9 @@ describe('sliding between the steps of a task', () => {
     expect(heading('Keller aufräumen')).toBeInTheDocument()
     expect(viewTransitions.directions()).toEqual([
       'forward',
+      'itemsForward',
       'forward',
+      'itemsForward',
       'forward',
     ])
   })

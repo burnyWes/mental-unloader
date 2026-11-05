@@ -700,3 +700,48 @@ html:active-view-transition-type(back)::view-transition-new(
     transform: translateX(-100%);
   }
 }
+
+html:active-view-transition-type(itemsForward, itemsBack) .filteredItems {
+  view-transition-name: filteredItems;
+}
+
+html:active-view-transition-type(itemsForward, itemsBack)::view-transition-old(
+    root
+  ),
+html:active-view-transition-type(itemsForward, itemsBack)::view-transition-new(
+    root
+  ) {
+  animation: none;
+}
+
+::view-transition-old(filteredItems),
+::view-transition-new(filteredItems) {
+  animation-duration: 350ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+}
+
+html:active-view-transition-type(itemsForward)::view-transition-old(
+    filteredItems
+  ) {
+  animation-name: slideOutToLeft;
+}
+
+html:active-view-transition-type(itemsForward)::view-transition-new(
+    filteredItems
+  ) {
+  animation-name: slideInFromRight;
+}
+
+html:active-view-transition-type(itemsBack)::view-transition-old(
+    filteredItems
+  ) {
+  animation-name: slideOutToRight;
+}
+
+html:active-view-transition-type(itemsBack)::view-transition-new(
+    filteredItems
+  ) {
+  animation-name: slideInFromLeft;
+}

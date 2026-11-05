@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
+import { slideBack, slideForward } from '../../shared/ui/pageSlide'
 import {
   listCompletedAnnouncement,
   recurringTaskCompletedAnnouncement,
@@ -194,19 +195,25 @@ export function TaskFlow({
           list={list}
           folder={folder}
           today={today}
-          onBack={() => onLeave('back')}
+          onBack={() => slideBack(() => onLeave('back'))}
           onComplete={() =>
-            setStep({ kind: 'confirmCompletion', from: 'overview' })
+            slideForward(() =>
+              setStep({ kind: 'confirmCompletion', from: 'overview' }),
+            )
           }
           onReopen={reopen}
           onEdit={() =>
-            setStep({
-              kind: 'edit',
-              draft: draftOf(task, today),
-              draftListId: null,
-            })
+            slideForward(() =>
+              setStep({
+                kind: 'edit',
+                draft: draftOf(task, today),
+                draftListId: null,
+              }),
+            )
           }
-          onDelete={() => setStep({ kind: 'confirmDeletion' })}
+          onDelete={() =>
+            slideForward(() => setStep({ kind: 'confirmDeletion' }))
+          }
         />
       )
 
@@ -222,8 +229,8 @@ export function TaskFlow({
               draftListId: shownStep.draftListId,
             })
           }
-          onSave={() => save(shownStep)}
-          onBack={() => setStep(OVERVIEW_STEP)}
+          onSave={() => slideBack(() => save(shownStep))}
+          onBack={() => slideBack(() => setStep(OVERVIEW_STEP))}
           announce={announce}
         >
           <TaskListSelect
@@ -242,8 +249,8 @@ export function TaskFlow({
           heading={taskCompletionHeading(task.name)}
           explanation={completionExplanationOf(task, today)}
           confirmLabel="Erledigen"
-          onConfirm={complete}
-          onCancel={() => cancelCompletion(shownStep.from)}
+          onConfirm={() => slideBack(complete)}
+          onCancel={() => slideBack(() => cancelCompletion(shownStep.from))}
         />
       )
 
@@ -253,8 +260,8 @@ export function TaskFlow({
           heading={taskDeletionHeading(task.name)}
           explanation={TASK_DELETION_EXPLANATION}
           confirmLabel="Löschen"
-          onConfirm={remove}
-          onCancel={() => setStep(OVERVIEW_STEP)}
+          onConfirm={() => slideBack(remove)}
+          onCancel={() => slideBack(() => setStep(OVERVIEW_STEP))}
         />
       )
   }

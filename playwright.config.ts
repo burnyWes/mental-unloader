@@ -8,6 +8,7 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
+    reducedMotion: 'reduce',
     baseURL: 'http://localhost:4173/mental-unloader/',
     trace: 'on-first-retry',
   },

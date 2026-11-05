@@ -3,6 +3,7 @@ import type { Appearance } from './shared/appearance/useAppearance'
 import { ChecklistIcon } from './shared/ui/ChecklistIcon'
 import { ConfirmationPage } from './shared/ui/ConfirmationPage'
 import { NavigationBar, type Area } from './shared/ui/NavigationBar'
+import { slideBack, slideForward } from './shared/ui/pageSlide'
 import { SettingsIcon } from './shared/ui/SettingsIcon'
 import { SettingsPage, type SettingsEntry } from './shared/ui/SettingsPage'
 import type { OrganizerClient } from './tasks/api/organizerClient'
@@ -115,7 +116,9 @@ export function SignedInApp({
             key={areaKey}
             navigation={navigation}
             entries={settingsEntries}
-            onRequestSignOut={() => setConfirmingSignOut(true)}
+            onRequestSignOut={() =>
+              slideForward(() => setConfirmingSignOut(true))
+            }
           />
         )
     }
@@ -128,7 +131,7 @@ export function SignedInApp({
         explanation="Auf diesem Gerät musst du dich danach mit E-Mail und Passwort neu anmelden."
         confirmLabel="Abmelden"
         onConfirm={onSignOut}
-        onCancel={() => setConfirmingSignOut(false)}
+        onCancel={() => slideBack(() => setConfirmingSignOut(false))}
       />
     )
 

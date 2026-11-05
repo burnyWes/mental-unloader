@@ -174,3 +174,5 @@ b Speicherwarnung fehlt, wenn IndexedDB erst asynchron scheitert (try/catch um p
 b Liste ohne Ordner (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Liste in einen Ordner legt, den ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt
 b Aufgabe ohne Liste (Waise) bleibt unsichtbar in Firestore, wenn ein Geraet offline eine Aufgabe in eine Liste legt, die ein anderes Geraet gleichzeitig loescht - wird ausgeblendet, nicht aufgeraeumt
 b Aufgabe, die direkt nach dem eigenen Erledigen auf einem anderen Geraet wieder geoeffnet wird, bleibt unter "offen" ausgeblendet, bis die Listen-Seite verlassen oder der Filter gewechselt wird (followingTask blendet removedId aus)
+b E2E "moves a list to another folder" (e2e/lists.spec.ts) scheitert: nach Zurueck hat die Ueberschrift "Garten" nicht den Fokus - war schon vor MUL-013 rot
+b E2E "completes an urgent task on the urgent page and in its list" (e2e/urgent.spec.ts) laeuft in einen Timeout bei locator.focus - war schon vor MUL-013 rot

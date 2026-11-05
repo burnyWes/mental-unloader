@@ -622,3 +622,81 @@ html:has(.bottomBar:not(.bottomBarInFlow)) {
     var(--bottomBarHeight) + env(safe-area-inset-bottom)
   );
 }
+
+.navigationBar {
+  view-transition-name: navigationBar;
+}
+
+::view-transition-group(navigationBar) {
+  animation: none;
+}
+
+::view-transition-old(navigationBar):not(:only-child) {
+  display: none;
+}
+
+::view-transition-new(navigationBar):not(:only-child) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(navigationBar):only-child,
+::view-transition-new(navigationBar):only-child {
+  animation-duration: 350ms;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+}
+
+html:active-view-transition-type(forward)::view-transition-old(root),
+html:active-view-transition-type(forward)::view-transition-old(
+    navigationBar
+  ):only-child {
+  animation-name: slideOutToLeft;
+}
+
+html:active-view-transition-type(forward)::view-transition-new(root),
+html:active-view-transition-type(forward)::view-transition-new(
+    navigationBar
+  ):only-child {
+  animation-name: slideInFromRight;
+}
+
+html:active-view-transition-type(back)::view-transition-old(root),
+html:active-view-transition-type(back)::view-transition-old(
+    navigationBar
+  ):only-child {
+  animation-name: slideOutToRight;
+}
+
+html:active-view-transition-type(back)::view-transition-new(root),
+html:active-view-transition-type(back)::view-transition-new(
+    navigationBar
+  ):only-child {
+  animation-name: slideInFromLeft;
+}
+
+@keyframes slideOutToLeft {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideOutToRight {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+}

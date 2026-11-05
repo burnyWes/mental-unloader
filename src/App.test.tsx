@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { App } from './App'
 import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppearanceClient'
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
@@ -10,6 +10,10 @@ import { createInMemoryOrganizerClient } from './tasks/api/inMemoryOrganizerClie
 import type { OrganizerClient } from './tasks/api/organizerClient'
 import type { Due, Task } from './tasks/domain/task'
 import { accessibilityViolations } from './testSupport/accessibility'
+import {
+  installFakeViewTransitions,
+  type FakeViewTransitions,
+} from './testSupport/fakeViewTransitions'
 
 const household = {
   email: 'haushalt@example.com',
@@ -535,5 +539,42 @@ describe('App', () => {
     await requestSignOut()
 
     expect(await accessibilityViolations(container)).toEqual([])
+  })
+})
+
+describe('App sliding', () => {
+  let viewTransitions: FakeViewTransitions
+
+  beforeEach(() => {
+    viewTransitions = installFakeViewTransitions()
+  })
+
+  afterEach(() => {
+    viewTransitions.uninstall()
+  })
+
+  async function slideBy(name: string) {
+    await userEvent.click(screen.getByRole('button', { name }))
+    viewTransitions.finishPendingUpdates()
+  }
+
+  it('slides into the sign out confirmation and back on cancel', async () => {
+    renderApp()
+    await openSettings()
+
+    await slideBy('Abmelden')
+    await slideBy('Abbrechen')
+
+    expect(screen.getByRole('heading', { name: 'Einstellungen' })).toHaveFocus()
+    expect(viewTransitions.directions()).toEqual(['forward', 'back'])
+  })
+
+  it('does not slide when switching areas', async () => {
+    renderApp()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+    await openSettings()
+
+    expect(viewTransitions.directions()).toEqual([])
   })
 })

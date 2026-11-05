@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { slideForward } from '../../shared/ui/pageSlide'
 import {
   taskDeletedElsewhereAnnouncement,
   taskNoLongerUrgentAnnouncement,
@@ -97,8 +98,10 @@ export function UrgentArea({
       urgentTasks={urgentTasks}
       today={today}
       focus={shown.focus}
-      onOpenTask={(task) => openTask(task, 'overview')}
-      onCompleteTask={(task) => openTask(task, 'completion')}
+      onOpenTask={(task) => slideForward(() => openTask(task, 'overview'))}
+      onCompleteTask={(task) =>
+        slideForward(() => openTask(task, 'completion'))
+      }
     />
   )
 }

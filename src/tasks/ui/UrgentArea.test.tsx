@@ -1,10 +1,14 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Announcer } from '../../shared/ui/Announcer'
 import { useAnnouncer } from '../../shared/ui/useAnnouncer'
 import { accessibilityViolations } from '../../testSupport/accessibility'
+import {
+  installFakeViewTransitions,
+  type FakeViewTransitions,
+} from '../../testSupport/fakeViewTransitions'
 import {
   createInMemoryOrganizerClient,
   type InMemoryOrganizerClient,
@@ -403,5 +407,39 @@ describe('UrgentArea urgent page', () => {
     const { container } = renderUrgentArea()
 
     expect(await accessibilityViolations(container)).toEqual([])
+  })
+})
+
+describe('UrgentArea sliding', () => {
+  let viewTransitions: FakeViewTransitions
+
+  beforeEach(() => {
+    viewTransitions = installFakeViewTransitions()
+  })
+
+  afterEach(() => {
+    viewTransitions.uninstall()
+  })
+
+  async function slideBy(element: HTMLElement) {
+    await userEvent.click(element)
+    viewTransitions.finishPendingUpdates()
+  }
+
+  it('slides forward into an urgent task and back', async () => {
+    renderUrgentArea()
+
+    await slideBy(button(MUELL_ROW))
+    await slideBy(button('Zurück'))
+    await slideBy(button('Müll rausbringen erledigen'))
+    await slideBy(button('Erledigen'))
+
+    expect(heading('Dringend')).toBeInTheDocument()
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'back',
+      'forward',
+      'back',
+    ])
   })
 })

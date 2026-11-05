@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
+import { slideBack, slideForward } from '../../shared/ui/pageSlide'
 import {
   folderCreatedAnnouncement,
   folderDeletedAnnouncement,
@@ -330,8 +331,8 @@ export function FoldersArea({
           heading="Ordner anlegen"
           name={shown.draftName}
           onNameChange={(draftName) => setPage({ kind: 'create', draftName })}
-          onSave={() => createFolder(shown.draftName)}
-          onBack={() => showOverview()}
+          onSave={() => slideBack(() => createFolder(shown.draftName))}
+          onBack={() => slideBack(() => showOverview())}
           announce={announce}
         />
       )
@@ -350,23 +351,27 @@ export function FoldersArea({
             openTaskSummaryOfList(organizer, listId, today)
           }
           focus={shown.focus}
-          onBack={() => showOverview()}
+          onBack={() => slideBack(() => showOverview())}
           onFilter={(filter) => showFolder(shown.folder.id, filter)}
           onEdit={() =>
-            setPage({
-              kind: 'edit',
-              id: shown.folder.id,
-              draftName: shown.folder.name,
-            })
+            slideForward(() =>
+              setPage({
+                kind: 'edit',
+                id: shown.folder.id,
+                draftName: shown.folder.name,
+              }),
+            )
           }
           onCreateList={() =>
-            setPage({
-              kind: 'createList',
-              folderId: shown.folder.id,
-              draftName: '',
-            })
+            slideForward(() =>
+              setPage({
+                kind: 'createList',
+                folderId: shown.folder.id,
+                draftName: '',
+              }),
+            )
           }
-          onOpenList={showList}
+          onOpenList={(list) => slideForward(() => showList(list))}
         />
       )
 
@@ -378,14 +383,18 @@ export function FoldersArea({
           onNameChange={(draftName) =>
             setPage({ kind: 'edit', id: shown.folder.id, draftName })
           }
-          onSave={() => renameFolder(shown.folder, shown.draftName)}
-          onBack={() => showFolder(shown.folder.id)}
+          onSave={() =>
+            slideBack(() => renameFolder(shown.folder, shown.draftName))
+          }
+          onBack={() => slideBack(() => showFolder(shown.folder.id))}
           onDelete={() =>
-            setPage({
-              kind: 'confirmDeletion',
-              id: shown.folder.id,
-              draftName: shown.draftName,
-            })
+            slideForward(() =>
+              setPage({
+                kind: 'confirmDeletion',
+                id: shown.folder.id,
+                draftName: shown.draftName,
+              }),
+            )
           }
           announce={announce}
         />
@@ -403,13 +412,15 @@ export function FoldersArea({
           )}
           explanation={folderDeletionExplanation(listCount, taskCount)}
           confirmLabel="Löschen"
-          onConfirm={() => deleteFolder(shown.folder)}
+          onConfirm={() => slideBack(() => deleteFolder(shown.folder))}
           onCancel={() =>
-            setPage({
-              kind: 'edit',
-              id: shown.folder.id,
-              draftName: shown.draftName,
-            })
+            slideBack(() =>
+              setPage({
+                kind: 'edit',
+                id: shown.folder.id,
+                draftName: shown.draftName,
+              }),
+            )
           }
         />
       )
@@ -427,8 +438,10 @@ export function FoldersArea({
               draftName,
             })
           }
-          onSave={() => createList(shown.folder, shown.draftName)}
-          onBack={() => showFolder(shown.folder.id)}
+          onSave={() =>
+            slideBack(() => createList(shown.folder, shown.draftName))
+          }
+          onBack={() => slideBack(() => showFolder(shown.folder.id))}
           announce={announce}
         />
       )
@@ -446,32 +459,42 @@ export function FoldersArea({
             showList(shown.list, shown.folder.id, filter, LIST_HEADING_FOCUS)
           }
           onBack={() =>
-            showFolder(
-              shown.folder.id,
-              listFilterOf(organizer, shown.list.id),
-              { kind: 'returningList', id: shown.list.id },
+            slideBack(() =>
+              showFolder(
+                shown.folder.id,
+                listFilterOf(organizer, shown.list.id),
+                { kind: 'returningList', id: shown.list.id },
+              ),
             )
           }
           onEdit={() =>
-            setPage({
-              kind: 'editList',
-              id: shown.list.id,
-              folderId: shown.list.folderId,
-              draftName: shown.list.name,
-              draftFolderId: null,
-            })
+            slideForward(() =>
+              setPage({
+                kind: 'editList',
+                id: shown.list.id,
+                folderId: shown.list.folderId,
+                draftName: shown.list.name,
+                draftFolderId: null,
+              }),
+            )
           }
           onCreateTask={() =>
-            setPage({
-              kind: 'createTask',
-              listId: shown.list.id,
-              folderId: shown.folder.id,
-              filter: shown.filter,
-              draft: emptyTaskDraft(today),
-            })
+            slideForward(() =>
+              setPage({
+                kind: 'createTask',
+                listId: shown.list.id,
+                folderId: shown.folder.id,
+                filter: shown.filter,
+                draft: emptyTaskDraft(today),
+              }),
+            )
           }
-          onOpenTask={(task) => openTask(shown, task, 'overview')}
-          onCompleteTask={(task) => openTask(shown, task, 'completion')}
+          onOpenTask={(task) =>
+            slideForward(() => openTask(shown, task, 'overview'))
+          }
+          onCompleteTask={(task) =>
+            slideForward(() => openTask(shown, task, 'completion'))
+          }
         />
       )
 
@@ -506,8 +529,10 @@ export function FoldersArea({
               draft,
             })
           }
-          onSave={() => createTask(shown)}
-          onBack={() => showList(shown.list, shown.folder.id, shown.filter)}
+          onSave={() => slideBack(() => createTask(shown))}
+          onBack={() =>
+            slideBack(() => showList(shown.list, shown.folder.id, shown.filter))
+          }
           announce={announce}
         />
       )
@@ -520,9 +545,11 @@ export function FoldersArea({
           onNameChange={(draftName) =>
             showListDraft('editList', shown, { draftName })
           }
-          onSave={() => saveList(shown)}
-          onBack={() => showList(shown.list)}
-          onDelete={() => showListDraft('confirmListDeletion', shown)}
+          onSave={() => slideBack(() => saveList(shown))}
+          onBack={() => slideBack(() => showList(shown.list))}
+          onDelete={() =>
+            slideForward(() => showListDraft('confirmListDeletion', shown))
+          }
           announce={announce}
         >
           <FolderSelect
@@ -546,8 +573,8 @@ export function FoldersArea({
             taskCountOfList(organizer, shown.list.id),
           )}
           confirmLabel="Löschen"
-          onConfirm={() => deleteList(shown.list)}
-          onCancel={() => showListDraft('editList', shown)}
+          onConfirm={() => slideBack(() => deleteList(shown.list))}
+          onCancel={() => slideBack(() => showListDraft('editList', shown))}
         />
       )
 
@@ -558,8 +585,10 @@ export function FoldersArea({
           folders={organizer.folders}
           summary={(folderId) => folderSummaryOf(organizer, folderId, today)}
           focus={shown.focus}
-          onCreateFolder={() => setPage({ kind: 'create', draftName: '' })}
-          onOpenFolder={(folder) => showFolder(folder.id)}
+          onCreateFolder={() =>
+            slideForward(() => setPage({ kind: 'create', draftName: '' }))
+          }
+          onOpenFolder={(folder) => slideForward(() => showFolder(folder.id))}
         />
       )
   }

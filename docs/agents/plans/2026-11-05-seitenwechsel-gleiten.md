@@ -5,7 +5,7 @@ branch: main
 story: MUL-013
 topic: "Seitenwechsel gleiten seitlich"
 tags: [plan, shared-ui, foldersarea, urgentarea, taskflow, css, view-transitions]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-013 — Seitenwechsel gleiten seitlich
@@ -306,15 +306,15 @@ Diese Phase liefert den Helfer, das CSS und die vier Hauptebenen. Danach gleiten
   schlagen auch ohne diese Änderung fehl, siehe Notizen zur Umsetzung.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] Ordner öffnen: Die Übersicht gleitet nach links hinaus, der Ordner kommt von
+- [x] Ordner öffnen: Die Übersicht gleitet nach links hinaus, der Ordner kommt von
   rechts. Die obere Leiste steht dabei still.
-- [ ] „Zurück“ aus Liste und Ordner: Die Bewegung läuft genau andersherum.
-- [ ] Liste → Aufgabe öffnen: Die obere Leiste gleitet mit der Liste hinaus, die
+- [x] „Zurück“ aus Liste und Ordner: Die Bewegung läuft genau andersherum.
+- [x] Liste → Aufgabe öffnen: Die obere Leiste gleitet mit der Liste hinaus, die
   Aufgabenseite kommt samt unterer Leiste herein.
-- [ ] Das Tempo mit 350 ms fühlt sich richtig an.
-- [ ] Mit VoiceOver landet der Fokus nach jedem Wechsel wie bisher auf Überschrift oder
+- [x] Das Tempo mit 350 ms fühlt sich richtig an.
+- [x] Mit VoiceOver landet der Fokus nach jedem Wechsel wie bisher auf Überschrift oder
   Zeile.
-- [ ] Mit „Bewegung reduzieren“ wechselt die Seite sofort.
+- [x] Mit „Bewegung reduzieren“ wechselt die Seite sofort.
 
 ### Phase 2: Gleiten bei Formularen, Rückfragen, Aufgabenschritten, Dringend und Abmelden
 
@@ -383,14 +383,14 @@ Aktionen mit Datenänderung vollständig im `update` laufen.
   Tests rot wie vor der Änderung.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] `+` und Stift gleiten von rechts herein. Speichern und Zurück gleiten von links
+- [x] `+` und Stift gleiten von rechts herein. Speichern und Zurück gleiten von links
   zurück, die untere Leiste mit „Speichern“ gleitet mit.
-- [ ] Beim Tippen in Formularen und beim Filterwechsel bewegt sich nichts.
-- [ ] Ordner löschen, Liste löschen, Aufgabe löschen und erledigen: Es wird nur die
+- [x] Beim Tippen in Formularen und beim Filterwechsel bewegt sich nichts.
+- [x] Ordner löschen, Liste löschen, Aufgabe löschen und erledigen: Es wird nur die
   eigene Ansage gesprochen, keine „anderswo gelöscht“-Ansage.
-- [ ] Dringend → Aufgabe → Zurück gleitet. Der Wechsel zwischen den Reitern oben
+- [x] Dringend → Aufgabe → Zurück gleitet. Der Wechsel zwischen den Reitern oben
   gleitet nicht.
-- [ ] Einstellungen → Abmelden → Abbrechen gleitet.
+- [x] Einstellungen → Abmelden → Abbrechen gleitet.
 
 ### Phase 3: Gleiten beim Filter- und Bereichswechsel
 
@@ -473,9 +473,9 @@ Entscheidungen:
 - [x] `npm run build` läuft fehlerfrei.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] Filter offen → erledigt: Nur die Listen bzw. Aufgaben gleiten, erledigte kommen
+- [x] Filter offen → erledigt: Nur die Listen bzw. Aufgaben gleiten, erledigte kommen
   von rechts. Zurück auf offen läuft andersherum.
-- [ ] Dringend → Ordner → Einstellungen gleitet nach rechts, zurück nach links. Die
+- [x] Dringend → Ordner → Einstellungen gleitet nach rechts, zurück nach links. Die
   obere Leiste steht still.
 
 ## Notizen zur Umsetzung

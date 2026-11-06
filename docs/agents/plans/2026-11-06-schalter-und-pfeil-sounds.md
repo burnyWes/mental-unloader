@@ -5,7 +5,7 @@ branch: main
 story: MUL-016
 topic: "Töne für Schalter, Auswahl und Pfeile"
 tags: [plan, shared-ui, sound, settings, task-form, deadline-stepper]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-016 — Töne für Schalter, Auswahl und Pfeile
@@ -251,11 +251,11 @@ Diese Phase erweitert den Port um drei Töne und vertont die drei Schalter. Der 
   `sounds/deactivate.wav` und `sounds/arrow.wav`.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] „Dunkelmodus“ ein- und ausschalten: Es erklingen `activate` und `deactivate`.
-- [ ] „Animationen“ aus und wieder ein: Beide Töne sind zu hören.
-- [ ] „Sounds“ aus: Es erklingt noch `deactivate`, danach ist alles still.
-- [ ] „Sounds“ wieder ein: Es erklingt sofort `activate`.
-- [ ] Stummschalter auf lautlos: Alle Töne sind still.
+- [x] „Dunkelmodus“ ein- und ausschalten: Es erklingen `activate` und `deactivate`.
+- [x] „Animationen“ aus und wieder ein: Beide Töne sind zu hören.
+- [x] „Sounds“ aus: Es erklingt noch `deactivate`, danach ist alles still.
+- [x] „Sounds“ wieder ein: Es erklingt sofort `activate`.
+- [x] Stummschalter auf lautlos: Alle Töne sind still.
 
 ### Phase 2: Töne im Aufgabenformular
 
@@ -303,17 +303,17 @@ des Stichtags.
 - [x] `npm run build` läuft fehlerfrei.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] Aufgabe anlegen, „Stichtag“ wählen: Es erklingt `activate`. Ein erneuter Tipp
+- [x] Aufgabe anlegen, „Stichtag“ wählen: Es erklingt `activate`. Ein erneuter Tipp
   bleibt still.
-- [ ] „Wiederkehrend“ an- und abhaken: Es erklingen `activate` und `deactivate`.
-- [ ] ▲ und ▼ bei Tag, Monat und Jahr: Jeder Tipp spielt `arrow`. Schnelles Tippen
+- [x] „Wiederkehrend“ an- und abhaken: Es erklingen `activate` und `deactivate`.
+- [x] ▲ und ▼ bei Tag, Monat und Jahr: Jeder Tipp spielt `arrow`. Schnelles Tippen
   klingt nicht abgehackt.
-- [ ] Filter „offen / erledigt“: Es blättert wie bisher.
+- [x] Filter „offen / erledigt“: Es blättert wie bisher.
 
 ## Notizen zur Umsetzung
 
 - Auf Wunsch des Nutzers wurden beide Phasen am Stück umgesetzt, committet und
-  gepusht. Die manuelle Prüfung beider Phasen auf dem iPhone steht noch aus.
+  gepusht. Die manuelle Prüfung beider Phasen hat der Nutzer bestätigt.
 - Die Auswahl zwischen activate und deactivate liegt in
   `src/shared/ui/toggleSound.ts` (`toggleSoundFor(turnedOn)`). `SettingsPage` und
   `RepeatFields` nutzen sie gemeinsam, statt sie doppelt zu führen. Deshalb gibt es

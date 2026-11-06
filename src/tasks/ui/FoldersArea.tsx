@@ -179,15 +179,13 @@ export function FoldersArea({
     })
   }
 
-  function createFolder(draftName: string) {
-    const name = createName(draftName)
+  function createFolder(name: string) {
     const id = organizer.addFolder(name)
     showOverview({ kind: 'arrivingFolder', id })
     announce(folderCreatedAnnouncement(name))
   }
 
-  function renameFolder(folder: Folder, draftName: string) {
-    const name = createName(draftName)
+  function renameFolder(folder: Folder, name: string) {
     organizer.renameFolder(folder.id, name)
     showFolder(folder.id)
     announce(folderSavedAnnouncement(name))
@@ -207,15 +205,13 @@ export function FoldersArea({
     announce(folderDeletedAnnouncement(folder.name))
   }
 
-  function createList(folder: Folder, draftName: string) {
-    const name = createName(draftName)
+  function createList(folder: Folder, name: string) {
     const id = organizer.addList(folder.id, name)
     showFolder(folder.id, 'open', { kind: 'arrivingList', id })
     announce(listCreatedAnnouncement(name))
   }
 
-  function saveList(shownDraft: ShownListDraftPage) {
-    const name = createName(shownDraft.draftName)
+  function saveList(shownDraft: ShownListDraftPage, name: string) {
     const { list, folder, targetFolder } = shownDraft
     organizer.changeList(list.id, name, targetFolder.id)
     showList(list, targetFolder.id)
@@ -237,13 +233,16 @@ export function FoldersArea({
     announce(listDeletedAnnouncement(list.name))
   }
 
-  function createTask(shownPage: ShownCreateTaskPage) {
+  function createTask(
+    shownPage: ShownCreateTaskPage,
+    name: string,
+    description: string,
+  ) {
     const { list, folder, draft } = shownPage
-    const name = createName(draft.name)
     const id = organizer.addTask({
       listId: list.id,
       name,
-      description: createDescription(draft.description),
+      description,
       due: dueAfterChange(null, dueChoiceOf(draft), today),
       createdAt: now().getTime(),
     })
@@ -347,7 +346,10 @@ export function FoldersArea({
           heading="Ordner anlegen"
           name={shown.draftName}
           onNameChange={(draftName) => setPage({ kind: 'create', draftName })}
-          onSave={() => slideBack(() => createFolder(shown.draftName))}
+          onSave={() => {
+            const name = createName(shown.draftName)
+            slideBack(() => createFolder(name), 'confirm')
+          }}
           onBack={() => slideBack(() => showOverview())}
           announce={announce}
         />
@@ -403,9 +405,10 @@ export function FoldersArea({
           onNameChange={(draftName) =>
             setPage({ kind: 'edit', id: shown.folder.id, draftName })
           }
-          onSave={() =>
-            slideBack(() => renameFolder(shown.folder, shown.draftName))
-          }
+          onSave={() => {
+            const name = createName(shown.draftName)
+            slideBack(() => renameFolder(shown.folder, name), 'confirm')
+          }}
           onBack={() => slideBack(() => showFolder(shown.folder.id))}
           onDelete={() =>
             slideForward(() =>
@@ -432,14 +435,18 @@ export function FoldersArea({
           )}
           explanation={folderDeletionExplanation(listCount, taskCount)}
           confirmLabel="Löschen"
-          onConfirm={() => slideBack(() => deleteFolder(shown.folder))}
-          onCancel={() =>
-            slideBack(() =>
-              setPage({
-                kind: 'edit',
-                id: shown.folder.id,
-                draftName: shown.draftName,
-              }),
+          onConfirm={() =>
+            slideBack(() => deleteFolder(shown.folder), 'confirm')
+          }
+          onCancel={(sound) =>
+            slideBack(
+              () =>
+                setPage({
+                  kind: 'edit',
+                  id: shown.folder.id,
+                  draftName: shown.draftName,
+                }),
+              sound,
             )
           }
         />
@@ -458,9 +465,10 @@ export function FoldersArea({
               draftName,
             })
           }
-          onSave={() =>
-            slideBack(() => createList(shown.folder, shown.draftName))
-          }
+          onSave={() => {
+            const name = createName(shown.draftName)
+            slideBack(() => createList(shown.folder, name), 'confirm')
+          }}
           onBack={() => slideBack(() => showFolder(shown.folder.id))}
           announce={announce}
         />
@@ -551,7 +559,11 @@ export function FoldersArea({
               draft,
             })
           }
-          onSave={() => slideBack(() => createTask(shown))}
+          onSave={() => {
+            const name = createName(shown.draft.name)
+            const description = createDescription(shown.draft.description)
+            slideBack(() => createTask(shown, name, description), 'confirm')
+          }}
           onBack={() =>
             slideBack(() => showList(shown.list, shown.folder.id, shown.filter))
           }
@@ -567,7 +579,10 @@ export function FoldersArea({
           onNameChange={(draftName) =>
             showListDraft('editList', shown, { draftName })
           }
-          onSave={() => slideBack(() => saveList(shown))}
+          onSave={() => {
+            const name = createName(shown.draftName)
+            slideBack(() => saveList(shown, name), 'confirm')
+          }}
           onBack={() => slideBack(() => showList(shown.list))}
           onDelete={() =>
             slideForward(() => showListDraft('confirmListDeletion', shown))
@@ -595,8 +610,10 @@ export function FoldersArea({
             taskCountOfList(organizer, shown.list.id),
           )}
           confirmLabel="Löschen"
-          onConfirm={() => slideBack(() => deleteList(shown.list))}
-          onCancel={() => slideBack(() => showListDraft('editList', shown))}
+          onConfirm={() => slideBack(() => deleteList(shown.list), 'confirm')}
+          onCancel={(sound) =>
+            slideBack(() => showListDraft('editList', shown), sound)
+          }
         />
       )
 

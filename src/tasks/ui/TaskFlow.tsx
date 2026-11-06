@@ -131,7 +131,7 @@ export function TaskFlow({
   onLeave,
   onMoved,
 }: TaskFlowProps) {
-  const { slideBack, slideForward } = usePageSlide()
+  const { slideBack, slideForward, playSound } = usePageSlide()
   const [step, setStep] = useState<TaskFlowStep>(() => firstStep(entry))
   const shownStep = resolveTaskFlowStep(step, { task, list, folder }, organizer)
   const alreadyCompleted =
@@ -141,9 +141,11 @@ export function TaskFlow({
     if (alreadyCompleted) announce(taskAlreadyCompletedAnnouncement(task.name))
   }, [alreadyCompleted, announce, task.name])
 
-  function save({ draft, targetList, targetFolder }: ShownEditStep) {
-    const name = createName(draft.name)
-    const description = createDescription(draft.description)
+  function save(
+    { draft, targetList, targetFolder }: ShownEditStep,
+    name: string,
+    description: string,
+  ) {
     const due = dueAfterChange(task.due, dueChoiceOf(draft), today)
     organizer.changeTask(
       task.id,
@@ -202,7 +204,10 @@ export function TaskFlow({
               setStep({ kind: 'confirmCompletion', from: 'overview' }),
             )
           }
-          onReopen={reopen}
+          onReopen={() => {
+            playSound('confirm')
+            reopen()
+          }}
           onEdit={() =>
             slideForward(() =>
               setStep({
@@ -230,7 +235,11 @@ export function TaskFlow({
               draftListId: shownStep.draftListId,
             })
           }
-          onSave={() => slideBack(() => save(shownStep))}
+          onSave={() => {
+            const name = createName(shownStep.draft.name)
+            const description = createDescription(shownStep.draft.description)
+            slideBack(() => save(shownStep, name, description), 'confirm')
+          }}
           onBack={() => slideBack(() => setStep(OVERVIEW_STEP))}
           announce={announce}
         >
@@ -250,8 +259,10 @@ export function TaskFlow({
           heading={taskCompletionHeading(task.name)}
           explanation={completionExplanationOf(task, today)}
           confirmLabel="Erledigen"
-          onConfirm={() => slideBack(complete)}
-          onCancel={() => slideBack(() => cancelCompletion(shownStep.from))}
+          onConfirm={() => slideBack(complete, 'confirm')}
+          onCancel={(sound) =>
+            slideBack(() => cancelCompletion(shownStep.from), sound)
+          }
         />
       )
 
@@ -261,8 +272,8 @@ export function TaskFlow({
           heading={taskDeletionHeading(task.name)}
           explanation={TASK_DELETION_EXPLANATION}
           confirmLabel="Löschen"
-          onConfirm={() => slideBack(remove)}
-          onCancel={() => slideBack(() => setStep(OVERVIEW_STEP))}
+          onConfirm={() => slideBack(remove, 'confirm')}
+          onCancel={(sound) => slideBack(() => setStep(OVERVIEW_STEP), sound)}
         />
       )
   }

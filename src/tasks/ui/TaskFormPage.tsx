@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BackIcon } from '../../shared/ui/BackIcon'
 import { BottomBar } from '../../shared/ui/BottomBar'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import { SaveIcon } from '../../shared/ui/SaveIcon'
 import {
   descriptionFailureMessage,
@@ -46,6 +47,7 @@ export function TaskFormPage({
   announce,
   children,
 }: TaskFormPageProps) {
+  const { playSound } = usePageSlide()
   const [nameFailure, setNameFailure] = useState('')
   const [descriptionFailure, setDescriptionFailure] = useState('')
   const nameField = useRef<HTMLInputElement>(null)
@@ -66,6 +68,7 @@ export function TaskFormPage({
   ) {
     showFailure(message)
     announce(message)
+    playSound('refuse')
     field?.focus()
   }
 

@@ -3,16 +3,13 @@ import {
   installFakeViewTransitions,
   type FakeViewTransitions,
 } from '../../testSupport/fakeViewTransitions'
+import { createInMemorySoundEffects } from '../sound/inMemorySoundEffects'
 import { createPageSlide, directionBetween } from './pageSlide'
 
-function countingSlides() {
-  let reportedSlides = 0
-  return {
-    onSlide: () => {
-      reportedSlides++
-    },
-    reportedSlides: () => reportedSlides,
-  }
+function hearingPageSlide(animations = true) {
+  const soundEffects = createInMemorySoundEffects()
+  const pageSlide = createPageSlide({ animations, play: soundEffects.play })
+  return { pageSlide, played: soundEffects.played }
 }
 
 describe('page slide', () => {
@@ -43,17 +40,14 @@ describe('page slide', () => {
 
   it('runs the action at once when animations are turned off', () => {
     viewTransitions = installFakeViewTransitions()
-    const slides = countingSlides()
+    const { pageSlide, played } = hearingPageSlide(false)
     let runs = 0
 
-    createPageSlide({
-      animations: false,
-      onSlide: slides.onSlide,
-    }).slideForward(() => runs++)
+    pageSlide.slideForward(() => runs++)
 
     expect(runs).toBe(1)
     expect(viewTransitions.directions()).toEqual([])
-    expect(slides.reportedSlides()).toBe(0)
+    expect(played()).toEqual([])
   })
 
   it('slides forward by running the action inside the transition update', () => {
@@ -98,29 +92,67 @@ describe('page slide', () => {
     expect(viewTransitions.directions()).toEqual(['itemsForward', 'itemsBack'])
   })
 
-  it('reports each slide that animates', () => {
+  it('plays the page turn for each slide that animates', () => {
     viewTransitions = installFakeViewTransitions()
-    const slides = countingSlides()
-    const pageSlide = createPageSlide({
-      animations: true,
-      onSlide: slides.onSlide,
-    })
+    const { pageSlide, played } = hearingPageSlide()
 
     pageSlide.slideForward(() => {})
     pageSlide.slidePage('back', () => {})
     pageSlide.slideItems('forward', () => {})
 
-    expect(slides.reportedSlides()).toBe(3)
+    expect(played()).toEqual(['pageTurn', 'pageTurn', 'pageTurn'])
   })
 
-  it('does not report a slide when reduced motion is preferred', () => {
+  it('does not play the page turn when reduced motion is preferred', () => {
     viewTransitions = installFakeViewTransitions({ reducedMotion: true })
-    const slides = countingSlides()
+    const { pageSlide, played } = hearingPageSlide()
 
-    createPageSlide({ animations: true, onSlide: slides.onSlide }).slideBack(
-      () => {},
-    )
+    pageSlide.slideBack(() => {})
 
-    expect(slides.reportedSlides()).toBe(0)
+    expect(played()).toEqual([])
+  })
+
+  it('plays the given sound instead of the page turn when sliding back', () => {
+    viewTransitions = installFakeViewTransitions()
+    const { pageSlide, played } = hearingPageSlide()
+    let runs = 0
+
+    pageSlide.slideBack(() => runs++, 'confirm')
+    viewTransitions.finishPendingUpdates()
+
+    expect(runs).toBe(1)
+    expect(played()).toEqual(['confirm'])
+    expect(viewTransitions.directions()).toEqual(['back'])
+  })
+
+  it('plays the given sound even when animations are turned off', () => {
+    viewTransitions = installFakeViewTransitions()
+    const { pageSlide, played } = hearingPageSlide(false)
+    let runs = 0
+
+    pageSlide.slideBack(() => runs++, 'refuse')
+
+    expect(runs).toBe(1)
+    expect(played()).toEqual(['refuse'])
+    expect(viewTransitions.directions()).toEqual([])
+  })
+
+  it('plays the given sound even when reduced motion is preferred', () => {
+    viewTransitions = installFakeViewTransitions({ reducedMotion: true })
+    const { pageSlide, played } = hearingPageSlide()
+
+    pageSlide.slideBack(() => {}, 'confirm')
+
+    expect(played()).toEqual(['confirm'])
+  })
+
+  it('plays an action sound without sliding', () => {
+    viewTransitions = installFakeViewTransitions()
+    const { pageSlide, played } = hearingPageSlide()
+
+    pageSlide.playSound('confirm')
+
+    expect(played()).toEqual(['confirm'])
+    expect(viewTransitions.directions()).toEqual([])
   })
 })

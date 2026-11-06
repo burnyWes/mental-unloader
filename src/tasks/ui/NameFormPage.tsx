@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { BackIcon } from '../../shared/ui/BackIcon'
 import { BottomBar } from '../../shared/ui/BottomBar'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import { SaveIcon } from '../../shared/ui/SaveIcon'
 import { TrashIcon } from '../../shared/ui/TrashIcon'
 import { nameFailureMessage } from '../domain/announcements'
@@ -27,6 +28,7 @@ export function NameFormPage({
   announce,
   children,
 }: NameFormPageProps) {
+  const { playSound } = usePageSlide()
   const [failureMessage, setFailureMessage] = useState('')
   const nameField = useRef<HTMLInputElement>(null)
 
@@ -42,6 +44,7 @@ export function NameFormPage({
       const message = nameFailureMessage(error.reason)
       setFailureMessage(message)
       announce(message)
+      playSound('refuse')
       nameField.current?.focus()
     }
   }

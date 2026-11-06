@@ -1,4 +1,5 @@
 import { flushSync } from 'react-dom'
+import type { ActionSound, SoundEffect } from '../sound/soundEffects'
 
 export type SlideDirection = 'forward' | 'back'
 
@@ -8,14 +9,15 @@ type SlideAction = () => void
 
 export type PageSlideSettings = {
   animations: boolean
-  onSlide: () => void
+  play: (effect: SoundEffect) => void
 }
 
 export type PageSlide = {
   slidePage: (direction: SlideDirection, action: SlideAction) => void
   slideForward: (action: SlideAction) => void
-  slideBack: (action: SlideAction) => void
+  slideBack: (action: SlideAction, sound?: SoundEffect) => void
   slideItems: (direction: SlideDirection, action: SlideAction) => void
+  playSound: (sound: ActionSound) => void
 }
 
 const ITEMS_TRANSITION_TYPES: Record<SlideDirection, SlideTransitionType> = {
@@ -27,7 +29,7 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 const ANIMATED_WITHOUT_SOUND: PageSlideSettings = {
   animations: true,
-  onSlide: () => {},
+  play: () => {},
 }
 
 function supportsTypedViewTransitions(): boolean {
@@ -59,12 +61,18 @@ export function createPageSlide(
     )
   }
 
-  function slide(type: SlideTransitionType, action: SlideAction) {
+  function slide(
+    type: SlideTransitionType,
+    action: SlideAction,
+    sound: SoundEffect = 'pageTurn',
+  ) {
+    const playsPageTurn = sound === 'pageTurn'
+    if (!playsPageTurn) settings.play(sound)
     if (!animates()) {
       action()
       return
     }
-    settings.onSlide()
+    if (playsPageTurn) settings.play(sound)
     document.startViewTransition({
       update: () => flushSync(action),
       types: [type],
@@ -78,8 +86,9 @@ export function createPageSlide(
   return {
     slidePage,
     slideForward: (action) => slidePage('forward', action),
-    slideBack: (action) => slidePage('back', action),
+    slideBack: (action, sound) => slide('back', action, sound),
     slideItems: (direction, action) =>
       slide(ITEMS_TRANSITION_TYPES[direction], action),
+    playSound: (sound) => settings.play(sound),
   }
 }

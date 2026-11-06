@@ -6,12 +6,13 @@ import {
   type FakeViewTransitions,
 } from '../../testSupport/fakeViewTransitions'
 import {
+  descriptionFailureMessage,
   folderDeletedAnnouncement,
   listDeletedAnnouncement,
 } from '../domain/announcements'
 import type { Folder } from '../domain/folder'
 import type { List } from '../domain/list'
-import type { Task } from '../domain/task'
+import { MAXIMUM_DESCRIPTION_LENGTH, type Task } from '../domain/task'
 import {
   announced,
   button,
@@ -257,6 +258,87 @@ describe('sliding between the pages of the folders area', () => {
     )
 
     expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'forward',
+      'forward',
+    ])
+  })
+
+  const EMPTY_NAME_FAILURE = 'Bitte einen Namen eingeben.'
+
+  function expectFailureInField(failure: string, field: HTMLElement) {
+    expect(screen.getByText(failure)).toBeInTheDocument()
+    expect(announced()).toHaveTextContent(failure)
+    expect(field).toHaveFocus()
+  }
+
+  async function saveWithoutName() {
+    await userEvent.clear(screen.getByLabelText('Name'))
+    await slideBy(button('Speichern'))
+  }
+
+  it('stays on the folder form with a failure when saving an empty name while sliding', async () => {
+    const { client } = renderFoldersArea()
+    await slideBy(button('Ordner anlegen'))
+
+    await saveWithoutName()
+
+    expect(heading('Ordner anlegen')).toBeInTheDocument()
+    expectFailureInField(EMPTY_NAME_FAILURE, screen.getByLabelText('Name'))
+    expect(viewTransitions.directions()).toEqual(['forward'])
+    expect(client.storedFolders()).toEqual([])
+  })
+
+  it('stays on the list form with a failure when saving an empty name while sliding', async () => {
+    renderFoldersArea([familie], [haushalt])
+    await slideIntoList()
+    await slideBy(button('Liste bearbeiten'))
+
+    await saveWithoutName()
+
+    expect(heading('Liste bearbeiten')).toBeInTheDocument()
+    expectFailureInField(EMPTY_NAME_FAILURE, screen.getByLabelText('Name'))
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'forward',
+      'forward',
+    ])
+  })
+
+  it('stays on the task form with a failure when saving an empty name while sliding', async () => {
+    const { client } = renderFoldersArea([familie], [haushalt])
+    await slideIntoList()
+    await slideBy(button('Aufgabe anlegen'))
+
+    await saveWithoutName()
+
+    expect(heading('Aufgabe anlegen')).toBeInTheDocument()
+    expectFailureInField(EMPTY_NAME_FAILURE, screen.getByLabelText('Name'))
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'forward',
+      'forward',
+    ])
+    expect(client.storedTasks()).toEqual([])
+  })
+
+  it('stays on the task form with a failure when the description is too long while sliding', async () => {
+    renderFoldersArea([familie], [haushalt], [keller])
+    await slideIntoList()
+    await slideBy(buttonNamedFirst('Keller aufräumen'))
+    await slideBy(button('Bearbeiten'))
+
+    await userEvent.click(screen.getByLabelText('Beschreibung'))
+    await userEvent.paste('x'.repeat(MAXIMUM_DESCRIPTION_LENGTH + 1))
+    await slideBy(button('Speichern'))
+
+    expect(heading('Aufgabe bearbeiten')).toBeInTheDocument()
+    expectFailureInField(
+      descriptionFailureMessage(),
+      screen.getByLabelText('Beschreibung'),
+    )
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
       'forward',
       'forward',
       'forward',

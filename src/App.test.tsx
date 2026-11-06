@@ -7,9 +7,9 @@ import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpd
 import type { AuthClient } from './shared/auth/authClient'
 import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
 import {
-  createInMemoryPageTurnSound,
-  type CountingPageTurnSound,
-} from './shared/sound/inMemoryPageTurnSound'
+  createInMemorySoundEffects,
+  type RecordingSoundEffects,
+} from './shared/sound/inMemorySoundEffects'
 import { createInMemoryOrganizerClient } from './tasks/api/inMemoryOrganizerClient'
 import type { OrganizerClient } from './tasks/api/organizerClient'
 import type { Due, Task } from './tasks/domain/task'
@@ -43,7 +43,7 @@ function renderApp(
   ) => OrganizerClient = () => createInMemoryOrganizerClient(),
   storageWarning = '',
   now: () => Date = () => TENTH_OF_OCTOBER_MORNING,
-  pageTurnSound: CountingPageTurnSound = createInMemoryPageTurnSound(),
+  soundEffects: RecordingSoundEffects = createInMemorySoundEffects(),
 ) {
   return render(
     <App
@@ -53,7 +53,7 @@ function renderApp(
       createOrganizerClient={createOrganizerClient}
       storageWarning={storageWarning}
       now={now}
-      pageTurnSound={pageTurnSound}
+      soundEffects={soundEffects}
     />,
   )
 }
@@ -643,7 +643,7 @@ describe('App sliding', () => {
   })
 
   function renderAppHearing(
-    pageTurnSound: CountingPageTurnSound,
+    soundEffects: RecordingSoundEffects,
     appearanceClient = createInMemoryAppearanceClient(),
   ) {
     const client = createInMemoryOrganizerClient({
@@ -656,7 +656,7 @@ describe('App sliding', () => {
       () => client,
       undefined,
       undefined,
-      pageTurnSound,
+      soundEffects,
     )
   }
 
@@ -666,8 +666,8 @@ describe('App sliding', () => {
   }
 
   it('plays the page turn sound once for each slide', async () => {
-    const pageTurnSound = createInMemoryPageTurnSound()
-    renderAppHearing(pageTurnSound)
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
 
     await slideByClicking('Ordner')
     await slideByClicking('Familie')
@@ -678,36 +678,36 @@ describe('App sliding', () => {
       'forward',
       'itemsForward',
     ])
-    expect(pageTurnSound.plays()).toBe(3)
+    expect(soundEffects.played()).toEqual(['pageTurn', 'pageTurn', 'pageTurn'])
   })
 
   it('does not play the page turn sound when choosing the area already shown', async () => {
-    const pageTurnSound = createInMemoryPageTurnSound()
-    renderAppHearing(pageTurnSound)
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
 
     await userEvent.click(screen.getByRole('button', { name: 'Dringend' }))
 
-    expect(pageTurnSound.plays()).toBe(0)
+    expect(soundEffects.played()).toEqual([])
   })
 
   it('stays silent once sounds are turned off', async () => {
-    const pageTurnSound = createInMemoryPageTurnSound()
+    const soundEffects = createInMemorySoundEffects()
     const appearanceClient = createInMemoryAppearanceClient()
-    renderAppHearing(pageTurnSound, appearanceClient)
+    renderAppHearing(soundEffects, appearanceClient)
     await slideByClicking('Einstellungen')
 
     await userEvent.click(screen.getByRole('switch', soundsSwitch))
     await slideByClicking('Ordner')
 
     expect(viewTransitions.directions()).toEqual(['forward', 'back'])
-    expect(pageTurnSound.plays()).toBe(1)
+    expect(soundEffects.played()).toEqual(['pageTurn'])
     expect(appearanceClient.storedSounds()).toBe(false)
   })
 
   it('stays silent while animations are turned off', async () => {
-    const pageTurnSound = createInMemoryPageTurnSound()
+    const soundEffects = createInMemorySoundEffects()
     renderAppHearing(
-      pageTurnSound,
+      soundEffects,
       createInMemoryAppearanceClient({ animations: false }),
     )
 
@@ -715,16 +715,57 @@ describe('App sliding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
     await userEvent.click(screen.getByRole('button', { name: 'Einstellungen' }))
 
-    expect(pageTurnSound.plays()).toBe(0)
+    expect(soundEffects.played()).toEqual([])
     expect(screen.getByRole('switch', soundsSwitch)).toBeChecked()
     expect(screen.getByRole('switch', soundsSwitch)).toBeEnabled()
+  })
+
+  async function requestSignOutHearing() {
+    await slideByClicking('Einstellungen')
+    await slideByClicking('Abmelden')
+  }
+
+  it('plays the confirm sound when signing out', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
+    await requestSignOutHearing()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abmelden' }))
+
+    expect(soundEffects.played()).toEqual(['pageTurn', 'pageTurn', 'confirm'])
+  })
+
+  it('plays the refuse sound when cancelling the sign out', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
+    await requestSignOutHearing()
+
+    await slideByClicking('Abbrechen')
+
+    expect(soundEffects.played()).toEqual(['pageTurn', 'pageTurn', 'refuse'])
+    expect(viewTransitions.directions()).toEqual(['forward', 'forward', 'back'])
+  })
+
+  it('stays silent on confirmation once sounds are turned off', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(
+      soundEffects,
+      createInMemoryAppearanceClient({ sounds: false }),
+    )
+    await requestSignOutHearing()
+
+    await slideByClicking('Abbrechen')
+    await slideByClicking('Abmelden')
+    await userEvent.click(screen.getByRole('button', { name: 'Abmelden' }))
+
+    expect(soundEffects.played()).toEqual([])
   })
 })
 
 describe('App sound with reduced motion', () => {
   it('stays silent when reduced motion is preferred', async () => {
     const viewTransitions = installFakeViewTransitions({ reducedMotion: true })
-    const pageTurnSound = createInMemoryPageTurnSound()
+    const soundEffects = createInMemorySoundEffects()
     renderApp(
       undefined,
       undefined,
@@ -732,12 +773,32 @@ describe('App sound with reduced motion', () => {
       undefined,
       undefined,
       undefined,
-      pageTurnSound,
+      soundEffects,
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
 
-    expect(pageTurnSound.plays()).toBe(0)
+    expect(soundEffects.played()).toEqual([])
+    viewTransitions.uninstall()
+  })
+
+  it('plays the refuse sound when reduced motion is preferred', async () => {
+    const viewTransitions = installFakeViewTransitions({ reducedMotion: true })
+    const soundEffects = createInMemorySoundEffects()
+    renderApp(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      soundEffects,
+    )
+    await requestSignOut()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abbrechen' }))
+
+    expect(soundEffects.played()).toEqual(['refuse'])
     viewTransitions.uninstall()
   })
 })

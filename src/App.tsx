@@ -8,7 +8,7 @@ import { useAppUpdate } from './shared/appUpdate/useAppUpdate'
 import type { AuthClient } from './shared/auth/authClient'
 import { SignInPage } from './shared/auth/SignInPage'
 import { useSession } from './shared/auth/useSession'
-import type { PageTurnSound } from './shared/sound/pageTurnSound'
+import type { SoundEffects } from './shared/sound/soundEffects'
 import { Announcer } from './shared/ui/Announcer'
 import { PageSlideProvider } from './shared/ui/PageSlideProvider'
 import { useAnnouncer } from './shared/ui/useAnnouncer'
@@ -24,7 +24,7 @@ type AppProps = {
   ) => OrganizerClient
   storageWarning?: string
   now: () => Date
-  pageTurnSound: PageTurnSound
+  soundEffects: SoundEffects
 }
 
 export function App({
@@ -34,7 +34,7 @@ export function App({
   createOrganizerClient,
   storageWarning = '',
   now,
-  pageTurnSound,
+  soundEffects,
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
   const session = useSession(authClient)
@@ -66,7 +66,7 @@ export function App({
         <PageSlideProvider
           animations={appearance.animations}
           sounds={appearance.sounds}
-          pageTurnSound={pageTurnSound}
+          soundEffects={soundEffects}
         >
           <SignedInApp
             createOrganizerClient={createOrganizerClient}

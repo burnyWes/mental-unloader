@@ -53,7 +53,7 @@ export function SignedInApp({
   now,
   onSignOut,
 }: SignedInAppProps) {
-  const { slideBack, slideForward, slidePage } = usePageSlide()
+  const { slideBack, slideForward, slidePage, playSound } = usePageSlide()
   const [activeArea, setActiveArea] = useState<AreaId>('urgent')
   const [areaVisit, setAreaVisit] = useState(0)
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
@@ -158,8 +158,13 @@ export function SignedInApp({
         heading="Abmelden?"
         explanation="Auf diesem Gerät musst du dich danach mit E-Mail und Passwort neu anmelden."
         confirmLabel="Abmelden"
-        onConfirm={onSignOut}
-        onCancel={() => slideBack(() => setConfirmingSignOut(false))}
+        onConfirm={() => {
+          playSound('confirm')
+          onSignOut()
+        }}
+        onCancel={(sound) =>
+          slideBack(() => setConfirmingSignOut(false), sound)
+        }
       />
     )
 

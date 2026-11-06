@@ -2,10 +2,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { accessibilityViolations } from '../../testSupport/accessibility'
-import { ConfirmationPage } from './ConfirmationPage'
+import { ConfirmationPage, type CancelSound } from './ConfirmationPage'
 
 function renderConfirmationPage() {
-  const calls = { confirmed: 0, cancelled: 0 }
+  const calls = {
+    confirmed: 0,
+    cancelledWith: [] as CancelSound[],
+  }
   const rendered = render(
     <ConfirmationPage
       heading="Abmelden?"
@@ -14,8 +17,8 @@ function renderConfirmationPage() {
       onConfirm={() => {
         calls.confirmed += 1
       }}
-      onCancel={() => {
-        calls.cancelled += 1
+      onCancel={(sound) => {
+        calls.cancelledWith.push(sound)
       }}
     />,
   )
@@ -42,15 +45,23 @@ describe('ConfirmationPage', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Abmelden' }))
 
-    expect(calls).toEqual({ confirmed: 1, cancelled: 0 })
+    expect(calls).toEqual({ confirmed: 1, cancelledWith: [] })
   })
 
-  it.each(['Abbrechen', 'Zurück'])('cancels with %s', async (name) => {
+  it('cancels with Abbrechen and the refuse sound', async () => {
     const { calls } = renderConfirmationPage()
 
-    await userEvent.click(screen.getByRole('button', { name }))
+    await userEvent.click(screen.getByRole('button', { name: 'Abbrechen' }))
 
-    expect(calls).toEqual({ confirmed: 0, cancelled: 1 })
+    expect(calls).toEqual({ confirmed: 0, cancelledWith: ['refuse'] })
+  })
+
+  it('cancels with Zurück and the page turn sound', async () => {
+    const { calls } = renderConfirmationPage()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Zurück' }))
+
+    expect(calls).toEqual({ confirmed: 0, cancelledWith: ['pageTurn'] })
   })
 
   it('offers no navigation', () => {

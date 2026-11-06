@@ -1,4 +1,4 @@
-import type { PageTurnSound } from './pageTurnSound'
+import type { SoundEffect, SoundEffects } from './soundEffects'
 
 export type AudioOutput<Sound> = {
   isRunning(): boolean
@@ -13,11 +13,13 @@ export type AudioEnvironment<Sound> = {
   fetch(url: string): Promise<Pick<Response, 'ok' | 'arrayBuffer'>>
 }
 
+export type SoundUrls = Record<SoundEffect, string>
+
 type NavigatorWithAudioSession = Navigator & {
   audioSession?: { type: string }
 }
 
-const SILENT: PageTurnSound = { play: () => {} }
+const SILENT: SoundEffects = { play: () => {} }
 
 function audioOutputOf(context: AudioContext): AudioOutput<AudioBuffer> {
   return {
@@ -61,27 +63,30 @@ async function loadSound<Sound>(
   }
 }
 
-export function createPageTurnSound<Sound>(
-  soundUrl: string,
+export function createSoundEffects<Sound>(
+  soundUrls: SoundUrls,
   environment: AudioEnvironment<Sound>,
-): PageTurnSound {
+): SoundEffects {
   environment.chooseAmbientAudioSession()
   const output = environment.createOutput()
   if (output === null) return SILENT
 
-  let loadedSound: Sound | null = null
-  void loadSound(soundUrl, environment, output).then((sound) => {
-    loadedSound = sound
-  })
+  const loadedSounds = new Map<SoundEffect, Sound>()
+  for (const effect of Object.keys(soundUrls) as SoundEffect[]) {
+    void loadSound(soundUrls[effect], environment, output).then((sound) => {
+      if (sound !== null) loadedSounds.set(effect, sound)
+    })
+  }
 
   return {
-    play() {
+    play(effect) {
       if (!output.isRunning()) void output.resume().catch(() => {})
-      if (loadedSound !== null) output.play(loadedSound)
+      const sound = loadedSounds.get(effect)
+      if (sound !== undefined) output.play(sound)
     },
   }
 }
 
-export function createWebAudioPageTurnSound(soundUrl: string): PageTurnSound {
-  return createPageTurnSound(soundUrl, browserAudioEnvironment())
+export function createWebAudioSoundEffects(soundUrls: SoundUrls): SoundEffects {
+  return createSoundEffects(soundUrls, browserAudioEnvironment())
 }

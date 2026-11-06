@@ -11,12 +11,18 @@ const SOUND_URLS: SoundUrls = {
   pageTurn: '/mental-unloader/sounds/page-turn.wav',
   confirm: '/mental-unloader/sounds/confirm.wav',
   refuse: '/mental-unloader/sounds/refuse.wav',
+  activate: '/mental-unloader/sounds/activate.wav',
+  deactivate: '/mental-unloader/sounds/deactivate.wav',
+  arrow: '/mental-unloader/sounds/arrow.wav',
 }
 
 const SOUND_BYTES: Record<SoundEffect, Uint8Array<ArrayBuffer>> = {
   pageTurn: new Uint8Array([1]),
   confirm: new Uint8Array([1, 2]),
   refuse: new Uint8Array([1, 2, 3]),
+  activate: new Uint8Array([1, 2, 3, 4]),
+  deactivate: new Uint8Array([1, 2, 3, 4, 5]),
+  arrow: new Uint8Array([1, 2, 3, 4, 5, 6]),
 }
 
 type FakeOutput = AudioOutput<string> & {

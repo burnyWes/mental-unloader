@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { usePageSlide } from './PageSlideProvider'
+import { toggleSoundFor } from './toggleSound'
 import { useHeadingFocus } from './useHeadingFocus'
 
 export type SettingsEntry = {
@@ -7,6 +9,7 @@ export type SettingsEntry = {
   label: string
   enabled: boolean
   onToggle: () => void
+  audibleWhenMuted?: boolean
 }
 
 type SettingsPageProps = {
@@ -21,6 +24,14 @@ export function SettingsPage({
   onRequestSignOut,
 }: SettingsPageProps) {
   const heading = useHeadingFocus()
+  const { playSound, playSoundEvenWhenMuted } = usePageSlide()
+
+  function toggle(entry: SettingsEntry) {
+    const sound = toggleSoundFor(!entry.enabled)
+    if (entry.audibleWhenMuted) playSoundEvenWhenMuted(sound)
+    else playSound(sound)
+    entry.onToggle()
+  }
 
   return (
     <>
@@ -42,7 +53,7 @@ export function SettingsPage({
                     role="switch"
                     className="checkboxLook"
                     checked={entry.enabled}
-                    onChange={entry.onToggle}
+                    onChange={() => toggle(entry)}
                   />
                 </label>
               </li>

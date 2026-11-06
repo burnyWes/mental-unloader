@@ -690,7 +690,7 @@ describe('App sliding', () => {
     expect(soundEffects.played()).toEqual([])
   })
 
-  it('stays silent once sounds are turned off', async () => {
+  it('plays the deactivate sound when turning sounds off and stays silent after', async () => {
     const soundEffects = createInMemorySoundEffects()
     const appearanceClient = createInMemoryAppearanceClient()
     renderAppHearing(soundEffects, appearanceClient)
@@ -700,8 +700,64 @@ describe('App sliding', () => {
     await slideByClicking('Ordner')
 
     expect(viewTransitions.directions()).toEqual(['forward', 'back'])
-    expect(soundEffects.played()).toEqual(['pageTurn'])
+    expect(soundEffects.played()).toEqual(['pageTurn', 'deactivate'])
     expect(appearanceClient.storedSounds()).toBe(false)
+  })
+
+  it('plays the activate sound when turning sounds on', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(
+      soundEffects,
+      createInMemoryAppearanceClient({ sounds: false }),
+    )
+    await slideByClicking('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', soundsSwitch))
+
+    expect(soundEffects.played()).toEqual(['activate'])
+  })
+
+  it('plays the deactivate and activate sounds when switching dark mode', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
+    await slideByClicking('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', { name: 'Dunkelmodus' }))
+    await userEvent.click(screen.getByRole('switch', { name: 'Dunkelmodus' }))
+
+    expect(soundEffects.played()).toEqual([
+      'pageTurn',
+      'deactivate',
+      'activate',
+    ])
+  })
+
+  it('plays the switch sounds for animations even while animations are turned off', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(soundEffects)
+    await slideByClicking('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', { name: 'Animationen' }))
+    await userEvent.click(screen.getByRole('switch', { name: 'Animationen' }))
+
+    expect(soundEffects.played()).toEqual([
+      'pageTurn',
+      'deactivate',
+      'activate',
+    ])
+  })
+
+  it('keeps the other switches silent once sounds are turned off', async () => {
+    const soundEffects = createInMemorySoundEffects()
+    renderAppHearing(
+      soundEffects,
+      createInMemoryAppearanceClient({ sounds: false }),
+    )
+    await slideByClicking('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', { name: 'Dunkelmodus' }))
+
+    expect(soundEffects.played()).toEqual([])
   })
 
   it('stays silent while animations are turned off', async () => {

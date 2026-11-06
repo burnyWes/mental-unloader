@@ -1,3 +1,5 @@
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
+import { toggleSoundFor } from '../../shared/ui/toggleSound'
 import { REPEAT_RHYTHM_LABELS } from '../domain/announcements'
 import {
   isRepeatRhythm,
@@ -19,6 +21,13 @@ export function RepeatFields({
   onRepeatsChange,
   onRhythmChange,
 }: RepeatFieldsProps) {
+  const { playSound } = usePageSlide()
+
+  function changeRepeats(repeats: boolean) {
+    playSound(toggleSoundFor(repeats))
+    onRepeatsChange(repeats)
+  }
+
   return (
     <>
       <p className="field dueChoice">
@@ -29,7 +38,7 @@ export function RepeatFields({
             type="checkbox"
             className="checkboxLook"
             checked={repeats}
-            onChange={(event) => onRepeatsChange(event.target.checked)}
+            onChange={(event) => changeRepeats(event.target.checked)}
           />
         </label>
       </p>

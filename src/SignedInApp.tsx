@@ -83,6 +83,7 @@ export function SignedInApp({
       label: 'Sounds',
       enabled: appearance.sounds,
       onToggle: appearance.toggleSounds,
+      audibleWhenMuted: true,
     },
   ]
 

@@ -21,6 +21,9 @@ const soundEffects = createWebAudioSoundEffects({
   pageTurn: `${soundsPath}/page-turn.wav`,
   confirm: `${soundsPath}/confirm.wav`,
   refuse: `${soundsPath}/refuse.wav`,
+  activate: `${soundsPath}/activate.wav`,
+  deactivate: `${soundsPath}/deactivate.wav`,
+  arrow: `${soundsPath}/arrow.wav`,
 })
 
 createRoot(document.getElementById('root')!).render(

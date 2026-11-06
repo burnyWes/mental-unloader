@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
@@ -39,6 +39,29 @@ const keller: Task = {
 }
 
 const KELLER_COMPLETED: Task = { ...keller, completions: [1] }
+
+const KELLER_IN_THE_LAST_YEAR: Task = {
+  ...keller,
+  due: {
+    kind: 'deadline',
+    deadline: '2099-06-15',
+    urgentFrom: 'oneWeek',
+    repetition: null,
+  },
+}
+
+function radio(name: string) {
+  return screen.getByRole('radio', { name })
+}
+
+function spinButton(name: string) {
+  return screen.getByRole('spinbutton', { name })
+}
+
+function stepButtonOf(fieldName: string, arrow: '▲' | '▼') {
+  const column = spinButton(fieldName).closest('.deadlineField') as HTMLElement
+  return within(column).getByText(arrow)
+}
 
 describe('sounds of the folders area', () => {
   let viewTransitions: FakeViewTransitions
@@ -248,5 +271,90 @@ describe('sounds of the folders area', () => {
     await tap(button('Ordner anlegen'))
 
     expect(await soundsOfTapping(button('Zurück'))).toEqual(['pageTurn'])
+  })
+
+  async function soundsOfPressing(
+    element: HTMLElement,
+    key: string,
+  ): Promise<readonly SoundEffect[]> {
+    const playedBefore = soundEffects.played().length
+    element.focus()
+    await userEvent.keyboard(`{${key}}`)
+    return soundEffects.played().slice(playedBefore)
+  }
+
+  async function openTheTaskForm() {
+    await openTheList()
+    await tap(button('Aufgabe anlegen'))
+  }
+
+  it('plays the activate sound when choosing another due kind', async () => {
+    renderHearing()
+    await openTheTaskForm()
+
+    expect(await soundsOfTapping(radio('Stichtag'))).toEqual(['activate'])
+    expect(await soundsOfTapping(radio('Irgendwann'))).toEqual(['activate'])
+  })
+
+  it('stays silent when tapping the due kind already chosen', async () => {
+    renderHearing()
+    await openTheTaskForm()
+
+    expect(await soundsOfTapping(radio('Irgendwann'))).toEqual([])
+  })
+
+  it('plays the activate and deactivate sounds for Wiederkehrend', async () => {
+    renderHearing()
+    await openTheTaskForm()
+    await tap(radio('Stichtag'))
+    const repeats = screen.getByRole('checkbox', { name: 'Wiederkehrend' })
+
+    expect(await soundsOfTapping(repeats)).toEqual(['activate'])
+    expect(await soundsOfTapping(repeats)).toEqual(['deactivate'])
+  })
+
+  it('plays the arrow sound for each step button', async () => {
+    renderHearing()
+    await openTheTaskForm()
+    await tap(radio('Stichtag'))
+
+    expect(await soundsOfTapping(stepButtonOf('Tag', '▲'))).toEqual(['arrow'])
+    expect(await soundsOfTapping(stepButtonOf('Monat', '▼'))).toEqual(['arrow'])
+  })
+
+  it('plays the arrow sound for each arrow key', async () => {
+    renderHearing()
+    await openTheTaskForm()
+    await tap(radio('Stichtag'))
+
+    expect(await soundsOfPressing(spinButton('Jahr'), 'ArrowUp')).toEqual([
+      'arrow',
+    ])
+    expect(await soundsOfPressing(spinButton('Jahr'), 'ArrowDown')).toEqual([
+      'arrow',
+    ])
+    expect(await soundsOfPressing(spinButton('Jahr'), 'ArrowLeft')).toEqual([])
+  })
+
+  it('plays the arrow sound even at the last year', async () => {
+    renderHearing([KELLER_IN_THE_LAST_YEAR])
+    await openTheTask()
+    await tap(button('Bearbeiten'))
+
+    expect(await soundsOfTapping(stepButtonOf('Jahr', '▲'))).toEqual(['arrow'])
+    expect(spinButton('Jahr')).toHaveAttribute('aria-valuenow', '2099')
+  })
+
+  it('plays the form sounds while animations are turned off', async () => {
+    renderHearing([keller], false)
+    await openTheTaskForm()
+
+    expect(await soundsOfTapping(radio('Stichtag'))).toEqual(['activate'])
+    expect(
+      await soundsOfTapping(
+        screen.getByRole('checkbox', { name: 'Wiederkehrend' }),
+      ),
+    ).toEqual(['activate'])
+    expect(await soundsOfTapping(stepButtonOf('Tag', '▲'))).toEqual(['arrow'])
   })
 })

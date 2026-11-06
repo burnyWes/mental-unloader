@@ -142,7 +142,10 @@ export function TaskFormPage({
               className="checkboxLook"
               value={choice.kind}
               checked={draft.dueKind === choice.kind}
-              onChange={() => change({ dueKind: choice.kind })}
+              onChange={() => {
+                playSound('activate')
+                change({ dueKind: choice.kind })
+              }}
             />
           </label>
         ))}

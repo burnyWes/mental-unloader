@@ -10,6 +10,7 @@ type SlideAction = () => void
 export type PageSlideSettings = {
   animations: boolean
   play: (effect: SoundEffect) => void
+  playEvenWhenMuted: (effect: SoundEffect) => void
 }
 
 export type PageSlide = {
@@ -18,6 +19,7 @@ export type PageSlide = {
   slideBack: (action: SlideAction, sound?: SoundEffect) => void
   slideItems: (direction: SlideDirection, action: SlideAction) => void
   playSound: (sound: ActionSound) => void
+  playSoundEvenWhenMuted: (sound: ActionSound) => void
 }
 
 const ITEMS_TRANSITION_TYPES: Record<SlideDirection, SlideTransitionType> = {
@@ -30,6 +32,7 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const ANIMATED_WITHOUT_SOUND: PageSlideSettings = {
   animations: true,
   play: () => {},
+  playEvenWhenMuted: () => {},
 }
 
 function supportsTypedViewTransitions(): boolean {
@@ -90,5 +93,6 @@ export function createPageSlide(
     slideItems: (direction, action) =>
       slide(ITEMS_TRANSITION_TYPES[direction], action),
     playSound: (sound) => settings.play(sound),
+    playSoundEvenWhenMuted: (sound) => settings.playEvenWhenMuted(sound),
   }
 }

@@ -1,4 +1,5 @@
 import type { PointerEvent, ReactNode } from 'react'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import { SpinButton, type SpinStep } from '../../shared/ui/SpinButton'
 import {
   daysInMonth,
@@ -38,6 +39,13 @@ function DeadlineField({
   onStep,
   children,
 }: DeadlineFieldProps) {
+  const { playSound } = usePageSlide()
+
+  function step(direction: SpinStep) {
+    playSound('arrow')
+    onStep(direction)
+  }
+
   return (
     <div className="deadlineField">
       <button
@@ -46,7 +54,7 @@ function DeadlineField({
         aria-hidden="true"
         tabIndex={-1}
         onPointerDown={keepFocusWhereItIs}
-        onClick={() => onStep(1)}
+        onClick={() => step(1)}
       >
         ▲
       </button>
@@ -56,7 +64,7 @@ function DeadlineField({
         minimum={minimum}
         maximum={maximum}
         valueText={valueText}
-        onStep={onStep}
+        onStep={step}
       >
         {children}
       </SpinButton>
@@ -66,7 +74,7 @@ function DeadlineField({
         aria-hidden="true"
         tabIndex={-1}
         onPointerDown={keepFocusWhereItIs}
-        onClick={() => onStep(-1)}
+        onClick={() => step(-1)}
       >
         ▼
       </button>

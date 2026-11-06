@@ -1,4 +1,5 @@
-export type SoundEffect = 'pageTurn' | 'confirm' | 'refuse'
+export type SoundEffect =
+  'pageTurn' | 'confirm' | 'refuse' | 'activate' | 'deactivate' | 'arrow'
 
 export type ActionSound = Exclude<SoundEffect, 'pageTurn'>
 

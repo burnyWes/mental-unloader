@@ -8,8 +8,17 @@ import { createPageSlide, directionBetween } from './pageSlide'
 
 function hearingPageSlide(animations = true) {
   const soundEffects = createInMemorySoundEffects()
-  const pageSlide = createPageSlide({ animations, play: soundEffects.play })
-  return { pageSlide, played: soundEffects.played }
+  const soundEffectsEvenWhenMuted = createInMemorySoundEffects()
+  const pageSlide = createPageSlide({
+    animations,
+    play: soundEffects.play,
+    playEvenWhenMuted: soundEffectsEvenWhenMuted.play,
+  })
+  return {
+    pageSlide,
+    played: soundEffects.played,
+    playedEvenWhenMuted: soundEffectsEvenWhenMuted.played,
+  }
 }
 
 describe('page slide', () => {
@@ -153,6 +162,17 @@ describe('page slide', () => {
     pageSlide.playSound('confirm')
 
     expect(played()).toEqual(['confirm'])
+    expect(viewTransitions.directions()).toEqual([])
+  })
+
+  it('plays an action sound even when muted', () => {
+    viewTransitions = installFakeViewTransitions()
+    const { pageSlide, played, playedEvenWhenMuted } = hearingPageSlide()
+
+    pageSlide.playSoundEvenWhenMuted('activate')
+
+    expect(playedEvenWhenMuted()).toEqual(['activate'])
+    expect(played()).toEqual([])
     expect(viewTransitions.directions()).toEqual([])
   })
 })

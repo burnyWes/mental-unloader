@@ -24,6 +24,7 @@ export function PageSlideProvider({
         play: (effect) => {
           if (sounds) soundEffects.play(effect)
         },
+        playEvenWhenMuted: (effect) => soundEffects.play(effect),
       }),
     [animations, sounds, soundEffects],
   )

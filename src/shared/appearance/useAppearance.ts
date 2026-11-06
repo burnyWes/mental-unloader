@@ -4,6 +4,10 @@ import type { AppearanceClient } from './appearanceClient'
 export type Appearance = {
   darkMode: boolean
   toggleDarkMode: () => void
+  animations: boolean
+  toggleAnimations: () => void
+  sounds: boolean
+  toggleSounds: () => void
 }
 
 function applySurfaceToTheSystemBar() {
@@ -18,6 +22,10 @@ export function useAppearance(appearanceClient: AppearanceClient): Appearance {
   const [darkMode, setDarkMode] = useState(() =>
     appearanceClient.readDarkMode(),
   )
+  const [animations, setAnimations] = useState(() =>
+    appearanceClient.readAnimations(),
+  )
+  const [sounds, setSounds] = useState(() => appearanceClient.readSounds())
 
   useEffect(() => {
     document.documentElement.dataset.darkMode = String(darkMode)
@@ -30,6 +38,18 @@ export function useAppearance(appearanceClient: AppearanceClient): Appearance {
       const wanted = !darkMode
       appearanceClient.writeDarkMode(wanted)
       setDarkMode(wanted)
+    },
+    animations,
+    toggleAnimations() {
+      const wanted = !animations
+      appearanceClient.writeAnimations(wanted)
+      setAnimations(wanted)
+    },
+    sounds,
+    toggleSounds() {
+      const wanted = !sounds
+      appearanceClient.writeSounds(wanted)
+      setSounds(wanted)
     },
   }
 }

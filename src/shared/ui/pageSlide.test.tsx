@@ -3,12 +3,17 @@ import {
   installFakeViewTransitions,
   type FakeViewTransitions,
 } from '../../testSupport/fakeViewTransitions'
-import {
-  directionBetween,
-  slideBack,
-  slideForward,
-  slideItems,
-} from './pageSlide'
+import { createPageSlide, directionBetween } from './pageSlide'
+
+function countingSlides() {
+  let reportedSlides = 0
+  return {
+    onSlide: () => {
+      reportedSlides++
+    },
+    reportedSlides: () => reportedSlides,
+  }
+}
 
 describe('page slide', () => {
   let viewTransitions: FakeViewTransitions | null = null
@@ -21,7 +26,7 @@ describe('page slide', () => {
   it('runs the action at once when view transitions are unsupported', () => {
     let runs = 0
 
-    slideForward(() => runs++)
+    createPageSlide().slideForward(() => runs++)
 
     expect(runs).toBe(1)
   })
@@ -30,17 +35,32 @@ describe('page slide', () => {
     viewTransitions = installFakeViewTransitions({ reducedMotion: true })
     let runs = 0
 
-    slideForward(() => runs++)
+    createPageSlide().slideForward(() => runs++)
 
     expect(runs).toBe(1)
     expect(viewTransitions.directions()).toEqual([])
+  })
+
+  it('runs the action at once when animations are turned off', () => {
+    viewTransitions = installFakeViewTransitions()
+    const slides = countingSlides()
+    let runs = 0
+
+    createPageSlide({
+      animations: false,
+      onSlide: slides.onSlide,
+    }).slideForward(() => runs++)
+
+    expect(runs).toBe(1)
+    expect(viewTransitions.directions()).toEqual([])
+    expect(slides.reportedSlides()).toBe(0)
   })
 
   it('slides forward by running the action inside the transition update', () => {
     viewTransitions = installFakeViewTransitions()
     let runs = 0
 
-    slideForward(() => runs++)
+    createPageSlide().slideForward(() => runs++)
 
     expect(runs).toBe(0)
     viewTransitions.finishPendingUpdates()
@@ -52,7 +72,7 @@ describe('page slide', () => {
     viewTransitions = installFakeViewTransitions()
     let runs = 0
 
-    slideBack(() => runs++)
+    createPageSlide().slideBack(() => runs++)
     viewTransitions.finishPendingUpdates()
 
     expect(runs).toBe(1)
@@ -67,13 +87,40 @@ describe('page slide', () => {
 
   it('slides the items with their own transition type', () => {
     viewTransitions = installFakeViewTransitions()
+    const pageSlide = createPageSlide()
     let runs = 0
 
-    slideItems('forward', () => runs++)
-    slideItems('back', () => runs++)
+    pageSlide.slideItems('forward', () => runs++)
+    pageSlide.slideItems('back', () => runs++)
     viewTransitions.finishPendingUpdates()
 
     expect(runs).toBe(2)
     expect(viewTransitions.directions()).toEqual(['itemsForward', 'itemsBack'])
+  })
+
+  it('reports each slide that animates', () => {
+    viewTransitions = installFakeViewTransitions()
+    const slides = countingSlides()
+    const pageSlide = createPageSlide({
+      animations: true,
+      onSlide: slides.onSlide,
+    })
+
+    pageSlide.slideForward(() => {})
+    pageSlide.slidePage('back', () => {})
+    pageSlide.slideItems('forward', () => {})
+
+    expect(slides.reportedSlides()).toBe(3)
+  })
+
+  it('does not report a slide when reduced motion is preferred', () => {
+    viewTransitions = installFakeViewTransitions({ reducedMotion: true })
+    const slides = countingSlides()
+
+    createPageSlide({ animations: true, onSlide: slides.onSlide }).slideBack(
+      () => {},
+    )
+
+    expect(slides.reportedSlides()).toBe(0)
   })
 })

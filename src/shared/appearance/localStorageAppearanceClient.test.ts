@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import type { DeviceStorage } from './appearanceClient'
 import {
+  ANIMATIONS_KEY,
   createLocalStorageAppearanceClient,
   DARK_MODE_KEY,
+  SOUNDS_KEY,
 } from './localStorageAppearanceClient'
 
-function storageHolding(storedValue: string | null) {
+function storageHolding(
+  storedValue: string | null,
+  storedKey: string = DARK_MODE_KEY,
+) {
   const written: Record<string, string> = {}
   const storage: DeviceStorage = {
-    getItem: (key) => (key === DARK_MODE_KEY ? storedValue : null),
+    getItem: (key) => (key === storedKey ? storedValue : null),
     setItem: (key, value) => {
       written[key] = value
     },
@@ -91,5 +96,69 @@ describe('localStorageAppearanceClient', () => {
     const client = createLocalStorageAppearanceClient(throwingStorage)
 
     expect(() => client.writeDarkMode(false)).not.toThrow()
+  })
+
+  it('reads remembered animations as turned off', () => {
+    const { storage } = storageHolding('false', ANIMATIONS_KEY)
+
+    const client = createLocalStorageAppearanceClient(storage)
+
+    expect(client.readAnimations()).toBe(false)
+    expect(client.readDarkMode()).toBe(true)
+  })
+
+  it('reads nothing remembered for animations as turned on', () => {
+    const { storage } = storageHolding(null, ANIMATIONS_KEY)
+
+    const client = createLocalStorageAppearanceClient(storage)
+
+    expect(client.readAnimations()).toBe(true)
+  })
+
+  it('remembers animations turned off', () => {
+    const { storage, written } = storageHolding(null)
+
+    createLocalStorageAppearanceClient(storage).writeAnimations(false)
+
+    expect(written).toEqual({ [ANIMATIONS_KEY]: 'false' })
+  })
+
+  it('stays usable for animations while the storage is blocked', () => {
+    const client = createLocalStorageAppearanceClient(throwingStorage)
+
+    expect(client.readAnimations()).toBe(true)
+    expect(() => client.writeAnimations(false)).not.toThrow()
+  })
+
+  it('reads remembered sounds as turned off', () => {
+    const { storage } = storageHolding('false', SOUNDS_KEY)
+
+    const client = createLocalStorageAppearanceClient(storage)
+
+    expect(client.readSounds()).toBe(false)
+    expect(client.readAnimations()).toBe(true)
+  })
+
+  it('reads nothing remembered for sounds as turned on', () => {
+    const { storage } = storageHolding(null, SOUNDS_KEY)
+
+    const client = createLocalStorageAppearanceClient(storage)
+
+    expect(client.readSounds()).toBe(true)
+  })
+
+  it('remembers sounds turned off', () => {
+    const { storage, written } = storageHolding(null)
+
+    createLocalStorageAppearanceClient(storage).writeSounds(false)
+
+    expect(written).toEqual({ [SOUNDS_KEY]: 'false' })
+  })
+
+  it('stays usable for sounds while the storage is blocked', () => {
+    const client = createLocalStorageAppearanceClient(throwingStorage)
+
+    expect(client.readSounds()).toBe(true)
+    expect(() => client.writeSounds(false)).not.toThrow()
   })
 })

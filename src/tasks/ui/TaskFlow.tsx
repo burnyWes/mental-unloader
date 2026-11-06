@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
-import { slideBack, slideForward } from '../../shared/ui/pageSlide'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import {
   listCompletedAnnouncement,
   recurringTaskCompletedAnnouncement,
@@ -131,6 +131,7 @@ export function TaskFlow({
   onLeave,
   onMoved,
 }: TaskFlowProps) {
+  const { slideBack, slideForward } = usePageSlide()
   const [step, setStep] = useState<TaskFlowStep>(() => firstStep(entry))
   const shownStep = resolveTaskFlowStep(step, { task, list, folder }, organizer)
   const alreadyCompleted =

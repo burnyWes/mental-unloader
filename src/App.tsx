@@ -8,7 +8,9 @@ import { useAppUpdate } from './shared/appUpdate/useAppUpdate'
 import type { AuthClient } from './shared/auth/authClient'
 import { SignInPage } from './shared/auth/SignInPage'
 import { useSession } from './shared/auth/useSession'
+import type { PageTurnSound } from './shared/sound/pageTurnSound'
 import { Announcer } from './shared/ui/Announcer'
+import { PageSlideProvider } from './shared/ui/PageSlideProvider'
 import { useAnnouncer } from './shared/ui/useAnnouncer'
 import { useConnectionAnnouncements } from './shared/ui/useConnectionAnnouncements'
 import type { OrganizerClient } from './tasks/api/organizerClient'
@@ -22,6 +24,7 @@ type AppProps = {
   ) => OrganizerClient
   storageWarning?: string
   now: () => Date
+  pageTurnSound: PageTurnSound
 }
 
 export function App({
@@ -31,6 +34,7 @@ export function App({
   createOrganizerClient,
   storageWarning = '',
   now,
+  pageTurnSound,
 }: AppProps) {
   const { spokenText, announce } = useAnnouncer()
   const session = useSession(authClient)
@@ -59,13 +63,19 @@ export function App({
         <SignInPage authClient={authClient} announce={announce} />
       )}
       {session.status === 'signedIn' && (
-        <SignedInApp
-          createOrganizerClient={createOrganizerClient}
-          appearance={appearance}
-          announce={announce}
-          now={now}
-          onSignOut={signOut}
-        />
+        <PageSlideProvider
+          animations={appearance.animations}
+          sounds={appearance.sounds}
+          pageTurnSound={pageTurnSound}
+        >
+          <SignedInApp
+            createOrganizerClient={createOrganizerClient}
+            appearance={appearance}
+            announce={announce}
+            now={now}
+            onSignOut={signOut}
+          />
+        </PageSlideProvider>
       )}
       {installUpdate !== null && (
         <AppUpdateOffer installUpdate={installUpdate} />

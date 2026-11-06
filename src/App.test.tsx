@@ -6,6 +6,10 @@ import { createInMemoryAppearanceClient } from './shared/appearance/inMemoryAppe
 import { createInMemoryAppUpdateClient } from './shared/appUpdate/inMemoryAppUpdateClient'
 import type { AuthClient } from './shared/auth/authClient'
 import { createInMemoryAuthClient } from './shared/auth/inMemoryAuthClient'
+import {
+  createInMemoryPageTurnSound,
+  type CountingPageTurnSound,
+} from './shared/sound/inMemoryPageTurnSound'
 import { createInMemoryOrganizerClient } from './tasks/api/inMemoryOrganizerClient'
 import type { OrganizerClient } from './tasks/api/organizerClient'
 import type { Due, Task } from './tasks/domain/task'
@@ -39,6 +43,7 @@ function renderApp(
   ) => OrganizerClient = () => createInMemoryOrganizerClient(),
   storageWarning = '',
   now: () => Date = () => TENTH_OF_OCTOBER_MORNING,
+  pageTurnSound: CountingPageTurnSound = createInMemoryPageTurnSound(),
 ) {
   return render(
     <App
@@ -48,6 +53,7 @@ function renderApp(
       createOrganizerClient={createOrganizerClient}
       storageWarning={storageWarning}
       now={now}
+      pageTurnSound={pageTurnSound}
     />,
   )
 }
@@ -171,6 +177,16 @@ async function openSettings() {
 }
 
 const darkModeSwitch = { name: 'Dunkelmodus' }
+
+const animationsSwitch = { name: 'Animationen' }
+
+const soundsSwitch = { name: 'Sounds' }
+
+function switchLabels() {
+  return screen
+    .getAllByRole('switch')
+    .map((each) => each.closest('label')?.textContent)
+}
 
 const updateOffer = { name: 'Neue Version laden' }
 
@@ -370,7 +386,7 @@ describe('App', () => {
   })
 
   it('starts light on a device that turned dark mode off', () => {
-    renderApp(createInMemoryAppearanceClient(false))
+    renderApp(createInMemoryAppearanceClient({ darkMode: false }))
 
     expect(darkModeOnTheDocument()).toBe('false')
   })
@@ -392,6 +408,22 @@ describe('App', () => {
     expect(screen.getByRole('switch', darkModeSwitch)).not.toBeChecked()
     expect(appearanceClient.storedDarkMode()).toBe(false)
     expect(darkModeOnTheDocument()).toBe('false')
+  })
+
+  it('shows the animations switch below dark mode, turned on', async () => {
+    renderApp()
+    await openSettings()
+
+    expect(switchLabels()).toEqual(['Dunkelmodus', 'Animationen', 'Sounds'])
+    expect(screen.getByRole('switch', animationsSwitch)).toBeChecked()
+  })
+
+  it('shows the sounds switch below animations, turned on', async () => {
+    renderApp()
+    await openSettings()
+
+    expect(switchLabels().at(-1)).toBe('Sounds')
+    expect(screen.getByRole('switch', soundsSwitch)).toBeChecked()
   })
 
   it('shows the dark mode switch without accessibility violations', async () => {
@@ -586,5 +618,126 @@ describe('App sliding', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Dringend' }))
 
     expect(viewTransitions.directions()).toEqual([])
+  })
+
+  it('stops sliding once animations are turned off', async () => {
+    const appearanceClient = createInMemoryAppearanceClient()
+    renderApp(appearanceClient)
+    await slideBy('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', animationsSwitch))
+    await userEvent.click(screen.getByRole('button', { name: 'Dringend' }))
+
+    expect(screen.getByRole('heading', { name: 'Dringend' })).toHaveFocus()
+    expect(viewTransitions.directions()).toEqual(['forward'])
+    expect(appearanceClient.storedAnimations()).toBe(false)
+  })
+
+  it('starts without sliding when animations were turned off before', async () => {
+    renderApp(createInMemoryAppearanceClient({ animations: false }))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+
+    expect(screen.getByRole('heading', { name: 'Ordner' })).toHaveFocus()
+    expect(viewTransitions.directions()).toEqual([])
+  })
+
+  function renderAppHearing(
+    pageTurnSound: CountingPageTurnSound,
+    appearanceClient = createInMemoryAppearanceClient(),
+  ) {
+    const client = createInMemoryOrganizerClient({
+      folders: [{ id: 'stored-0', name: 'Familie' }],
+    })
+    return renderApp(
+      appearanceClient,
+      undefined,
+      undefined,
+      () => client,
+      undefined,
+      undefined,
+      pageTurnSound,
+    )
+  }
+
+  async function slideByClicking(name: string | RegExp) {
+    await userEvent.click(screen.getByRole('button', { name }))
+    viewTransitions.finishPendingUpdates()
+  }
+
+  it('plays the page turn sound once for each slide', async () => {
+    const pageTurnSound = createInMemoryPageTurnSound()
+    renderAppHearing(pageTurnSound)
+
+    await slideByClicking('Ordner')
+    await slideByClicking('Familie')
+    await slideByClicking(/^erledigt/)
+
+    expect(viewTransitions.directions()).toEqual([
+      'forward',
+      'forward',
+      'itemsForward',
+    ])
+    expect(pageTurnSound.plays()).toBe(3)
+  })
+
+  it('does not play the page turn sound when choosing the area already shown', async () => {
+    const pageTurnSound = createInMemoryPageTurnSound()
+    renderAppHearing(pageTurnSound)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dringend' }))
+
+    expect(pageTurnSound.plays()).toBe(0)
+  })
+
+  it('stays silent once sounds are turned off', async () => {
+    const pageTurnSound = createInMemoryPageTurnSound()
+    const appearanceClient = createInMemoryAppearanceClient()
+    renderAppHearing(pageTurnSound, appearanceClient)
+    await slideByClicking('Einstellungen')
+
+    await userEvent.click(screen.getByRole('switch', soundsSwitch))
+    await slideByClicking('Ordner')
+
+    expect(viewTransitions.directions()).toEqual(['forward', 'back'])
+    expect(pageTurnSound.plays()).toBe(1)
+    expect(appearanceClient.storedSounds()).toBe(false)
+  })
+
+  it('stays silent while animations are turned off', async () => {
+    const pageTurnSound = createInMemoryPageTurnSound()
+    renderAppHearing(
+      pageTurnSound,
+      createInMemoryAppearanceClient({ animations: false }),
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Einstellungen' }))
+
+    expect(pageTurnSound.plays()).toBe(0)
+    expect(screen.getByRole('switch', soundsSwitch)).toBeChecked()
+    expect(screen.getByRole('switch', soundsSwitch)).toBeEnabled()
+  })
+})
+
+describe('App sound with reduced motion', () => {
+  it('stays silent when reduced motion is preferred', async () => {
+    const viewTransitions = installFakeViewTransitions({ reducedMotion: true })
+    const pageTurnSound = createInMemoryPageTurnSound()
+    renderApp(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      pageTurnSound,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ordner' }))
+
+    expect(pageTurnSound.plays()).toBe(0)
+    viewTransitions.uninstall()
   })
 })

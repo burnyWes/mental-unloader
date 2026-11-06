@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ConfirmationPage } from '../../shared/ui/ConfirmationPage'
-import {
-  directionBetween,
-  slideBack,
-  slideForward,
-  slideItems,
-} from '../../shared/ui/pageSlide'
+import { directionBetween } from '../../shared/ui/pageSlide'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import {
   folderCreatedAnnouncement,
   folderDeletedAnnouncement,
@@ -81,19 +77,6 @@ type ShownListPage = Extract<ShownFoldersAreaPage, { kind: 'list' }>
 
 type ShownTaskPage = Extract<ShownFoldersAreaPage, { kind: 'task' }>
 
-function switchFilter(
-  from: StatusFilter,
-  to: StatusFilter,
-  action: () => void,
-) {
-  const direction = directionBetween(
-    STATUS_FILTER_ORDER.indexOf(from),
-    STATUS_FILTER_ORDER.indexOf(to),
-  )
-  if (direction === null) action()
-  else slideItems(direction, action)
-}
-
 function idsOf(identified: readonly { id: string }[]): readonly string[] {
   return identified.map((each) => each.id)
 }
@@ -113,6 +96,7 @@ export function FoldersArea({
   today,
   now,
 }: FoldersAreaProps) {
+  const { slideBack, slideForward, slideItems } = usePageSlide()
   const [page, setPage] = useState<FoldersAreaPage>({
     kind: 'overview',
     focus: OVERVIEW_HEADING_FOCUS,
@@ -124,6 +108,19 @@ export function FoldersArea({
   const lastKnownFolderName = useRef('')
   const lastKnownListName = useRef('')
   const lastKnownTaskName = useRef('')
+
+  function switchFilter(
+    from: StatusFilter,
+    to: StatusFilter,
+    action: () => void,
+  ) {
+    const direction = directionBetween(
+      STATUS_FILTER_ORDER.indexOf(from),
+      STATUS_FILTER_ORDER.indexOf(to),
+    )
+    if (direction === null) action()
+    else slideItems(direction, action)
+  }
 
   useEffect(() => {
     if (shownFolder !== null) lastKnownFolderName.current = shownFolder.name

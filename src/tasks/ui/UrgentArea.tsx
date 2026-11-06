@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { slideForward } from '../../shared/ui/pageSlide'
+import { usePageSlide } from '../../shared/ui/PageSlideProvider'
 import {
   taskDeletedElsewhereAnnouncement,
   taskNoLongerUrgentAnnouncement,
@@ -38,6 +38,7 @@ export function UrgentArea({
   today,
   now,
 }: UrgentAreaProps) {
+  const { slideForward } = usePageSlide()
   const [page, setPage] = useState<UrgentAreaPage>({
     kind: 'overview',
     focus: URGENT_HEADING_FOCUS,

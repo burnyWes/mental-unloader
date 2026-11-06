@@ -28,7 +28,7 @@ function givenThePalette() {
 
 function renderAppearance(darkMode = true) {
   const { result } = renderHook(() =>
-    useAppearance(createInMemoryAppearanceClient(darkMode)),
+    useAppearance(createInMemoryAppearanceClient({ darkMode })),
   )
   return result
 }
@@ -65,5 +65,25 @@ describe('useAppearance', () => {
     renderAppearance()
 
     expect(systemBar()?.getAttribute('content')).toBe('untouched')
+  })
+
+  it('toggles the animations and remembers them', () => {
+    const appearanceClient = createInMemoryAppearanceClient()
+    const { result } = renderHook(() => useAppearance(appearanceClient))
+
+    act(() => result.current.toggleAnimations())
+
+    expect(result.current.animations).toBe(false)
+    expect(appearanceClient.storedAnimations()).toBe(false)
+  })
+
+  it('toggles the sounds and remembers them', () => {
+    const appearanceClient = createInMemoryAppearanceClient()
+    const { result } = renderHook(() => useAppearance(appearanceClient))
+
+    act(() => result.current.toggleSounds())
+
+    expect(result.current.sounds).toBe(false)
+    expect(appearanceClient.storedSounds()).toBe(false)
   })
 })

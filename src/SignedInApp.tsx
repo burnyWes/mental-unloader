@@ -3,12 +3,8 @@ import type { Appearance } from './shared/appearance/useAppearance'
 import { ChecklistIcon } from './shared/ui/ChecklistIcon'
 import { ConfirmationPage } from './shared/ui/ConfirmationPage'
 import { NavigationBar, type Area } from './shared/ui/NavigationBar'
-import {
-  directionBetween,
-  slideBack,
-  slideForward,
-  slidePage,
-} from './shared/ui/pageSlide'
+import { directionBetween } from './shared/ui/pageSlide'
+import { usePageSlide } from './shared/ui/PageSlideProvider'
 import { SettingsIcon } from './shared/ui/SettingsIcon'
 import { SettingsPage, type SettingsEntry } from './shared/ui/SettingsPage'
 import type { OrganizerClient } from './tasks/api/organizerClient'
@@ -57,6 +53,7 @@ export function SignedInApp({
   now,
   onSignOut,
 }: SignedInAppProps) {
+  const { slideBack, slideForward, slidePage } = usePageSlide()
   const [activeArea, setActiveArea] = useState<AreaId>('urgent')
   const [areaVisit, setAreaVisit] = useState(0)
   const [confirmingSignOut, setConfirmingSignOut] = useState(false)
@@ -72,6 +69,20 @@ export function SignedInApp({
       label: 'Dunkelmodus',
       enabled: appearance.darkMode,
       onToggle: appearance.toggleDarkMode,
+    },
+    {
+      kind: 'toggle',
+      id: 'animations',
+      label: 'Animationen',
+      enabled: appearance.animations,
+      onToggle: appearance.toggleAnimations,
+    },
+    {
+      kind: 'toggle',
+      id: 'sounds',
+      label: 'Sounds',
+      enabled: appearance.sounds,
+      onToggle: appearance.toggleSounds,
     },
   ]
 

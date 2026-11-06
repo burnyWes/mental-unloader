@@ -5,7 +5,7 @@ branch: main
 story: MUL-014
 topic: "Schalter für Animationen und Sounds, Blättergeräusch beim Gleiten"
 tags: [plan, shared-ui, appearance, sound, settings, view-transitions, pwa]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-014 — Schalter für Animationen und Sounds, Blättergeräusch beim Gleiten
@@ -352,10 +352,10 @@ Diese Phase stellt das Gleiten auf den Provider um und liefert den Schalter
 - [x] `npm run build` läuft fehlerfrei.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] Unter „Dunkelmodus“ steht „Animationen“, eingeschaltet.
-- [ ] Mit „Animationen“ aus wechseln Ordner, Liste, Filter und Bereiche sofort.
-- [ ] Nach einem Neustart der App ist der Schalter noch aus.
-- [ ] Wieder eingeschaltet gleitet alles wie vorher.
+- [x] Unter „Dunkelmodus“ steht „Animationen“, eingeschaltet.
+- [x] Mit „Animationen“ aus wechseln Ordner, Liste, Filter und Bereiche sofort.
+- [x] Nach einem Neustart der App ist der Schalter noch aus.
+- [x] Wieder eingeschaltet gleitet alles wie vorher.
 
 ### Phase 2: Blättergeräusch und Schalter „Sounds“
 
@@ -419,18 +419,18 @@ hörbar, und der Stummschalter lässt sich prüfen.
   `dist/sw.js` den Eintrag `sounds/page-turn.wav` im Precache.
 
 **Manuelle Verifikation** (iPhone, installierte PWA, `page-turn.wav` vorhanden):
-- [ ] Unter „Animationen“ steht „Sounds“, eingeschaltet.
-- [ ] Ordner öffnen, Zurück, Filter wechseln und Bereich wechseln: Jedes Mal ertönt
+- [x] Unter „Animationen“ steht „Sounds“, eingeschaltet.
+- [x] Ordner öffnen, Zurück, Filter wechseln und Bereich wechseln: Jedes Mal ertönt
   einmal das Blättergeräusch, gleichzeitig mit dem Gleiten.
-- [ ] Ein Klick auf den bereits gewählten Filter oder Bereich bleibt still.
-- [ ] „Sounds“ aus: Es gleitet ohne Ton. Nach einem Neustart der App ist der Schalter
+- [x] Ein Klick auf den bereits gewählten Filter oder Bereich bleibt still.
+- [x] „Sounds“ aus: Es gleitet ohne Ton. Nach einem Neustart der App ist der Schalter
   noch aus.
-- [ ] „Animationen“ aus, „Sounds“ an: Es wechselt sofort und bleibt still.
-- [ ] Stummschalter auf lautlos: Es gleitet ohne Ton. Stummschalter zurück: Der Ton ist
+- [x] „Animationen“ aus, „Sounds“ an: Es wechselt sofort und bleibt still.
+- [x] Stummschalter auf lautlos: Es gleitet ohne Ton. Stummschalter zurück: Der Ton ist
   wieder da.
-- [ ] Mit laufender Musik, etwa Podcast oder Spotify, mischt sich das Geräusch dazu, ohne
+- [x] Mit laufender Musik, etwa Podcast oder Spotify, mischt sich das Geräusch dazu, ohne
   die Musik anzuhalten.
-- [ ] Im Flugmodus nach einmaligem Laden der neuen Version ist der Ton weiterhin da.
+- [x] Im Flugmodus nach einmaligem Laden der neuen Version ist der Ton weiterhin da.
 
 ## Notizen zur Umsetzung
 

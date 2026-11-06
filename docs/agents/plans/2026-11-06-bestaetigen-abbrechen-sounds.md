@@ -5,7 +5,7 @@ branch: main
 story: MUL-015
 topic: "Töne für Bestätigen und Abbrechen"
 tags: [plan, shared-ui, sound, confirmation, forms, view-transitions]
-status: ready
+status: done
 ---
 
 # PLAN: MUL-015 — Töne für Bestätigen und Abbrechen
@@ -346,18 +346,18 @@ Diese Phase verallgemeinert den Port auf drei Töne und vertont alle Rückfragen
   `sounds/refuse.wav` im Precache.
 
 **Manuelle Verifikation** (iPhone, installierte PWA):
-- [ ] Ordner löschen und bestätigen: Es ertönt nur `confirm`, kein Blättern. Das
+- [x] Ordner löschen und bestätigen: Es ertönt nur `confirm`, kein Blättern. Das
   Gleiten läuft wie bisher.
-- [ ] Aufgabe über den Haken erledigen: Der Haken blättert, „Erledigen“ spielt
+- [x] Aufgabe über den Haken erledigen: Der Haken blättert, „Erledigen“ spielt
   `confirm`.
-- [ ] Löschen abbrechen: Es ertönt nur `refuse`. Mit „Zurück“ auf der Rückfrage
+- [x] Löschen abbrechen: Es ertönt nur `refuse`. Mit „Zurück“ auf der Rückfrage
   blättert es.
-- [ ] Erledigte Aufgabe „Wieder öffnen“: Es ertönt `confirm`.
-- [ ] Abmelden bestätigen: Es ertönt `confirm`.
-- [ ] „Animationen“ aus: Bestätigen und Abbrechen sind weiter zu hören, Navigation
+- [x] Erledigte Aufgabe „Wieder öffnen“: Es ertönt `confirm`.
+- [x] Abmelden bestätigen: Es ertönt `confirm`.
+- [x] „Animationen“ aus: Bestätigen und Abbrechen sind weiter zu hören, Navigation
   bleibt still.
-- [ ] „Sounds“ aus: Alles ist still.
-- [ ] Stummschalter auf lautlos: Auch `confirm` und `refuse` sind still.
+- [x] „Sounds“ aus: Alles ist still.
+- [x] Stummschalter auf lautlos: Auch `confirm` und `refuse` sind still.
 
 ### Phase 2: Töne beim Speichern, Prüfung vor dem Gleiten
 
@@ -411,12 +411,12 @@ Fehlermeldung. „Speichern“ spielt danach `confirm`, abgelehnte Eingabe spiel
 - [x] `npm run build` läuft fehlerfrei.
 
 **Manuelle Verifikation** (iPhone, installierte PWA, Animationen an):
-- [ ] Ordner anlegen und speichern: Es ertönt nur `confirm`, das Gleiten läuft wie
+- [x] Ordner anlegen und speichern: Es ertönt nur `confirm`, das Gleiten läuft wie
   bisher.
-- [ ] Ordner mit leerem Namen speichern: Das Formular bleibt stehen, die Fehlermeldung
+- [x] Ordner mit leerem Namen speichern: Das Formular bleibt stehen, die Fehlermeldung
   erscheint, und es ertönt `refuse`.
-- [ ] Aufgabe bearbeiten und speichern: Es ertönt `confirm`.
-- [ ] „Zurück“ aus einem Formular: Es blättert.
+- [x] Aufgabe bearbeiten und speichern: Es ertönt `confirm`.
+- [x] „Zurück“ aus einem Formular: Es blättert.
 
 ## Notizen zur Umsetzung
 
